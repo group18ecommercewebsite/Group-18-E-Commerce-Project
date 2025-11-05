@@ -3,7 +3,6 @@ import './App.css'
 import Header from './components/Header'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Dashboard from './Pages/Dashboard';
-import Header from './Components/Header';
 import Sidebar from './Components/Sidebar';
 
 function App() {
