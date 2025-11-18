@@ -26,7 +26,7 @@ const [submenuIndex, setSubmenuIndex] = useState(null);
         <>
             <div className="sidebar fixed top-0 left-0 bg-[#fff] w-[18%] h-full border-r border-[rbg(0,0,0,0.1)] py-2 px-2">
                 <div className="py-2 w-full">
-                    <Link to="/"><img src="https://ecme-react.themenate.net/img/logo/logo-light-full.png" className="w-[150px]"/>
+                    <Link to="/"><img src="https://ecme-react.themenate.net/img/logo/logo-light-full.png" className="w-[200px]"/>
                     </Link>
                 </div>
 
