@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import './App.css'
-import Header from './components/Header'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Dashboard from './Pages/Dashboard';
 import Header from './Components/Header';
 import Sidebar from './Components/Sidebar';
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const router = createBrowserRouter([
     {
@@ -15,47 +14,22 @@ function App() {
       exact:true,
       element: (
         <>
-          <section className='main'>
-            <Header/>
+          <section className='main min-h-screen bg-gray-50'>
+            <Header onToggleSidebar={() => setSidebarOpen(s => !s)} sidebarOpen={sidebarOpen} />
             <div className='contentMain flex'>
-              <div className='sidebarWrapper w-[25%]'>
-                <Sidebar/>
+              <Sidebar isOpen={sidebarOpen}/>
+              <div className={`contentWrapper flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-[18%]' : 'ml-[70px]'}`}>
+                <Dashboard/>
               </div>
             </div>
           </section>
         </>
       ),
-      
-    },
-  ]);
-
-  const router = createBrowserRouter([
-    {
-      path:"/",
-      exact:true,
-      element: (
-        <>
-          <section className='main'>
-            <Header/>
-            <div className='contentMain flex'>
-              <div className='sidebarWrapper w-[25%]'>
-                <Sidebar/>
-              </div>
-            </div>
-          </section>
-        </>
-      ),
-      
     },
   ]);
 
   return (
     <>
-      <Header onToggleSidebar={() => setSidebarOpen(s => !s)} />
-      <main className="max-w-7xl mx-auto p-6">
-        <h1 className="text-3xl font-bold text-gray-700">Admin</h1>
-        <p className="mt-4 text-gray-600">Welcome to the admin dashboard</p>
-      </main>
       <RouterProvider router={router}/>
     </>
   );
