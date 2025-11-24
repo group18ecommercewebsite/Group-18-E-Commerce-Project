@@ -18,7 +18,7 @@ const AdsBannerSlider = (props) => {
       >
         <SwiperSlide>
           <BannerBox
-            img={'https://serviceapi.spicezgold.com/download/1761910732417_banner1.webp'}
+            img={'https://serviceapi.spicezgold.com/download/1741669037986_banner2.webp'}
             link={'/'}
           />
         </SwiperSlide>
@@ -46,14 +46,14 @@ const AdsBannerSlider = (props) => {
 
         <SwiperSlide>
           <BannerBox
-            img={'https://serviceapi.spicezgold.com/download/1761910732417_banner1.webp'}
+            img={'https://serviceapi.spicezgold.com/download/1741669037986_banner2.webp'}
             link={'/'}
           />
         </SwiperSlide>
 
         <SwiperSlide>
           <BannerBox
-            img={'https://serviceapi.spicezgold.com/download/1761910732417_banner1.webp'}
+            img={'https://serviceapi.spicezgold.com/download/1741669037986_banner2.webp'}
             link={'/'}
           />
         </SwiperSlide>
