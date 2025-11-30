@@ -9,7 +9,7 @@ import { TbCategory } from "react-icons/tb";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { IoMdLogOut } from "react-icons/io";
 import { FaAngleDown } from "react-icons/fa6";
-import { Collapse } from 'react-collapse';
+import { Collapse } from "react-collapse";
 
 const Sidebar = () => {
     const [submenuIndex, setSubmenuIndex] = useState(null);
