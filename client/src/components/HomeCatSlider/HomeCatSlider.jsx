@@ -8,9 +8,15 @@ import { Link } from 'react-router-dom';
 
 const HomeCatSlider = () => {
   return (
-    <div className="homeCatSlider">
+    <div className="homeCatSlider pt-4 py-8">
       <div className="container">
-        <Swiper slidesPerView={8} spaceBetween={10} navigation={true} modules={[Navigation]} className="mySwiper">
+        <Swiper
+          slidesPerView={8}
+          spaceBetween={10}
+          navigation={true}
+          modules={[Navigation]}
+          className="mySwiper"
+        >
           <SwiperSlide>
             <Link to={'/'}>
               <div className="item py-7 px-3 bg-white rounded-sm text-center flex items-center justify-center flex-col">
@@ -114,10 +120,6 @@ const HomeCatSlider = () => {
               </div>
             </Link>
           </SwiperSlide>
-
-          
-          
-
         </Swiper>
       </div>
     </div>
