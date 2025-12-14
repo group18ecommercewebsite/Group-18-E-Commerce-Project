@@ -1,58 +1,97 @@
-import React, { useEffect, useState } from "react";
-import Button from '@mui/material/Button';
-import { RiMenu2Line } from "react-icons/ri";
-import { FaSearch, FaBell, FaUserCircle } from "react-icons/fa";
+import { useState, useRef, useEffect } from 'react'
+import { FiMenu, FiBell, FiChevronDown } from 'react-icons/fi'
 
-const Header = ({ onToggleSidebar, sidebarOpen = true }) => {
-    const [isMobile, setIsMobile] = useState(() => {
-        if (typeof window === "undefined") return false;
-        return window.innerWidth <= 1024;
-    });
+export default function Header({ onToggleSidebar = () => {} }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const menuRef = useRef(null)
+  const notifRef = useRef(null)
+  const notifications = 99
 
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1024);
-        };
+  useEffect(() => {
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false)
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false)
+      }
+    }
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [])
 
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+  return (
+    <header className="bg-white border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onToggleSidebar}
+              aria-label="Toggle sidebar"
+              className="p-2 rounded-md text-gray-600 hover:bg-gray-100"
+            >
+              <FiMenu className="h-6 w-6" />
+            </button>
 
-    const sideOffset = sidebarOpen ? "18%" : "70px";
-    const headerPaddingLeft = isMobile ? "16px" : `calc(${sideOffset} + 1rem)`;
-
-    return (
-        <header 
-            className="h-[60px] fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 flex items-center justify-between shadow-sm transition-all duration-300"
-            style={{ paddingLeft: headerPaddingLeft, paddingRight: "1.5rem" }}
-        >
-            <div className="flex items-center gap-4">
-                <Button 
-                    className="!w-[40px] !h-[40px] !rounded-full !min-w-[40px] !p-0 hover:!bg-gray-100"
-                    onClick={onToggleSidebar}
-                >
-                    <RiMenu2Line className="text-[22px] text-gray-700"/>
-                </Button>
-                <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-lg px-4 py-2 w-64">
-                    <FaSearch className="text-gray-400 text-sm"/>
-                    <input 
-                        type="text" 
-                        placeholder="Search..." 
-                        className="bg-transparent border-none outline-none text-sm flex-1 text-gray-700 placeholder-gray-400"
-                    />
-                </div>
+            <div className="flex items-center">
+              <img src="/logo192.png" alt="logo" className="h-10 w-10 object-contain" />
+              <div className="ml-3 hidden sm:block">
+                <div className="text-lg font-bold text-gray-800">DOGEDOGSHOP</div>
+                <div className="text-xs text-gray-500">BIG MEGA GIGA SUPER ULTRA STORE</div>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-                <Button className="!min-w-[40px] !w-[40px] !h-[40px] !rounded-full !p-0 hover:!bg-gray-100 relative">
-                    <FaBell className="text-gray-600 text-lg"/>
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </Button>
-                <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 rounded-lg px-3 py-2">
-                    <FaUserCircle className="text-gray-600 text-xl"/>
-                    <span className="text-sm font-medium text-gray-700 hidden md:block">Admin</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                className="relative p-2 rounded-full text-gray-600 hover:bg-gray-100"
+                aria-label="Notifications"
+              >
+                <FiBell className="h-6 w-6" />
+                {notifications > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">{notifications}</span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <div className="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                  <div className="py-2">
+                    <div className="px-4 py-2 text-sm text-gray-700 border-b">Notifications</div>
+                    <div className="max-h-48 overflow-auto">
+                      <div className="px-4 py-2 text-sm text-gray-600">You have {notifications} new notifications.</div>
+                    </div>
+                  </div>
                 </div>
+              )}
             </div>
-        </header>
-    )
+
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-2 rounded-full focus:outline-none"
+                aria-haspopup="true"
+                aria-expanded={menuOpen}
+              >
+                <img className="h-9 w-9 rounded-full object-cover" src="https://www.gravatar.com/avatar?d=mp&s=200" alt="User" />
+                <FiChevronDown className="h-4 w-4 text-gray-500" />
+              </button>
+
+              {menuOpen && (
+                <div className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                  <div className="py-1">
+                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  )
 }
-    
