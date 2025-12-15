@@ -72,29 +72,45 @@
 
 import { useState } from 'react'
 import './App.css'
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from './Context/AuthContext';
+import ProtectedRoute from './Components/ProtectedRoute';
 
 import Dashboard from './Pages/Dashboard';
 import Header from './Components/Header';
 import Sidebar from './Components/Sidebar';
 import Login from './Pages/Login';
 import SignUp from './Pages/SignUp';
+import AddProductPanel from './Components/AddProductPanel';
+import { AddProductProvider } from './Context/AddProductContext';
+import BannerPanel from './Components/BannerPanel';
+import { BannerProvider } from './Context/BannerContext';
+import HomeSlides from './Pages/HomeSlides';
+import Categories from './Pages/Categories';
+import SubCategories from './Pages/SubCategories';
+import AddCategory from './Pages/AddCategory';
+import AddSubCategory from './Pages/AddSubCategory';
+import Users from './Pages/Users';
+import Orders from './Pages/Orders';
+import ForgotPassword from './Pages/ForgotPassword';
+import VerifyOTP from './Pages/VerifyOTP';
+import ChangePassword from './Pages/ChangePassword';
 
 function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const Layout = () => (
     <>
       <Header onToggleSidebar={() => setIsSidebarOpen(s => !s)} />
 
-      <section className='main flex'>
-        <div className={`sidebarWrapper w-[25%] ${isSidebarOpen ? '' : 'hidden'}`}>
-          <Sidebar />
-        </div>
+      <section className='main flex h-[calc(100vh-64px)] overflow-hidden'>
+        <Sidebar 
+          isOpen={isSidebarOpen} 
+          onClose={() => setIsSidebarOpen(false)}
+        />
 
-        <div className="content flex-1">
-          <Dashboard />
+        <div className={`content flex-1 overflow-y-auto transition-all duration-300 ${isSidebarOpen ? 'lg:ml-[280px]' : 'lg:ml-[80px]'}`}>
+          <Outlet />
         </div>
       </section>
     </>
@@ -103,7 +119,17 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Dashboard />
+        }
+      ]
     },
     {
       path: "/login",
@@ -112,10 +138,110 @@ function App() {
     {
       path: "/sign-up",
       element: <SignUp />
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPassword />
+    },
+    {
+      path: "/verify-otp",
+      element: <VerifyOTP />
+    },
+    {
+      path: "/change-password",
+      element: <ChangePassword />
+    },
+    {
+      path: "/home-slides",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <HomeSlides />
+        }
+      ]
+    },
+    {
+      path: "/categories",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Categories />
+        },
+        {
+          path: "add",
+          element: <AddCategory />
+        }
+      ]
+    },
+    {
+      path: "/category/subCat",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <SubCategories />
+        },
+        {
+          path: "add",
+          element: <AddSubCategory />
+        }
+      ]
+    },
+    {
+      path: "/users",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Users />
+        }
+      ]
+    },
+    {
+      path: "/orders",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Orders />
+        }
+      ]
     }
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <AddProductProvider>
+        <BannerProvider>
+          <RouterProvider router={router} />
+          <AddProductPanel />
+          <BannerPanel />
+        </BannerProvider>
+      </AddProductProvider>
+    </AuthProvider>
+  );
 }
 
 export default App;

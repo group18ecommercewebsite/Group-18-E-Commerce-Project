@@ -12,8 +12,10 @@ import {
     FaChartBar
 } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
+import { useAddProduct } from "../../Context/AddProductContext";
 
 const Dashboard = () => {
+    const { openPanel } = useAddProduct();
     const [currentPage, setCurrentPage] = useState(1);
     const [ordersPage, setOrdersPage] = useState(1);
     const [selectedProducts, setSelectedProducts] = useState([]);
@@ -223,7 +225,10 @@ const Dashboard = () => {
                         <p className="text-gray-600 mt-1">Here's What happening on your store today. See the statistics at once.</p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2">
+                        <button 
+                            onClick={openPanel}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+                        >
                             <FaPlus className="text-sm" />
                             Add Product
                         </button>
