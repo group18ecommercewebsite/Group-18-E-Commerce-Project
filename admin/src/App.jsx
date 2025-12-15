@@ -77,7 +77,6 @@ import { AuthProvider, useAuth } from './Context/AuthContext';
 import ProtectedRoute from './Components/ProtectedRoute';
 
 import Dashboard from './Pages/Dashboard';
-import Header from './Components/Header';
 import Sidebar from './Components/Sidebar';
 import Login from './Pages/Login';
 import SignUp from './Pages/SignUp';

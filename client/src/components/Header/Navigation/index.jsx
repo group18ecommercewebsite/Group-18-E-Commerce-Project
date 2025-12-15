@@ -27,12 +27,12 @@ export const Navigation = () => {
                         <ul className='flex items-center gap-3'>
                             <li className='list-none'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Home</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Home</Button>
                                 </Link>
                             </li>
                             <li className='list-none relative group'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Fashion</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Fashion</Button>
                                 </Link>
                                 <div className='submenu rounded-md absolute min-w-[200px] bg-white shadow-lg p-4 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
                                     <ul>
@@ -50,7 +50,7 @@ export const Navigation = () => {
                             </li>
                             <li className='list-none relative group'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Electronics</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Electronics</Button>
                                 </Link>
                                 <div className='submenu rounded-md absolute min-w-[200px] bg-white shadow-lg p-4 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
                                     <ul>
@@ -68,7 +68,7 @@ export const Navigation = () => {
                             </li>
                             <li className='list-none relative group'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Bags</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Bags</Button>
                                 </Link>
                                 <div className='submenu rounded-md absolute min-w-[200px] bg-white shadow-lg p-4 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
                                     <ul>
@@ -83,7 +83,7 @@ export const Navigation = () => {
                             </li>
                             <li className='list-none relative group'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Footwear</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Footwear</Button>
                                 </Link>
                                 <div className='submenu rounded-md absolute min-w-[250px] bg-white shadow-lg p-4 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
                                     <ul>
@@ -98,22 +98,22 @@ export const Navigation = () => {
                             </li>
                             <li className='list-none'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Groceries</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Groceries</Button>
                                 </Link>
                             </li>
                             <li className='list-none'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Beauty</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Beauty</Button>
                                 </Link>
                             </li>
                             <li className='list-none'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Wellness</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Wellness</Button>
                                 </Link>
                             </li>
                             <li className='list-none'>
                                 <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Jewellery</Button>
+                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !py-4'>Jewellery</Button>
                                 </Link>
                             </li>
                         </ul>
