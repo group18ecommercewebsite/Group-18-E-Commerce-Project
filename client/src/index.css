@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* * {
     margin: 0px;
@@ -6,38 +6,55 @@
     box-sizing: border-box;
 } */
 body {
-    font-family: "Montserrat", sans-serif;
-    font-optical-sizing: auto;
-    background: #f5f0f0;
-    color: rgba(0, 0, 0, 0.9);
-    overflow-x: hidden;
+  font-family: 'Montserrat', sans-serif;
+  font-optical-sizing: auto;
+  background: #f5f0f0;
+  color: rgba(0, 0, 0, 0.9);
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff5252;
+}
+::-webkit-scrollbar-track {
+  background: #fff;
 }
 
 .bg-primary {
-    background: #ff5252;
+  background: #ff5252 !important;
 }
 
 .container {
-    width: 90%;
-    margin: auto;
+  width: 90%;
+  margin: auto;
 }
 .link:hover {
-    color: #ff5252;
+  color: #ff5252;
 }
 
-.sliderHome{
-    overflow: inherit !important;
+.sliderHome {
+  overflow: inherit !important;
 }
 
-.swiper-button-prev,.swiper-button-next{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-    border-radius: 100%;
-    width: 45px;
-    height: 45px;
-    min-width: 45px;
+.swiper-button-prev,
+.swiper-button-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 100%;
+  width: 45px;
+  height: 45px;
+  min-width: 45px;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: #ff5252;
 }
 
 .swiper-button-prev::after,
@@ -51,44 +68,126 @@ body {
   stroke: #000 !important;
 }
 
-.homeCatSlider{
-    overflow: inherit !important;
+.smlBtn .swiper-button-prev,
+.smlBtn .swiper-button-next {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  top: 55% !important;
 }
 
-.homeCatSlider .item{
-    border: 1px solid rgba(0, 0, 0, 0.1);
+.smlBtn .swiper-button-prev::after,
+.smlBtn .swiper-button-next::after {
+  font-size: 18px;
+  color: #000;
 }
 
-.homeCatSlider .item:hover img{
-    transform: scale(1.1);
+.homeCatSlider {
+  overflow: inherit !important;
 }
 
-.homeCatSlider .swiper-button-prev{
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    left: -10px !important;
+.homeCatSlider .item {
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.homeCatSlider .swiper-button-prev::after, .swiper-button-prev svg{
-    font-size: 12px !important;
+.homeCatSlider .item:hover img {
+  transform: scale(1.1);
 }
 
-.homeCatSlider .swiper-button-next{
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    right: -10px !important;
+.homeCatSlider .swiper-button-prev {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  left: -10px !important;
 }
 
-.homeCatSlider .swiper-button-next::after, .swiper-button-next svg{
-    font-size: 12px !important;
+.homeCatSlider .swiper-button-prev::after,
+.swiper-button-prev svg {
+  font-size: 12px !important;
 }
 
-.homeCatSlider .swiper-button-prev:hover,.homeCatSlider .swiper-button-next:hover{
-    background: #ff5252 !important;
+.homeCatSlider .swiper-button-next {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  right: -10px !important;
 }
 
-.homeCatSlider .swiper-button-prev:hover::after, .homeCatSlider .swiper-button-next:hover::after{
-    background: #ff5252 !important;
+.homeCatSlider .swiper-button-next::after,
+.swiper-button-next svg {
+  font-size: 12px !important;
+}
+
+.homeCatSlider .swiper-button-prev:hover,
+.homeCatSlider .swiper-button-next:hover {
+  background: #ff5252 !important;
+}
+
+.homeCatSlider .swiper-button-prev:hover::after,
+.homeCatSlider .swiper-button-next:hover::after {
+  background: #ff5252 !important;
+}
+
+.MuiTabs-indicator {
+  background: #ff5252 !important;
+}
+.MuiTab-textColorPrimary.Mui-selected {
+  color: #ff5252 !important;
+}
+
+.productsSlider .swiper-wrapper {
+  padding: 15px;
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+.btn-org {
+  width: 100%;
+  background-color: #ff5252 !important;
+  color: #ffffff !important;
+
+  padding: 12px 16px;
+  min-height: 44px;
+
+  border: none;
+  border-radius: 8px;
+  outline: none;
+
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+/* Hover */
+.btn-org:hover {
+  background-color: #000 !important;
+}
+
+/* Active */
+.btn-org:active {
+  transform: scale(0.97);
+}
+
+/* Focus (keyboard accessibility) */
+.btn-org:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 82, 82, 0.4);
+}
+
+/* Disabled */
+.btn-org:disabled {
+  background-color: #ff9a9a;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-lg {
+  height: 45px !important; /* Tạo độ cao cho nút (giống trong ảnh) */
+  font-weight: 600 !important; /* Chữ in đậm */
+  font-size: 14px !important; /* Kích cỡ chữ vừa phải */
+  text-transform: uppercase !important; /* Chữ in hoa: LOGIN WITH GOOGLE */
+  border-radius: 5px !important; /* Bo góc nhẹ giống các ô input */
+  box-shadow: none !important; /* Loại bỏ bóng mặc định của Material UI nếu cần */
 }
