@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-collapse": "^5.1.1",
+    "react-range-slider-input": "^3.3.2"
+  }
+}
