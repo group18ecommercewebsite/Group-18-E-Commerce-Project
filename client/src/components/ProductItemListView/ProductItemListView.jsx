@@ -6,14 +6,14 @@ import Button from '@mui/material/Button';
 import { FaRegHeart } from 'react-icons/fa';
 import { IoIosGitCompare } from 'react-icons/io';
 import { MdZoomOutMap } from 'react-icons/md';
+import { MdOutlineShoppingCart } from 'react-icons/md';
 import { MyContext } from '../../App';
 
 const ProductItem = () => {
   const context = useContext(MyContext);
-
   return (
-    <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)]">
-      <div className="group imgWrapper w-[100%] overflow-hidden rounded-md relative">
+    <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)] flex items-center">
+      <div className="group imgWrapper w-[25%] overflow-hidden rounded-md relative">
         <Link to="/">
           <div className="img h-[220px] overflow-hidden">
             <img
@@ -48,17 +48,23 @@ const ProductItem = () => {
         </div>
       </div>
 
-      <div className="info p-3 py-5">
-        <h6 className="text-[13px]">
+      <div className="info p-3 py-5 px-8 w-[75%]">
+        <h6 className="text-[15px] !font-[400]">
           <Link to="/" className="link transition-all">
             Soylent Green
           </Link>
         </h6>
-        <h3 className="text-[13px] title mt-1 font-medium mb-1 text-[#000]">
+        <h3 className="text-[18px] title mt-3 mb-3 font-medium text-[#000]">
           <Link to="/" className="link transition-all">
             Men Layerr Regular Fit Spread Collar Cotton Shirt
           </Link>
         </h3>
+
+        <p className="text-[14px] mb-3">
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+          been the industry's standard dummy text ever since the 1500s, when an unknown printer took
+          a galley of type and scrambled it to make a type specimen book.ac
+        </p>
 
         <Rating name="size-small" defaultValue={2} size="small" readOnly />
 
@@ -67,6 +73,35 @@ const ProductItem = () => {
             $58.00
           </span>
           <span className="price text-[#ff5252] text-[15px] font-[600]">$58.00</span>
+        </div>
+
+        <div className="mt-3">
+          <Button
+            variant="contained"
+            color="inherit"
+            sx={{
+              backgroundColor: '#ff5252',
+              color: '#fff',
+              minWidth: 200,
+              height: 48,
+              px: 3.5,
+              fontSize: 15,
+              fontWeight: 600,
+              borderRadius: 1,
+              textTransform: 'uppercase',
+              display: 'flex',
+              gap: 2,
+              '&:hover': {
+                backgroundColor: '#000',
+              },
+              '&:active': {
+                transform: 'scale(0.97)',
+              },
+            }}
+          >
+            <MdOutlineShoppingCart className="text-[20px]" />
+            Add to Cart
+          </Button>
         </div>
       </div>
     </div>

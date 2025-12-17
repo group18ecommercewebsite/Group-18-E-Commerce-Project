@@ -209,6 +209,19 @@ body {
 .homeSliderV2 .info h3 {
   transition-duration: 1.5s;
 }
-.homeSliderV2 .info div {
-  transition-duration: 1.7s;
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -appearance: none;
 }
+
+.reviewScroll::-webkit-scrollbar{width: 5px !important;}
+.reviewScroll::-webkit-scrollbar-thumb{background: #ccc !important;}
+
+.productDetailsModal .MuiDialogContent-root{padding: 0px !important;}
+
+.productsSlider .swiper,.blogSection .swiper{overflow: inherit !important;}
+
+.cartPanel .MuiPaper-root{width: 400px !important; overflow: hidden !important;}
