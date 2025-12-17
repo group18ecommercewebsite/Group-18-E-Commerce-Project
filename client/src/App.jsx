@@ -18,6 +18,7 @@ import ProductDetailsComponent from './components/ProductDetailsComponent/Produc
 import { IoCloseSharp } from 'react-icons/io5';
 import Drawer from '@mui/material/Drawer';
 import CartPanel from './components/CartPanel/CartPanel';
+import Footer from './components/Footer';
 
 const MyContext = createContext();
 
@@ -39,6 +40,8 @@ function App() {
   const values = {
     setOpenProductDetailsModal,
     setOpenCartPanel,
+    openCartPanel,
+    toggleCartPanel,
   };
 
   return (
@@ -53,6 +56,7 @@ function App() {
             <Route path="/productListing" exact={true} element={<ProductListing />} />
             <Route path="/product/:id" exact={true} element={<ProductDetails />} />
           </Routes>
+          <Footer/>
         </MyContext.Provider>
       </BrowserRouter>
 
@@ -84,22 +88,9 @@ function App() {
         </DialogContent>
       </Dialog>
 
-      {/* Cart panel */}
-      <Drawer
-        open={openCartPanel}
-        onClose={toggleCartPanel(false)}
-        anchor={'right'}
-        className="cartPanel"
-      >
-        <div className="flex items-center justify-between py-3 px-4 gap-3 border-b border-[rgba(0,0,0,0.1)] overflow-hidden">
-          <h4>Shopping Cart (0)</h4>
-          <IoCloseSharp className="text-[20px] cursor-pointer" onClick={toggleCartPanel(false)} />
-        </div>
-
-        <CartPanel/>
-      </Drawer>
+      
     </>
-  )
+  );
 }
 
 export default App;
