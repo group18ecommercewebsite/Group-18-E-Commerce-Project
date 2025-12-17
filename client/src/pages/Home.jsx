@@ -29,7 +29,7 @@ export const Home = () => {
   return (
     <div>
       <HomeSlider />
-
+      
       <HomeCatSlider />
 
       <section className="bg-white py-8">
