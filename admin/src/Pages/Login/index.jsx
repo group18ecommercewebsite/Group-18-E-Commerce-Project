@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { CgLogIn } from "react-icons/cg";
 import { FaRegUser } from "react-icons/fa";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
@@ -9,13 +9,19 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { FaRegEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
+import { useAuth } from "../../Context/AuthContext";
 
 export const Login = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isPasswordShow, setIsPasswordShow] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const { login } = useAuth();
+    const navigate = useNavigate();
 
     const [loadingGoogle, setLoadingGoogle] = React.useState(false);
     const [loadingFb, setLoadingFb] = React.useState(false);
-
-    const [isPasswordShow, setIsPasswordShow] = useState(false);
 
     function handleClickGoogle() {
         setLoadingGoogle(true);
@@ -24,6 +30,25 @@ export const Login = () => {
     function handleClickFb() {
         setLoadingFb(true);
     }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            const result = await login(email, password);
+            if (result.success) {
+                navigate('/');
+            } else {
+                setError(result.error || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
+            }
+        } catch (err) {
+            setError('Đã có lỗi xảy ra. Vui lòng thử lại.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <section className="bg-white w-full">
@@ -96,12 +121,22 @@ export const Login = () => {
 
                 <br />
 
-                <form className="w-full px-8 mt-3">
+                <form className="w-full px-8 mt-3" onSubmit={handleSubmit}>
+                    {error && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+                            {error}
+                        </div>
+                    )}
+
                     <div className="form-group mb-4 w-full">
                         <h4 className="text-[14px] font-[500] mb-1">Email</h4>
                         <input
                             type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
                             className="w-full h-[45px] border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:border-[rgba(0,0,0,0.7)] focus:outline-none px-3"
+                            placeholder="admin@example.com"
                         />
                     </div>
 
@@ -110,9 +145,14 @@ export const Login = () => {
                         <div className="relative w-full">
                             <input
                                 type={isPasswordShow === false ? 'password' : 'text'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
                                 className="w-full h-[50px] border-2 border-[rgba(0,0,0,0.1)] rounded-md focus:border-[rgba(0,0,0,0.7)] focus:outline-none px-3"
+                                placeholder="Nhập mật khẩu"
                             />
                             <Button
+                                type="button"
                                 className="!absolute top-[7px] right-[10px] z-50 !rounded-full !w-[35px] !h-[35px] !min-w-[35px] !text-gray-600"
                                 onClick={() => setIsPasswordShow(!isPasswordShow)}
                             >
@@ -142,11 +182,13 @@ export const Login = () => {
 
                     </div>
 
-                    <Button className="btn-blue btn-lg w-full">
-                        Sign In
+                    <Button 
+                        type="submit"
+                        disabled={loading}
+                        className="btn-blue btn-lg w-full"
+                    >
+                        {loading ? 'Đang đăng nhập...' : 'Sign In'}
                     </Button>
-
-
                 </form>
             </div>
         </section>

@@ -13,6 +13,11 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 import { Navigation } from 'swiper/modules';
+import { BlogItem } from '../components/BlogItem/index';
+import Footer from '../components/Footer';
+import { HomeBannerV2 } from '../components/HomeSliderV2/index';
+import BannerBox from '../components/BannerBox/BannerBox';
+import BannerBoxV2 from '../components/BannerBoxV2/index';
 
 export const Home = () => {
   const [value, setValue] = React.useState(0);
@@ -61,6 +66,18 @@ export const Home = () => {
         </div>
       </section>
 
+      <section className='py-6'>
+        <div className='container flex items-center gap-5'>
+          <div className='part1 w-[70%]'>
+            <HomeBannerV2 />
+          </div>
+          <div className='part2 w-[30%] flex items-center flex-col gap-5 justify-around h-full'>
+            <BannerBoxV2 info="right" image={"https://serviceapi.spicezgold.com/download/1760160666204_1737020916820_New_Project_52.jpg"} />
+            <BannerBoxV2 info="right" image={"https://serviceapi.spicezgold.com/download/1741664665391_1741497254110_New_Project_50.jpg"} />
+          </div>
+        </div>
+      </section>
+
       <section className="py-4 pt-2 bg-white">
         <div className="container">
           <div className="freeShipping w-[80%] m-auto py-4 p-4 border-2 border-[#ff5252] flex items-center justify-between rounded-md mb-7">
@@ -100,27 +117,42 @@ export const Home = () => {
         </div>
       </section>
 
-      <section className="py-5 pt-0 bg-white blogSection">
-        <div className="py-5">
+      <section className="py-5 pb-8 pt-0 bg-white blogSection">
+        <div className="container">
+          <h2 className="text-[20px] font-[600] mb-4">From the Blog</h2>
           <Swiper
-            slidesPerView={3}
-            spaceBetween={10}
+            slidesPerView={4}
+            spaceBetween={30}
             navigation={true}
             modules={[Navigation]}
             className="blogSlider"
           >
             <SwiperSlide>
-              
+              <BlogItem />
+            </SwiperSlide>
+
+            <SwiperSlide>
+              <BlogItem />
+            </SwiperSlide>
+
+            <SwiperSlide>
+              <BlogItem />
+            </SwiperSlide>
+
+            <SwiperSlide>
+              <BlogItem />
+            </SwiperSlide>
+
+            <SwiperSlide>
+              <BlogItem />
             </SwiperSlide>
           </Swiper>
         </div>
       </section>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
+
+      <Footer />
+
+
     </div>
   );
 };
