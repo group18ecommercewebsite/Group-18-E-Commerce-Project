@@ -1,5 +1,13 @@
-body{
+html,
+body {
+    height: 100%;
+}
+body {
     font-family: "Raleway", serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #f9fafb;
 }
 .MuiBadge-badge {background: #ff5252 !important;}
 
@@ -7,6 +15,83 @@ body{
   transition: height 300ms;
 }
 
+.main {
+    position: relative;
+    margin-top: 64px;
+}
+
+.content {
+    padding: 24px;
+    transition: margin-left 0.3s ease;
+    background: #f9fafb;
+    min-height: calc(100vh - 64px);
+}
+
+/* Sidebar styles */
+.sidebar {
+    top: 64px;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+@media (max-width: 1024px) {
+    .content {
+        margin-left: 0 !important;
+    }
+}
+
+/* Zebra Striping cho tất cả các bảng trong Dashboard */
+table tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+table tbody tr:hover {
+    background-color: #f3f4f6 !important;
+}
+
+.contentMain {
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+    display: flex;
+}
+
+.contentWrapper {
+    padding: 24px;
+    transition: margin-left 0.3s ease;
+    background: #f9fafb;
+    min-height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+    .contentWrapper {
+        margin-left: 0 !important;
+        max-height: calc(100vh - 60px);
+        min-height: calc(100vh - 60px);
+        overflow-y: auto;
+    }
+}
 .btn-blue{background: #3872fa !important; color: #fff !important; padding: 8px 20px !important;}
 .btn-blue:hover{background: #3067e5 !important;}
 .btn-lg{padding: 8px 20px !important; font-size: 16px !important;}
