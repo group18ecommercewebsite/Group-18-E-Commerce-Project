@@ -20,7 +20,7 @@ const auth = async (request, response, next) => {
             })
         }
 
-        request.userid = decode.id
+        request.userId = decode.id
 
         next()
     }
