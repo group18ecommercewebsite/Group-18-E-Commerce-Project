@@ -9,8 +9,19 @@ body {
   font-family: 'Montserrat', sans-serif;
   font-optical-sizing: auto;
   background: #f5f0f0;
-  color: rgba(0, 0, 0, 0.9);
+  color: rgba(36, 36, 36, 1);
   overflow-x: hidden;
+}
+
+p {
+  font-size: 14px;
+  line-height: 25px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
 }
 
 ::-webkit-scrollbar {
@@ -184,31 +195,127 @@ body {
 }
 
 .btn-lg {
-  height: 45px !important; 
-  font-weight: 600 !important; 
-  font-size: 14px !important; 
-  text-transform: uppercase !important; 
-  border-radius: 5px !important; 
-  box-shadow: none !important; 
+  height: 45px !important; /* Tạo độ cao cho nút (giống trong ảnh) */
+  font-weight: 600 !important; /* Chữ in đậm */
+  font-size: 14px !important; /* Kích cỡ chữ vừa phải */
+  text-transform: uppercase !important; /* Chữ in hoa: LOGIN WITH GOOGLE */
+  border-radius: 5px !important; /* Bo góc nhẹ giống các ô input */
+  box-shadow: none !important; /* Loại bỏ bóng mặc định của Material UI nếu cần */
 }
-.swiper-pagination-bullet-active {
-  background: #ff5252 !important;
-}
-.homeSliderV2 .swiper-slide-active .info {right: 0px !important;opacity: 1;}
-.homeSliderV2 .swiper-slide-active .info h4 {right: 0px !important;opacity: 1;}
-.homeSliderV2 .swiper-slide-active .info h2 {right: 0px !important;opacity: 1;}
-.homeSliderV2 .swiper-slide-active .info h3 {right: 0px !important;opacity: 1;}
-.homeSliderV2 .swiper-slide-active .info div {right: 0px !important;opacity: 1;}
 
-.homeSliderV2 .info h4 {
-  transition-duration: 1s;
+.MuiCheckbox-root {
+  padding: 6px !important;
 }
-.homeSliderV2 .info h2 {
-  transition-duration: 1.3s;
+
+.ReactCollapse--collapse {
+  transition: height 400ms;
 }
-.homeSliderV2 .info h3 {
-  transition-duration: 1.5s;
+
+.itemViewActions button.active svg {
+  color: #ff5252 !important;
+  opacity: 1;
 }
-.homeSliderV2 .info div {
-  transition-duration: 1.7s;
+
+.Mui-selected.MuiPaginationItem-page {
+  background: #ff5252 !important;
+  color: #fff !important;
 }
+
+/* --- Container chung --- */
+.zoomProductSliderThumbs {
+  height: 500px !important;
+  padding: 40px 0 !important; /* Chừa chỗ rộng hơn cho 2 nút hình chữ nhật */
+  box-sizing: border-box;
+}
+
+/* --- Từng ảnh thumbnail --- */
+.zoomProductSliderThumbs .swiper-slide {
+  height: auto !important;
+  cursor: pointer;
+  opacity: 1 !important; /* KHÔNG LÀM MỜ: Luôn hiển thị rõ 100% */
+  border: 1px solid transparent; /* Giữ chỗ cho viền để không bị giật layout */
+  transition: all 0.3s;
+}
+
+/* Ảnh đang được chọn */
+.zoomProductSliderThumbs .swiper-slide-thumb-active {
+  border: 1px solid #000; /* Viền đen bao quanh ảnh đang chọn */
+}
+
+/* --- Cấu hình chung cho 2 nút bấm (Hình chữ nhật) --- */
+.zoomProductSliderThumbs .swiper-button-next,
+.zoomProductSliderThumbs .swiper-button-prev {
+  width: 100% !important; /* Rộng full chiều ngang cột */
+  height: 35px !important; /* Chiều cao cố định hình chữ nhật */
+  background-color: #f0f0f0; /* Màu nền xám nhẹ để ra dáng nút bấm (bạn có thể đổi thành #fff) */
+  border-radius: 0 !important; /* Vuông góc, không bo tròn */
+  color: #000 !important; /* Màu mũi tên đen */
+
+  /* Căn chỉnh vị trí */
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 !important;
+
+  /* Căn giữa mũi tên trong hình chữ nhật */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nút Next (Mũi tên xuống - Nằm sát đáy) */
+.zoomProductSliderThumbs .swiper-button-next {
+  bottom: 0 !important;
+  top: auto !important;
+}
+
+/* Nút Prev (Mũi tên lên - Nằm sát đỉnh) */
+.zoomProductSliderThumbs .swiper-button-prev {
+  top: 0 !important;
+  bottom: auto !important;
+}
+
+/* Chỉnh icon mũi tên nhỏ lại cho tinh tế */
+.zoomProductSliderThumbs .swiper-button-next:after,
+.zoomProductSliderThumbs .swiper-button-prev:after {
+  font-size: 14px !important;
+  font-weight: bold;
+}
+
+/* Xoay mũi tên cho đúng chiều dọc */
+.zoomProductSliderThumbs .swiper-button-next:after {
+  transform: rotate(90deg); /* Xuống */
+}
+
+.zoomProductSliderThumbs .swiper-button-prev:after {
+  transform: rotate(
+    90deg
+  ); /* Lên (Swiper mặc định icon 2 chiều giống nhau nên xoay 90 độ là được) */
+}
+
+.zoomProductSliderThumbs .swiper-button-next:hover,
+.zoomProductSliderThumbs .swiper-button-prev:hover {
+  background: #ff5252;
+}
+
+.productContent .actions button {
+  min-width: 40px !important;
+  height: 30px !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -appearance: none;
+}
+
+.reviewScroll::-webkit-scrollbar{width: 5px !important;}
+.reviewScroll::-webkit-scrollbar-thumb{background: #ccc !important;}
+
+.productDetailsModal .MuiDialogContent-root{padding: 0px !important;}
+
+.productsSlider .swiper,.blogSection .swiper{overflow: inherit !important;}
+
+.cartPanel .MuiPaper-root{width: 400px !important; overflow: hidden !important;}
