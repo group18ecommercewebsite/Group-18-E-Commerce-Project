@@ -3,7 +3,6 @@ import ProductModel from '../models/product.model.js';
 import { v2 as cloudinary } from 'cloudinary';
 import { error } from 'console';
 import fs from 'fs';
-import { listenerCount } from 'process';
 
 // Configuration
 cloudinary.config({
@@ -152,7 +151,6 @@ export async function getAllProducts(request, response) {
         });
     }
 }
-// chua test]
 
 
 // get all product by category id
@@ -199,7 +197,6 @@ export async function getAllProductsByCatId(request, response) {
         });
     }
 }
-// chua test]
 
 
 // get all product by category name
@@ -246,7 +243,6 @@ export async function getAllProductsByCatName(request, response) {
         });
     }
 }
-// chua test]
 
 
 // get all product by sub category id
@@ -293,7 +289,6 @@ export async function getAllProductsBySubCatId(request, response) {
         });
     }
 }
-// chua test]
 
 
 // get all product by sub category name
@@ -340,7 +335,6 @@ export async function getAllProductsBySubCatName(request, response) {
         });
     }
 }
-// chua test]
 
 
 export async function getAllProductsByThirdLavelCatId(request, response) {
@@ -386,7 +380,6 @@ export async function getAllProductsByThirdLavelCatId(request, response) {
         });
     }
 }
-// chua test]
 
 
 export async function getAllProductsByThirdLavelCatName(request, response) {
@@ -432,7 +425,6 @@ export async function getAllProductsByThirdLavelCatName(request, response) {
         });
     }
 }
-// chua test]
 
 
 // get all product by price
@@ -560,7 +552,6 @@ export async function getAllProductsByRating(request, response) {
         });
     }
 }
-// chua test]
 
 
 // get all products count
@@ -590,7 +581,6 @@ export async function getProductsCount(request, response) {
         });
     }
 }
-// chua test]
 
 
 // get all features product
@@ -621,17 +611,14 @@ export async function getAllFeaturedProducts(request, response) {
         });
     }
 }
-// chua test]
 
 
 // delete product
 export async function deleteProduct(request, response) {
     try {
-        const products = await ProductModel.findById(
-            request.params.id
-        ).populate("category");
+        const product = await ProductModel.findById(request.params.id).populate("category");
 
-        if (!products) {
+        if (!product) {
             return response.status(404).json({
                 error: true,
                 success: false,
@@ -679,7 +666,6 @@ export async function deleteProduct(request, response) {
         });
     }
 }
-// chua test]
 
 
 //get single product
