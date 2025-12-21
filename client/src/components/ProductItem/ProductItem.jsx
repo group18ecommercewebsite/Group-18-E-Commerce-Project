@@ -8,13 +8,13 @@ import { IoIosGitCompare } from 'react-icons/io';
 import { MdZoomOutMap } from 'react-icons/md';
 import { MyContext } from '../../App';
 
-const ProductItem = () => {
+const ProductItem = ({ productId = '1' }) => {
   const context = useContext(MyContext);
 
   return (
     <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)]">
       <div className="group imgWrapper w-[100%] overflow-hidden rounded-md relative">
-        <Link to="/">
+        <Link to={`/product/${productId}`}>
           <div className="img h-[220px] overflow-hidden">
             <img
               src="https://api.spicezgold.com/download/file_1734690981297_011618e4-4682-4123-be80-1fb7737d34ad1714702040213RARERABBITMenComfortOpaqueCasualShirt1.jpg"
@@ -50,12 +50,12 @@ const ProductItem = () => {
 
       <div className="info p-3 py-5">
         <h6 className="text-[13px] !font-[400]">
-          <Link to="/" className="link transition-all">
+          <Link to={`/product/${productId}`} className="link transition-all">
             Soylent Green
           </Link>
         </h6>
         <h3 className="text-[13px] title mt-1 font-medium mb-1 text-[#000]">
-          <Link to="/" className="link transition-all">
+          <Link to={`/product/${productId}`} className="link transition-all">
             Men Layerr Regular Fit Spread Collar Cotton Shirt
           </Link>
         </h3>
