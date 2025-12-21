@@ -22,6 +22,7 @@ import Footer from './components/Footer';
 import CartPage from './pages/Cart';
 import { Verify } from './pages/Verify';
 import ResetPassword from './pages/ResetPassword';
+import { Checkout } from './pages/Checkout';
 
 import toast, { Toaster } from 'react-hot-toast';
 import { duration } from '@mui/material';
@@ -74,6 +75,7 @@ function App() {
             <Route path="/cart" exact={true} element={<CartPage />} />
             <Route path="/verify" exact={true} element={<Verify />} />
             <Route path="/reset-password" exact={true} element={<ResetPassword />} />
+            <Route path="/checkout" exact={true} element={<Checkout />} />
           </Routes>
           <Footer/>
         </MyContext.Provider>
