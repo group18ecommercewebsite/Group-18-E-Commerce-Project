@@ -23,6 +23,7 @@ import CartPage from './pages/Cart';
 import { Verify } from './pages/Verify';
 import ResetPassword from './pages/ResetPassword';
 import { Checkout } from './pages/Checkout';
+import { Account } from './pages/Account';
 
 import toast, { Toaster } from 'react-hot-toast';
 import { duration } from '@mui/material';
@@ -33,6 +34,7 @@ function App() {
   const [openProductDetailsModal, setOpenProductDetailsModal] = useState(false);
   const [fullWidth, setFullWidth] = useState(true);
   const [maxWidth, setMaxWidth] = useState('lg');
+  const [isLogin, setIsLogin] = useState(true);
 
   const [openCartPanel, setOpenCartPanel] = useState(false);
 
@@ -59,6 +61,8 @@ function App() {
     openCartPanel,
     toggleCartPanel,
     openAlertBox,
+    isLogin,
+    setIsLogin
   };
 
   return (
@@ -76,6 +80,7 @@ function App() {
             <Route path="/verify" exact={true} element={<Verify />} />
             <Route path="/reset-password" exact={true} element={<ResetPassword />} />
             <Route path="/checkout" exact={true} element={<Checkout />} />
+            <Route path="/my-account" exact={true} element={<Account />} /> 
           </Routes>
           <Footer/>
         </MyContext.Provider>
