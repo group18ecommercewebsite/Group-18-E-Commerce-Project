@@ -24,6 +24,7 @@ import { Verify } from './pages/Verify';
 import ResetPassword from './pages/ResetPassword';
 import { Checkout } from './pages/Checkout';
 import { Account } from './pages/Account';
+import MyList from './pages/MyList';
 
 import toast, { Toaster } from 'react-hot-toast';
 import { duration } from '@mui/material';
@@ -80,7 +81,8 @@ function App() {
             <Route path="/verify" exact={true} element={<Verify />} />
             <Route path="/reset-password" exact={true} element={<ResetPassword />} />
             <Route path="/checkout" exact={true} element={<Checkout />} />
-            <Route path="/my-account" exact={true} element={<Account />} /> 
+            <Route path="/my-account" exact={true} element={<Account />} />
+            <Route path="/my-list" exact={true} element={<MyList />} />
           </Routes>
           <Footer/>
         </MyContext.Provider>
