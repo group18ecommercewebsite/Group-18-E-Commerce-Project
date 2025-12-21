@@ -20,6 +20,11 @@ import Drawer from '@mui/material/Drawer';
 import CartPanel from './components/CartPanel/CartPanel';
 import Footer from './components/Footer';
 import CartPage from './pages/Cart';
+import { Verify } from './pages/Verify';
+import ResetPassword from './pages/ResetPassword';
+
+import toast, { Toaster } from 'react-hot-toast';
+import { duration } from '@mui/material';
 
 const MyContext = createContext();
 
@@ -38,11 +43,21 @@ function App() {
     setOpenCartPanel(newOpen);
   };
 
+  const openAlertBox=(status, msg)=>{
+    if(status === "success"){
+      toast.success(msg || "Success");
+    }
+    if(status === "error"){
+      toast.error(msg || "Error");
+    }
+  }
+
   const values = {
     setOpenProductDetailsModal,
     setOpenCartPanel,
     openCartPanel,
     toggleCartPanel,
+    openAlertBox,
   };
 
   return (
@@ -57,11 +72,17 @@ function App() {
             <Route path="/productListing" exact={true} element={<ProductListing />} />
             <Route path="/product/:id" exact={true} element={<ProductDetails />} />
             <Route path="/cart" exact={true} element={<CartPage />} />
+            <Route path="/verify" exact={true} element={<Verify />} />
+            <Route path="/reset-password" exact={true} element={<ResetPassword />} />
           </Routes>
           <Footer/>
         </MyContext.Provider>
       </BrowserRouter>
-
+      <Toaster
+        toastOptions={{
+          duration: 3000
+        }}
+      />
       <Dialog
         open={openProductDetailsModal}
         fullWidth={fullWidth}
