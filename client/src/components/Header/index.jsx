@@ -100,7 +100,7 @@ export const Header = () => {
                           <CiLocationOn className='text-[20px]' />
                           Address
                         </Link>
-                        <Link to='/orders' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
+                        <Link to='/my-orders' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
                           <IoBagCheckOutline className='text-[20px]' />
                           Orders
                         </Link>
