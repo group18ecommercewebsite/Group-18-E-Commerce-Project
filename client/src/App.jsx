@@ -29,6 +29,7 @@ import { Orders } from './pages/Orders';
 
 import toast, { Toaster } from 'react-hot-toast';
 import { duration } from '@mui/material';
+import { CategoryProvider } from './context/CategoryContext';
 
 const MyContext = createContext();
 
@@ -76,24 +77,27 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <MyContext.Provider value={values}>
-          <Header />
-          <Routes>
-            <Route path="/" exact={true} element={<Home />} />
-            <Route path="/login" exact={true} element={<Login />} />
-            <Route path="/register" exact={true} element={<Register />} />
-            <Route path="/productListing" exact={true} element={<ProductListing />} />
-            <Route path="/product/:id" exact={true} element={<ProductDetails />} />
-            <Route path="/cart" exact={true} element={<CartPage />} />
-            <Route path="/verify" exact={true} element={<Verify />} />
-            <Route path="/reset-password" exact={true} element={<ResetPassword />} />
-            <Route path="/checkout" exact={true} element={<Checkout />} />
-            <Route path="/my-account" exact={true} element={<Account />} />
-            <Route path="/my-list" exact={true} element={<MyList />} />
-            <Route path="/my-orders" exact={true} element={<Orders />} />
-          </Routes>
-          <Footer/>
-        </MyContext.Provider>
+        <CategoryProvider>
+          <MyContext.Provider value={values}>
+            <Header />
+            <Routes>
+              <Route path="/" exact={true} element={<Home />} />
+              <Route path="/login" exact={true} element={<Login />} />
+              <Route path="/register" exact={true} element={<Register />} />
+              <Route path="/productListing" exact={true} element={<ProductListing />} />
+              <Route path="/productListing/:categoryId" exact={true} element={<ProductListing />} />
+              <Route path="/product/:id" exact={true} element={<ProductDetails />} />
+              <Route path="/cart" exact={true} element={<CartPage />} />
+              <Route path="/verify" exact={true} element={<Verify />} />
+              <Route path="/reset-password" exact={true} element={<ResetPassword />} />
+              <Route path="/checkout" exact={true} element={<Checkout />} />
+              <Route path="/my-account" exact={true} element={<Account />} />
+              <Route path="/my-list" exact={true} element={<MyList />} />
+              <Route path="/my-orders" exact={true} element={<Orders />} />
+            </Routes>
+            <Footer/>
+          </MyContext.Provider>
+        </CategoryProvider>
       </BrowserRouter>
       <Toaster
         toastOptions={{

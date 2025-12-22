@@ -8,8 +8,23 @@ import { IoIosGitCompare } from 'react-icons/io';
 import { MdZoomOutMap } from 'react-icons/md';
 import { MyContext } from '../../App';
 
-const ProductItem = ({ productId = '1' }) => {
+const ProductItem = ({ product }) => {
   const context = useContext(MyContext);
+
+  // Handle both prop formats - full product object or individual props
+  const productData = product || {};
+  const productId = productData._id || '1';
+  const name = productData.name || 'Product Name';
+  const brand = productData.brand || 'Brand';
+  const images = productData.images || [];
+  const price = productData.price || 0;
+  const oldPrice = productData.oldPrice || 0;
+  const discount = productData.discount || 0;
+  const rating = productData.rating || 0;
+
+  // Get first two images for hover effect
+  const primaryImage = images[0] || 'https://via.placeholder.com/300x300?text=No+Image';
+  const secondaryImage = images[1] || primaryImage;
 
   return (
     <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)]">
@@ -17,24 +32,26 @@ const ProductItem = ({ productId = '1' }) => {
         <Link to={`/product/${productId}`}>
           <div className="img h-[220px] overflow-hidden">
             <img
-              src="https://api.spicezgold.com/download/file_1734690981297_011618e4-4682-4123-be80-1fb7737d34ad1714702040213RARERABBITMenComfortOpaqueCasualShirt1.jpg"
-              alt=""
+              src={primaryImage}
+              alt={name}
               className="w-full"
             />
 
             <img
-              src="https://api.spicezgold.com/download/file_1734690981297_23990e6b-d01e-40fd-bb6b-98198db544c01714702040162RARERABBITMenComfortOpaqueCasualShirt2.jpg"
-              alt=""
+              src={secondaryImage}
+              alt={name}
               className="w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105"
             />
           </div>
         </Link>
-        <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-primary text-white rounded-lg p-1 text-[12px] font-medium">
-          10%
-        </span>
+        {discount > 0 && (
+          <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-primary text-white rounded-lg p-1 text-[12px] font-medium">
+            {discount}%
+          </span>
+        )}
 
         <div className="actions absolute top-[-200px] right-[5px] z-50 flex items-center gap-2 flex-col w-[50px] transition-all duration-300 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-[#ff5252] hover:text-white group" onClick={()=>context.setOpenProductDetailsModal(true)}>
+          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-[#ff5252] hover:text-white group" onClick={()=>context.setOpenProductDetailsModal(true, productData)}>
             <MdZoomOutMap className="text-[18px] !text-black group-hover:text-white hover:!text-white " />
           </Button>
 
@@ -51,22 +68,24 @@ const ProductItem = ({ productId = '1' }) => {
       <div className="info p-3 py-5">
         <h6 className="text-[13px] !font-[400]">
           <Link to={`/product/${productId}`} className="link transition-all">
-            Soylent Green
+            {brand}
           </Link>
         </h6>
         <h3 className="text-[13px] title mt-1 font-medium mb-1 text-[#000]">
-          <Link to={`/product/${productId}`} className="link transition-all">
-            Men Layerr Regular Fit Spread Collar Cotton Shirt
+          <Link to={`/product/${productId}`} className="link transition-all line-clamp-2">
+            {name}
           </Link>
         </h3>
 
-        <Rating name="size-small" defaultValue={2} size="small" readOnly />
+        <Rating name="size-small" value={rating} size="small" readOnly />
 
         <div className="flex items-center gap-4">
-          <span className="oldPrice line-through text-gray-500 text-[15px] font-medium">
-            $58.00
-          </span>
-          <span className="price text-[#ff5252] text-[15px] font-[600]">$58.00</span>
+          {oldPrice > 0 && oldPrice !== price && (
+            <span className="oldPrice line-through text-gray-500 text-[15px] font-medium">
+              ${oldPrice.toFixed(2)}
+            </span>
+          )}
+          <span className="price text-[#ff5252] text-[15px] font-[600]">${price.toFixed(2)}</span>
         </div>
       </div>
     </div>

@@ -10,13 +10,26 @@ import { FaAngleUp } from "react-icons/fa6";
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Rating from '@mui/material/Rating';
+import { useCategories } from '../../context/CategoryContext';
 
 
 
-const Sidebar = () => {
+const Sidebar = ({ selectedCategoryIds = [], setSelectedCategoryIds }) => {
+  const { categories } = useCategories();
   const [isOpenCategoryFilter, setIsOpenCategoryFilter] = useState(true);
   const [isOpenAvailFilter, setIsOpenAvailFilter] = useState(true);
   const [isOpenSizeFilter, setIsOpenSizeFilter] = useState(true);
+
+  // Handle checkbox change
+  const handleCategoryChange = (categoryId, checked) => {
+    if (!setSelectedCategoryIds) return;
+    
+    if (checked) {
+      setSelectedCategoryIds([...selectedCategoryIds, categoryId]);
+    } else {
+      setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== categoryId));
+    }
+  };
 
   return (
     <aside className="sidebar py-5">
@@ -34,42 +47,21 @@ const Sidebar = () => {
         </h3>
         <Collapse isOpened={isOpenCategoryFilter}>
           <div className="scroll px-4 relative -left-[13px]">
-            <FormControlLabel
-              control={<Checkbox size="small" />}
-              label="Fashion"
-              className="w-full"
-            />
-            <FormControlLabel
-              control={<Checkbox size="small" />}
-              label="Electronics"
-              className="w-full"
-            />
-            <FormControlLabel control={<Checkbox size="small" />} label="Bags" className="w-full" />
-            <FormControlLabel
-              control={<Checkbox size="small" />}
-              label="Footwear"
-              className="w-full"
-            />
-            <FormControlLabel
-              control={<Checkbox size="small" />}
-              label="Groceries"
-              className="w-full"
-            />
-            <FormControlLabel
-              control={<Checkbox size="small" />}
-              label="Beauty"
-              className="w-full"
-            />
-            <FormControlLabel
-              control={<Checkbox size="small" />}
-              label="Wellness"
-              className="w-full"
-            />
-            <FormControlLabel
-              control={<Checkbox size="small" />}
-              label="Jewellery"
-              className="w-full"
-            />
+            {/* Chỉ hiển thị categories cấp 1 */}
+            {categories.map((cat) => (
+              <FormControlLabel
+                key={cat._id}
+                control={
+                  <Checkbox 
+                    size="small" 
+                    checked={selectedCategoryIds.includes(cat._id)}
+                    onChange={(e) => handleCategoryChange(cat._id, e.target.checked)}
+                  />
+                }
+                label={cat.name}
+                className="w-full"
+              />
+            ))}
           </div>
         </Collapse>
       </div>

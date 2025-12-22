@@ -1,49 +1,55 @@
 import apiClient from './apiClient';
 
-// Lấy danh sách sản phẩm với filter
-export const getProducts = async (filters = {}) => {
-  const response = await apiClient.post('/product/get', filters);
+// Lấy tất cả sản phẩm
+export const getProducts = async () => {
+  const response = await apiClient.get('/product/getAllProducts');
   return response.data;
 };
 
 // Lấy chi tiết sản phẩm theo ID
 export const getProductById = async (id) => {
-  const response = await apiClient.get(`/product/get/${id}`);
+  const response = await apiClient.get(`/product/getProduct/${id}`);
   return response.data;
 };
 
-// Lấy sản phẩm theo danh mục
-export const getProductsByCategory = async (data) => {
-  const response = await apiClient.post('/product/get-product-by-category', data);
+// Lấy sản phẩm theo category ID
+export const getProductsByCategoryId = async (categoryId) => {
+  const response = await apiClient.get(`/product/getAllProductsByCatId/${categoryId}`);
+  return response.data;
+};
+
+// Lấy sản phẩm theo subcategory ID
+export const getProductsBySubCategoryId = async (subCatId) => {
+  const response = await apiClient.get(`/product/getAllProductsBySubCatId/${subCatId}`);
+  return response.data;
+};
+
+// Lấy sản phẩm theo third level category ID
+export const getProductsByThirdLevelCatId = async (thirdCatId) => {
+  const response = await apiClient.get(`/product/getAllProductsByThirdLavelCatId/${thirdCatId}`);
   return response.data;
 };
 
 // Lấy sản phẩm nổi bật
 export const getFeaturedProducts = async () => {
-  const response = await apiClient.get('/product/featured');
+  const response = await apiClient.get('/product/getAllFeaturedProducts');
   return response.data;
 };
 
 // Đếm số lượng sản phẩm
 export const getProductCount = async () => {
-  const response = await apiClient.get('/product/get/count');
-  return response.data;
-};
-
-// Lấy sản phẩm theo subcategory
-export const getProductsBySubCategory = async (data) => {
-  const response = await apiClient.post('/product/get-product-by-subcategory', data);
+  const response = await apiClient.get('/product/getAllProductsCount');
   return response.data;
 };
 
 // Lọc sản phẩm theo giá
-export const filterProductsByPrice = async (data) => {
-  const response = await apiClient.post('/product/get-filtered-products-by-price', data);
+export const getProductsByPrice = async (minPrice, maxPrice) => {
+  const response = await apiClient.get(`/product/getAllProductsByPrice?minPrice=${minPrice}&maxPrice=${maxPrice}`);
   return response.data;
 };
 
 // Lọc sản phẩm theo rating
-export const filterProductsByRating = async (data) => {
-  const response = await apiClient.post('/product/get-filtered-products-by-rating', data);
+export const getProductsByRating = async (rating) => {
+  const response = await apiClient.get(`/product/getAllProductsByRating?rating=${rating}`);
   return response.data;
 };
