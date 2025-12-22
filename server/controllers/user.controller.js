@@ -149,7 +149,7 @@ export async function loginUserController(request, response) {
         const user = await UserModel.findOne({ email: email });
 
         if (!user) {
-            response.status(400).json({
+            return response.status(400).json({
                 message: "User not register",
                 error: true,
                 success: false
@@ -157,7 +157,7 @@ export async function loginUserController(request, response) {
         }
 
         if (user.status !== "Active") {
-            response.status(400).json({
+            return response.status(400).json({
                 message: "Contact to admin",
                 error: true,
                 success: false
@@ -165,7 +165,7 @@ export async function loginUserController(request, response) {
         }
 
         if (user.verify_email !== true) {
-            response.status(400).json({
+            return response.status(400).json({
                 message: "Your email is not verify yet please verify your email first",
                 error: true,
                 success: false

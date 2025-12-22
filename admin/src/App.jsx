@@ -94,6 +94,7 @@ import Orders from './Pages/Orders';
 import ForgotPassword from './Pages/ForgotPassword';
 import VerifyOTP from './Pages/VerifyOTP';
 import ChangePassword from './Pages/ChangePassword';
+import Header from './Components/Header';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
