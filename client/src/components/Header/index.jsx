@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search } from '../Search'
 import Badge from '@mui/material/Badge';
@@ -16,6 +16,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import Tooltip from '@mui/material/Tooltip';
 import { Navigation } from './Navigation/index';
 import { MyContext } from '../../App';
+import { logoutUser } from '../../api/userApi';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -31,15 +32,38 @@ export const Header = () => {
 
   const context = useContext(MyContext);
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   
-  // Lấy user info - TODO: Thêm user vào context sau khi tích hợp API
-  const user = {
-    name: 'Kiệt Nguyễn Tuấn',
-    email: 'Tuankiet24022020@Gmail.Com'
-  };
+  // Lấy user info từ localStorage khi component mount hoặc khi login state thay đổi
+  useEffect(() => {
+    if (context.isLogin) {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          setUser(null);
+        }
+      }
+    } else {
+      setUser(null);
+    }
+  }, [context.isLogin]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      // Vẫn logout ở client dù API lỗi
+      console.error('Logout API error:', error);
+    }
+    
+    // Clear localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    
     context.setIsLogin(false);
+    context.openAlertBox('success', 'Logged out successfully');
     navigate('/login');
   };
 

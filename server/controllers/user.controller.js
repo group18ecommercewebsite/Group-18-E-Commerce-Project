@@ -203,7 +203,15 @@ export async function loginUserController(request, response) {
             success: true,
             data: {
                 accessToken,
-                refreshToken
+                refreshToken,
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    avatar: user.avatar,
+                    mobile: user.mobile,
+                    role: user.role
+                }
             }
         })
     }
@@ -510,8 +518,8 @@ export async function verifyForgotPasswordOtp(request, response) {
 
         return response.status(200).json({
             message: "OTP verified!",
-            error: true,
-            success: false
+            error: false,
+            success: true
         });
 
     } catch (error) {

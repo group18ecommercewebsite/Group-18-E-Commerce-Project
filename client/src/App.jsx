@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import { Header } from './components/Header';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -36,7 +36,13 @@ function App() {
   const [openProductDetailsModal, setOpenProductDetailsModal] = useState(false);
   const [fullWidth, setFullWidth] = useState(true);
   const [maxWidth, setMaxWidth] = useState('lg');
-  const [isLogin, setIsLogin] = useState(true);
+  
+  // Kiểm tra login state từ localStorage khi khởi tạo
+  const [isLogin, setIsLogin] = useState(() => {
+    const token = localStorage.getItem('accessToken');
+    const user = localStorage.getItem('user');
+    return !!(token && user);
+  });
 
   const [openCartPanel, setOpenCartPanel] = useState(false);
 
