@@ -53,6 +53,8 @@ const ProductDetailsComponent = ({ product }) => {
       const response = await addToCart(_id, quantity);
       if (response.success) {
         context.openAlertBox('success', response.message || 'Product added to cart!');
+        // Cập nhật global cart state để CartPanel hiển thị ngay
+        context.fetchCart();
         // Reset quantity về 1 sau khi thêm thành công
         setQuantity(1);
       } else {

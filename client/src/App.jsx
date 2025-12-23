@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import './App.css';
 import { Header } from './components/Header';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -30,6 +30,7 @@ import { Orders } from './pages/Orders';
 import toast, { Toaster } from 'react-hot-toast';
 import { duration } from '@mui/material';
 import { CategoryProvider } from './context/CategoryContext';
+import { getCart } from './api/cartApi';
 
 const MyContext = createContext();
 
@@ -47,6 +48,38 @@ function App() {
   });
 
   const [openCartPanel, setOpenCartPanel] = useState(false);
+  
+  // Global cart state
+  const [cartItems, setCartItems] = useState([]);
+  const [cartLoading, setCartLoading] = useState(false);
+
+  // Fetch cart function - có thể gọi từ bất kỳ component nào
+  const fetchCart = useCallback(async () => {
+    if (!isLogin) {
+      setCartItems([]);
+      return;
+    }
+    try {
+      setCartLoading(true);
+      const response = await getCart();
+      if (response.success) {
+        setCartItems(response.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch cart:', error);
+    } finally {
+      setCartLoading(false);
+    }
+  }, [isLogin]);
+
+  // Fetch cart khi login state thay đổi
+  useEffect(() => {
+    if (isLogin) {
+      fetchCart();
+    } else {
+      setCartItems([]);
+    }
+  }, [isLogin, fetchCart]);
 
   const handleCloseProductDetailsModal = () => {
     setOpenProductDetailsModal(false);
@@ -79,7 +112,12 @@ function App() {
     toggleCartPanel,
     openAlertBox,
     isLogin,
-    setIsLogin
+    setIsLogin,
+    // Global cart state
+    cartItems,
+    setCartItems,
+    cartLoading,
+    fetchCart
   };
 
   return (
