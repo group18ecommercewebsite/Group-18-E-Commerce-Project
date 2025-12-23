@@ -4,7 +4,7 @@ import UserModel from "../models/user.model.js";
 export const addToCartItemController = async (request, response) => {
     try {
         const userId = request.userId
-        const { productId } = request.body
+        const { productId, quantity = 1 } = request.body
 
         if (!productId) {
             return response.status(402).json({
@@ -14,19 +14,31 @@ export const addToCartItemController = async (request, response) => {
             })
         }
 
+        // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
         const checkItemCart = await CartProductModel.findOne({
             userId: userId,
             productId: productId
         })
 
+        // Nếu đã có trong giỏ -> tăng số lượng
         if (checkItemCart) {
-            return response.status(400).json({
-                message: "Item already in cart",
+            const updatedCart = await CartProductModel.findByIdAndUpdate(
+                checkItemCart._id,
+                { quantity: checkItemCart.quantity + quantity },
+                { new: true }
+            )
+
+            return response.status(200).json({
+                data: updatedCart,
+                message: "Cart updated successfully",
+                error: false,
+                success: true
             })
         }
 
+        // Nếu chưa có -> thêm mới
         const cartItem = new CartProductModel({
-            quantity: 1,
+            quantity: quantity,
             userId: userId,
             productId: productId
         })
@@ -44,7 +56,7 @@ export const addToCartItemController = async (request, response) => {
 
         return response.status(200).json({
             data: save,
-            message: "Item add successfully",
+            message: "Item added to cart successfully",
             error: false,
             success: true
         })

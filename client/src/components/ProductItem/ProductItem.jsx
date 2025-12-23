@@ -1,15 +1,19 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import '../ProductItem/style.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Rating from '@mui/material/Rating';
 import Button from '@mui/material/Button';
 import { FaRegHeart } from 'react-icons/fa';
 import { IoIosGitCompare } from 'react-icons/io';
 import { MdZoomOutMap } from 'react-icons/md';
 import { MyContext } from '../../App';
+import { addToMyList } from '../../api/myListApi';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const ProductItem = ({ product }) => {
   const context = useContext(MyContext);
+  const navigate = useNavigate();
+  const [addingToWishlist, setAddingToWishlist] = useState(false);
 
   // Handle both prop formats - full product object or individual props
   const productData = product || {};
@@ -25,6 +29,51 @@ const ProductItem = ({ product }) => {
   // Get first two images for hover effect
   const primaryImage = images[0] || 'https://via.placeholder.com/300x300?text=No+Image';
   const secondaryImage = images[1] || primaryImage;
+
+  const handleAddToWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!context.isLogin) {
+      context.openAlertBox('error', 'Please login to add items to wishlist');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      setAddingToWishlist(true);
+      const wishlistData = {
+        productId: productId,
+        productTitle: name,
+        image: primaryImage,
+        rating: rating,
+        price: price,
+        oldPrice: oldPrice,
+        brand: brand,
+        discount: discount
+      };
+      const response = await addToMyList(wishlistData);
+      if (response.success) {
+        context.openAlertBox('success', 'Added to wishlist!');
+      } else {
+        context.openAlertBox('error', response.message || 'Failed to add to wishlist');
+      }
+    } catch (error) {
+      if (error.response?.status === 400) {
+        context.openAlertBox('error', 'This item is already in your wishlist');
+      } else {
+        context.openAlertBox('error', error.response?.data?.message || 'Failed to add to wishlist');
+      }
+    } finally {
+      setAddingToWishlist(false);
+    }
+  };
+
+  const handleQuickView = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    context.setOpenProductDetailsModal(productData);
+  };
 
   return (
     <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)]">
@@ -51,7 +100,10 @@ const ProductItem = ({ product }) => {
         )}
 
         <div className="actions absolute top-[-200px] right-[5px] z-50 flex items-center gap-2 flex-col w-[50px] transition-all duration-300 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-[#ff5252] hover:text-white group" onClick={()=>context.setOpenProductDetailsModal(true, productData)}>
+          <Button 
+            className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-[#ff5252] hover:text-white group" 
+            onClick={handleQuickView}
+          >
             <MdZoomOutMap className="text-[18px] !text-black group-hover:text-white hover:!text-white " />
           </Button>
 
@@ -59,8 +111,16 @@ const ProductItem = ({ product }) => {
             <IoIosGitCompare className="text-[18px] !text-black group-hover:text-white hover:!text-white " />
           </Button>
 
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-[#ff5252] hover:text-white group">
-            <FaRegHeart className="text-[18px] !text-black group-hover:text-white hover:!text-white " />
+          <Button 
+            className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-[#ff5252] hover:text-white group"
+            onClick={handleAddToWishlist}
+            disabled={addingToWishlist}
+          >
+            {addingToWishlist ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <FaRegHeart className="text-[18px] !text-black group-hover:text-white hover:!text-white " />
+            )}
           </Button>
         </div>
       </div>

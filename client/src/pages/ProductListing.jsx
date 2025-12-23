@@ -45,6 +45,8 @@ const ProductListing = () => {
 
   // State cho sidebar filter
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 200]);
+  const [selectedRating, setSelectedRating] = useState(null);
 
   // Tìm tên category từ ID
   const findCategoryName = (catId, cats) => {
@@ -170,9 +172,26 @@ const ProductListing = () => {
 
   // Filter products dựa trên sidebar selection (bao gồm cả category con)
   const filterCatIds = getFilterCategoryIds(selectedCategoryIds);
-  const filteredProducts = selectedCategoryIds.length > 0
-    ? products.filter(product => filterCatIds.includes(product.catId))
-    : products;
+  
+  // Apply all filters: category, price, rating
+  const filteredProducts = products.filter(product => {
+    // Category filter
+    if (selectedCategoryIds.length > 0 && !filterCatIds.includes(product.catId)) {
+      return false;
+    }
+    
+    // Price filter
+    if (product.price < priceRange[0] || product.price > priceRange[1]) {
+      return false;
+    }
+    
+    // Rating filter (show products with rating >= selected rating)
+    if (selectedRating !== null && product.rating < selectedRating) {
+      return false;
+    }
+    
+    return true;
+  });
 
   // Sort products (use filteredProducts)
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -234,6 +253,10 @@ const ProductListing = () => {
             <Sidebar 
               selectedCategoryIds={selectedCategoryIds}
               setSelectedCategoryIds={setSelectedCategoryIds}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              selectedRating={selectedRating}
+              setSelectedRating={setSelectedRating}
             />
           </div>
 

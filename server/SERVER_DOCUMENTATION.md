@@ -502,4 +502,4 @@ npm run dev
 npm start
 ```
 
-Server sẽ chạy tại: `http://localhost:5000`
+Server sẽ chạy tại: `http://localhost:8000`

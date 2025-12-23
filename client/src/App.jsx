@@ -35,6 +35,7 @@ const MyContext = createContext();
 
 function App() {
   const [openProductDetailsModal, setOpenProductDetailsModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [fullWidth, setFullWidth] = useState(true);
   const [maxWidth, setMaxWidth] = useState('lg');
   
@@ -49,6 +50,13 @@ function App() {
 
   const handleCloseProductDetailsModal = () => {
     setOpenProductDetailsModal(false);
+    setSelectedProduct(null);
+  };
+
+  // Mở modal với product data
+  const openProductModal = (product) => {
+    setSelectedProduct(product);
+    setOpenProductDetailsModal(true);
   };
 
   const toggleCartPanel = (newOpen) => () => {
@@ -65,7 +73,7 @@ function App() {
   }
 
   const values = {
-    setOpenProductDetailsModal,
+    setOpenProductDetailsModal: openProductModal, // Thay thế bằng function mới
     setOpenCartPanel,
     openCartPanel,
     toggleCartPanel,
@@ -96,6 +104,35 @@ function App() {
               <Route path="/my-orders" exact={true} element={<Orders />} />
             </Routes>
             <Footer/>
+
+            {/* Product Quick View Modal */}
+            <Dialog
+              open={openProductDetailsModal}
+              fullWidth={fullWidth}
+              maxWidth={maxWidth}
+              onClose={handleCloseProductDetailsModal}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+              className="productDetailsModal"
+            >
+              <DialogContent>
+                <div className="flex items-center w-full productDetailsModalContainer relative py-8">
+                  <Button
+                    className="!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[#000] !absolute top-[15px] right-[15px] !bg-[#f1f1f1]"
+                    onClick={handleCloseProductDetailsModal}
+                  >
+                    <IoCloseSharp className="text-[20px]" />
+                  </Button>
+                  <div className="col1 w-[40%] px-3">
+                    <ProductZoom images={selectedProduct?.images} />
+                  </div>
+
+                  <div className="col2 w-[60%] py-8 px-8 pr-16 productContent">
+                    <ProductDetailsComponent product={selectedProduct} />
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </MyContext.Provider>
         </CategoryProvider>
       </BrowserRouter>
@@ -104,35 +141,6 @@ function App() {
           duration: 3000
         }}
       />
-      <Dialog
-        open={openProductDetailsModal}
-        fullWidth={fullWidth}
-        maxWidth={maxWidth}
-        onClose={handleCloseProductDetailsModal}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        className="productDetailsModal"
-      >
-        <DialogContent>
-          <div className="flex items-center w-full productDetailsModalContainer relative">
-            <Button
-              className="!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-[#000] !absolute top-[15px] right-[15px] !bg-[#f1f1f1]"
-              onClick={handleCloseProductDetailsModal}
-            >
-              <IoCloseSharp className="text-[20px]" />
-            </Button>
-            <div className="col1 w-[40%] px-3">
-              <ProductZoom />
-            </div>
-
-            <div className="col2 w-[60%] py-8 px-8 pr-16 productContent">
-              <ProductDetailsComponent />
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      
     </>
   );
 }
