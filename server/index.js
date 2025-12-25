@@ -12,6 +12,7 @@ import productRouter from './route/product.route.js';
 import cartRouter from './route/cart.route.js';
 import myListRouter from './route/mylist.route.js';
 import orderRouter from './route/order.route.js';
+import reviewRouter from './route/review.route.js';
 
 
 const app = express();
@@ -44,6 +45,7 @@ app.use('/api/product', productRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/myList', myListRouter)
 app.use('/api/order', orderRouter)
+app.use('/api/review', reviewRouter)
 
 connectDB().then(() => {
     app.listen(process.env.PORT, () => {

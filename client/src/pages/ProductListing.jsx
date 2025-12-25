@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar/Sidebar';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -13,11 +13,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Pagination from '@mui/material/Pagination';
 import CircularProgress from '@mui/material/CircularProgress';
-import { getProducts, getProductsByCategoryId } from '../api/productApi';
+import { getProducts, getProductsByCategoryId, searchProducts } from '../api/productApi';
 import { useCategories } from '../context/CategoryContext';
 
 const ProductListing = () => {
   const { categoryId } = useParams();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
   const { categories } = useCategories();
   
   const [itemView, setItemView] = useState('grid');
@@ -117,8 +119,17 @@ const ProductListing = () => {
       try {
         setLoading(true);
         setError(null);
+        setCurrentPage(1); // Reset to first page when filters change
         
-        if (categoryId && categories.length > 0) {
+        // Nếu có search query, sử dụng search API
+        if (searchQuery.trim()) {
+          const response = await searchProducts(searchQuery, 100);
+          if (response.success) {
+            setProducts(response.products || []);
+          } else {
+            setError(response.message || 'Failed to search products');
+          }
+        } else if (categoryId && categories.length > 0) {
           // Lấy tất cả category IDs (bao gồm cả con)
           const allCategoryIds = getAllCategoryIds(categoryId, categories);
           
@@ -139,7 +150,7 @@ const ProductListing = () => {
           );
           
           setProducts(uniqueProducts);
-        } else if (!categoryId) {
+        } else if (!categoryId && !searchQuery) {
           // Fetch tất cả products
           const response = await getProducts();
           if (response.success) {
@@ -157,7 +168,7 @@ const ProductListing = () => {
     };
 
     fetchProducts();
-  }, [categoryId, categories]);
+  }, [categoryId, categories, searchQuery]);
 
   // Thu thập tất cả category IDs (bao gồm con) cho filter sidebar
   const getFilterCategoryIds = (selectedIds) => {
@@ -239,10 +250,15 @@ const ProductListing = () => {
               {cat.name}
             </Link>
           ))}
-          {!categoryId && (
+          {!categoryId && !searchQuery && (
             <Link underline="hover" color="text.primary" href="/productListing" className="link transition !text-[14px]">
               All Products
             </Link>
+          )}
+          {searchQuery && (
+            <Typography color="text.primary" className="!text-[14px]">
+              Search: "{searchQuery}"
+            </Typography>
           )}
         </Breadcrumbs>
       </div>

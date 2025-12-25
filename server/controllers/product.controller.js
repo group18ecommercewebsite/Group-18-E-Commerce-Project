@@ -153,6 +153,44 @@ export async function getAllProducts(request, response) {
 }
 
 
+// search products by name
+export async function searchProducts(request, response) {
+    try {
+        const { q, limit = 10 } = request.query;
+
+        if (!q || q.trim() === '') {
+            return response.status(200).json({
+                error: false,
+                success: true,
+                products: []
+            });
+        }
+
+        // Search by name with case-insensitive regex
+        const products = await ProductModel.find({
+            name: { $regex: q, $options: 'i' }
+        })
+        .populate("category")
+        .limit(parseInt(limit))
+        .exec();
+
+        return response.status(200).json({
+            error: false,
+            success: true,
+            products: products,
+            query: q
+        });
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+}
+
+
 // get all product by category id
 export async function getAllProductsByCatId(request, response) {
     try {

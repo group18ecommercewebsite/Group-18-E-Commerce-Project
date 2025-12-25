@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { Link, useParams } from 'react-router-dom';
 import ProductZoom from '../components/ProductZoom/ProductZoom';
@@ -8,16 +8,26 @@ import TextField from '@mui/material/TextField';
 import ProductsSlider from '../components/ProductsSlider/ProductsSlider';
 import ProductDetailsComponent from '../components/ProductDetailsComponent/ProductDetailsComponent';
 import { getProductById, getProductsByCategoryId } from '../api/productApi';
+import { getProductReviews, addReview } from '../api/reviewApi';
 import CircularProgress from '@mui/material/CircularProgress';
-
+import { MyContext } from '../App';
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const context = useContext(MyContext);
   const [activeTab, setActiveTab] = useState(0);
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Review states
+  const [reviews, setReviews] = useState([]);
+  const [reviewStats, setReviewStats] = useState({ totalReviews: 0, avgRating: 0 });
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -33,7 +43,6 @@ const ProductDetails = () => {
             try {
               const relatedResponse = await getProductsByCategoryId(response.product.catId);
               if (relatedResponse.success) {
-                // Lọc bỏ sản phẩm hiện tại và giới hạn 8 sản phẩm
                 const filtered = relatedResponse.products
                   .filter(p => p._id !== id)
                   .slice(0, 8);
@@ -57,6 +66,81 @@ const ProductDetails = () => {
       fetchProduct();
     }
   }, [id]);
+
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        setReviewLoading(true);
+        const response = await getProductReviews(id);
+        if (response.success) {
+          setReviews(response.data.reviews || []);
+          setReviewStats(response.data.stats || { totalReviews: 0, avgRating: 0 });
+        }
+      } catch (err) {
+        console.log('Failed to load reviews');
+      } finally {
+        setReviewLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchReviews();
+    }
+  }, [id]);
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+
+    if (!context.isLogin) {
+      context.openAlertBox('error', 'Vui lòng đăng nhập để viết đánh giá');
+      return;
+    }
+
+    if (!reviewText.trim()) {
+      context.openAlertBox('error', 'Vui lòng nhập nội dung đánh giá');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const response = await addReview({
+        productId: id,
+        rating: reviewRating,
+        review: reviewText,
+        userName: context.user?.name || 'Anonymous',
+        userAvatar: context.user?.avatar || ''
+      });
+
+      if (response.success) {
+        context.openAlertBox('success', 'Đánh giá đã được gửi thành công!');
+        setReviewText('');
+        setReviewRating(5);
+        
+        // Refresh reviews
+        const reviewsResponse = await getProductReviews(id);
+        if (reviewsResponse.success) {
+          setReviews(reviewsResponse.data.reviews || []);
+          setReviewStats(reviewsResponse.data.stats || { totalReviews: 0, avgRating: 0 });
+        }
+      } else {
+        context.openAlertBox('error', response.message || 'Không thể gửi đánh giá');
+      }
+    } catch (err) {
+      context.openAlertBox('error', err.response?.data?.message || 'Không thể gửi đánh giá');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
 
   if (loading) {
     return (
@@ -107,7 +191,7 @@ const ProductDetails = () => {
           </div>
 
           <div className="productContent w-[60%] pr-10 pl-10">
-            <ProductDetailsComponent product={product} />
+            <ProductDetailsComponent product={product} reviewStats={reviewStats} />
           </div>
         </div>
 
@@ -135,7 +219,7 @@ const ProductDetails = () => {
               }`}
               onClick={() => setActiveTab(2)}
             >
-              Review (5)
+              Review ({reviewStats.totalReviews})
             </span>
           </div>
 
@@ -222,171 +306,120 @@ const ProductDetails = () => {
           {activeTab === 2 && (
             <div className="shadow-md w-[80%] py-5 p-8 rounded-md">
               <div className="w-full productReviewsContainer">
-                <h2 className="text-[18px]">Customer questions & answers</h2>
-
-                <div className="reviewScroll w-full max-h-[300px] overflow-y-scroll overflow-x-hidden mt-5 pr-5">
-                  <div className="review w-full pt-5 pb-5 border-b border-[rgba(0,0,0,0.1)] flex items-center justify-between">
-                    <div className="info w-[60%] flex items-center gap-2">
-                      <div className="img w-[80px] h-[80px] overflow-hidden rounded-full">
-                        <img
-                          src="https://lirp.cdn-website.com/6f140169/dms3rep/multi/opt/Parikshit+Gokhale-640w.jpg"
-                          alt=""
-                          className="w-full"
-                        />
-                      </div>
-
-                      <div className="w-[80%]">
-                        <h4 className="text-[16px]">Amzil Mhand</h4>
-                        <h5 className="text-[13px] mb-0">2025-09-19</h5>
-                        <p className="mt-0 mb-0">
-                          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                          Lorem Ipsum has been the industry's standard dummy text ever since the
-                          1500s
-                        </p>
-                      </div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-[18px]">Customer Reviews</h2>
+                  {reviewStats.totalReviews > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Rating value={reviewStats.avgRating} precision={0.1} readOnly size="small" />
+                      <span className="text-[14px] text-gray-600">
+                        {reviewStats.avgRating} out of 5 ({reviewStats.totalReviews} reviews)
+                      </span>
                     </div>
-                    <Rating name="size-small" defaultValue={4} readOnly />
-                  </div>
-
-                  <div className="review w-full pt-5 pb-5 border-b border-[rgba(0,0,0,0.1)] flex items-center justify-between">
-                    <div className="info w-[60%] flex items-center gap-2">
-                      <div className="img w-[80px] h-[80px] overflow-hidden rounded-full">
-                        <img
-                          src="https://lirp.cdn-website.com/6f140169/dms3rep/multi/opt/Parikshit+Gokhale-640w.jpg"
-                          alt=""
-                          className="w-full"
-                        />
-                      </div>
-
-                      <div className="w-[80%]">
-                        <h4 className="text-[16px]">Amzil Mhand</h4>
-                        <h5 className="text-[13px] mb-0">2025-09-19</h5>
-                        <p className="mt-0 mb-0">
-                          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                          Lorem Ipsum has been the industry's standard dummy text ever since the
-                          1500s
-                        </p>
-                      </div>
-                    </div>
-                    <Rating name="size-small" defaultValue={4} readOnly />
-                  </div>
-
-                  <div className="review w-full pt-5 pb-5 border-b border-[rgba(0,0,0,0.1)] flex items-center justify-between">
-                    <div className="info w-[60%] flex items-center gap-2">
-                      <div className="img w-[80px] h-[80px] overflow-hidden rounded-full">
-                        <img
-                          src="https://lirp.cdn-website.com/6f140169/dms3rep/multi/opt/Parikshit+Gokhale-640w.jpg"
-                          alt=""
-                          className="w-full"
-                        />
-                      </div>
-
-                      <div className="w-[80%]">
-                        <h4 className="text-[16px]">Amzil Mhand</h4>
-                        <h5 className="text-[13px] mb-0">2025-09-19</h5>
-                        <p className="mt-0 mb-0">
-                          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                          Lorem Ipsum has been the industry's standard dummy text ever since the
-                          1500s
-                        </p>
-                      </div>
-                    </div>
-                    <Rating name="size-small" defaultValue={4} readOnly />
-                  </div>
-
-                  <div className="review w-full pt-5 pb-5 border-b border-[rgba(0,0,0,0.1)] flex items-center justify-between">
-                    <div className="info w-[60%] flex items-center gap-2">
-                      <div className="img w-[80px] h-[80px] overflow-hidden rounded-full">
-                        <img
-                          src="https://lirp.cdn-website.com/6f140169/dms3rep/multi/opt/Parikshit+Gokhale-640w.jpg"
-                          alt=""
-                          className="w-full"
-                        />
-                      </div>
-
-                      <div className="w-[80%]">
-                        <h4 className="text-[16px]">Amzil Mhand</h4>
-                        <h5 className="text-[13px] mb-0">2025-09-19</h5>
-                        <p className="mt-0 mb-0">
-                          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                          Lorem Ipsum has been the industry's standard dummy text ever since the
-                          1500s
-                        </p>
-                      </div>
-                    </div>
-                    <Rating name="size-small" defaultValue={4} readOnly />
-                  </div>
-
-                  <div className="review w-full pt-5 pb-5 border-b border-[rgba(0,0,0,0.1)] flex items-center justify-between">
-                    <div className="info w-[60%] flex items-center gap-2">
-                      <div className="img w-[80px] h-[80px] overflow-hidden rounded-full">
-                        <img
-                          src="https://lirp.cdn-website.com/6f140169/dms3rep/multi/opt/Parikshit+Gokhale-640w.jpg"
-                          alt=""
-                          className="w-full"
-                        />
-                      </div>
-
-                      <div className="w-[80%]">
-                        <h4 className="text-[16px]">Amzil Mhand</h4>
-                        <h5 className="text-[13px] mb-0">2025-09-19</h5>
-                        <p className="mt-0 mb-0">
-                          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                          Lorem Ipsum has been the industry's standard dummy text ever since the
-                          1500s
-                        </p>
-                      </div>
-                    </div>
-                    <Rating name="size-small" defaultValue={4} readOnly />
-                  </div>
+                  )}
                 </div>
+
+                {reviewLoading ? (
+                  <div className="flex justify-center py-10">
+                    <CircularProgress size={30} />
+                  </div>
+                ) : reviews.length === 0 ? (
+                  <div className="py-10 text-center text-gray-500">
+                    <p>Chưa có đánh giá nào cho sản phẩm này</p>
+                    <p className="text-sm mt-1">Hãy là người đầu tiên đánh giá!</p>
+                  </div>
+                ) : (
+                  <div className="reviewScroll w-full max-h-[400px] overflow-y-auto mt-5 pr-2">
+                    {reviews.map((review) => (
+                      <div key={review._id} className="review w-full pt-5 pb-5 border-b border-[rgba(0,0,0,0.1)] flex items-start justify-between">
+                        <div className="info w-[75%] flex items-start gap-4">
+                          <div className="img w-[60px] h-[60px] flex-shrink-0 overflow-hidden rounded-full bg-gray-200">
+                            {review.userAvatar ? (
+                              <img
+                                src={review.userAvatar}
+                                alt={review.userName}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-[24px] font-semibold text-[#ff5252] bg-red-50">
+                                {review.userName?.charAt(0)?.toUpperCase() || 'A'}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex-1">
+                            <h4 className="text-[16px] font-medium">{review.userName}</h4>
+                            <h5 className="text-[13px] text-gray-500 mb-2">{formatDate(review.createdAt)}</h5>
+                            <p className="mt-0 mb-0 text-[14px] text-gray-700">
+                              {review.review}
+                            </p>
+                          </div>
+                        </div>
+                        <Rating value={review.rating} readOnly size="small" />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <br />
 
                 <div className="reviewForm bg-[#fafafa] p-4 rounded-md">
                   <h2 className="text-[18px]">Add a review</h2>
-                  <form className="w-full mt-5">
-                    <TextField
-                      id="outlined-multiline-flexible"
-                      label="Write a review...."
-                      className="w-full mb-5"
-                      multiline
-                      rows={5}
-                    />
+                  {!context.isLogin ? (
+                    <p className="text-gray-500 mt-3">
+                      Vui lòng <Link to="/login" className="text-[#ff5252] font-medium">đăng nhập</Link> để viết đánh giá
+                    </p>
+                  ) : (
+                    <form className="w-full mt-5" onSubmit={handleSubmitReview}>
+                      <TextField
+                        label="Write a review...."
+                        className="w-full mb-5"
+                        multiline
+                        rows={4}
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        disabled={submitting}
+                      />
 
-                    <br />
-                    <br />
+                      <div className="flex items-center gap-2 mt-3 mb-4">
+                        <span className="text-[14px]">Your Rating:</span>
+                        <Rating 
+                          value={reviewRating} 
+                          onChange={(e, newValue) => setReviewRating(newValue || 5)}
+                          disabled={submitting}
+                        />
+                      </div>
 
-                    <Rating name="size-small" defaultValue={4} />
-
-                    <div className="flex items-center mt-5">
                       <Button
+                        type="submit"
                         variant="contained"
-                        color="inherit"
+                        disabled={submitting}
                         sx={{
                           backgroundColor: '#ff5252',
                           color: '#fff',
-                          minWidth: 200,
-                          height: 48,
-                          px: 3.5,
-                          fontSize: 15,
+                          minWidth: 180,
+                          height: 45,
+                          px: 3,
+                          fontSize: 14,
                           fontWeight: 600,
                           borderRadius: 1,
                           textTransform: 'uppercase',
-                          display: 'flex',
-                          gap: 2,
                           '&:hover': {
                             backgroundColor: '#000',
                           },
-                          '&:active': {
-                            transform: 'scale(0.97)',
+                          '&:disabled': {
+                            backgroundColor: '#ccc',
+                            color: '#fff',
                           },
                         }}
                       >
-                        Submit Review
+                        {submitting ? (
+                          <CircularProgress size={22} color="inherit" />
+                        ) : (
+                          'Submit Review'
+                        )}
                       </Button>
-                    </div>
-                  </form>
+                    </form>
+                  )}
                 </div>
               </div>
             </div>

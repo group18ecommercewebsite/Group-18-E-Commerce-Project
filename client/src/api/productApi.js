@@ -53,3 +53,9 @@ export const getProductsByRating = async (rating) => {
   const response = await apiClient.get(`/product/getAllProductsByRating?rating=${rating}`);
   return response.data;
 };
+
+// Tìm kiếm sản phẩm theo tên
+export const searchProducts = async (query, limit = 10) => {
+  const response = await apiClient.get(`/product/search?q=${encodeURIComponent(query)}&limit=${limit}`);
+  return response.data;
+};

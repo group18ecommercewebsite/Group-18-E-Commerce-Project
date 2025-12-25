@@ -49,7 +49,16 @@ const ResetPassword = () => {
 
     try {
       setIsLoading(true);
-      const email = localStorage.getItem('resetEmail');
+      
+      // Xác định email: ưu tiên user đã đăng nhập, nếu không thì dùng resetEmail từ forgot password flow
+      let email = null;
+      const isLoggedIn = context.isLogin;
+      
+      if (isLoggedIn && context.user?.email) {
+        email = context.user.email;
+      } else {
+        email = localStorage.getItem('resetEmail');
+      }
       
       if (!email) {
         context.openAlertBox('error', 'Session expired. Please try again.');
@@ -66,7 +75,13 @@ const ResetPassword = () => {
       if (response.success) {
         context.openAlertBox('success', 'Password reset successfully!');
         localStorage.removeItem('resetEmail');
-        navigate('/login');
+        
+        // Nếu đang đăng nhập thì quay về trang account, nếu không thì về login
+        if (isLoggedIn) {
+          navigate('/my-account');
+        } else {
+          navigate('/login');
+        }
       } else {
         context.openAlertBox('error', response.message || 'Failed to reset password');
       }

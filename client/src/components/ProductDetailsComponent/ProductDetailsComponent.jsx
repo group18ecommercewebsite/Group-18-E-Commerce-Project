@@ -12,7 +12,7 @@ import { addToMyList } from '../../api/myListApi';
 import { MyContext } from '../../App';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const ProductDetailsComponent = ({ product }) => {
+const ProductDetailsComponent = ({ product, reviewStats }) => {
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(null);
   const [selectedRamIndex, setSelectedRamIndex] = useState(null);
   const [selectedWeightIndex, setSelectedWeightIndex] = useState(null);
@@ -112,9 +112,9 @@ const ProductDetailsComponent = ({ product }) => {
           Brands : <span className="font-medium text-black opacity-75">{brand}</span>
         </span>
 
-        <Rating name="size-small" value={rating} size="small" readOnly />
+        <Rating name="size-small" value={reviewStats?.avgRating || rating} precision={0.1} size="small" readOnly />
 
-        <span className="text-[13px] cursor-pointer">Review (0)</span>
+        <span className="text-[13px] cursor-pointer">Review ({reviewStats?.totalReviews || 0})</span>
       </div>
 
       <div className="flex items-center gap-4 mt-4">

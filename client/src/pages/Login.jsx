@@ -69,6 +69,8 @@ const Login = () => {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
+        // Cập nhật global state
+        context.setUser(response.data.user);
         context.setIsLogin(true);
         context.openAlertBox("success", "Login successful!");
         history("/");
