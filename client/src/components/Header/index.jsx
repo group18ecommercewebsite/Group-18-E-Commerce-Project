@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search } from '../Search'
 import Badge from '@mui/material/Badge';
@@ -32,23 +32,9 @@ export const Header = () => {
 
   const context = useContext(MyContext);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   
-  // Lấy user info từ localStorage khi component mount hoặc khi login state thay đổi
-  useEffect(() => {
-    if (context.isLogin) {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser));
-        } catch (e) {
-          setUser(null);
-        }
-      }
-    } else {
-      setUser(null);
-    }
-  }, [context.isLogin]);
+  // Sử dụng user từ global context thay vì local state
+  const user = context.user;
 
   const handleLogout = async () => {
     try {
@@ -175,7 +161,7 @@ export const Header = () => {
               </li>
               <li>
                 <Tooltip title="Wishlist">
-                  <IconButton aria-label="wishlist">
+                  <IconButton aria-label="wishlist" component={Link} to="/my-list">
                     <StyledBadge badgeContent={4} color="secondary">
                       <FaRegHeart />
                     </StyledBadge>

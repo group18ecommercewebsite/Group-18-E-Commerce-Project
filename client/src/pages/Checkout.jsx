@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { IoBagCheckOutline } from 'react-icons/io5';
+import CircularProgress from '@mui/material/CircularProgress';
+import { MyContext } from '../App';
+import { createOrder } from '../api/orderApi';
 
 export const Checkout = () => {
+  const context = useContext(MyContext);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+
   const [formFields, setFormFields] = useState({
     fullName: '',
     email: '',
@@ -15,26 +24,110 @@ export const Checkout = () => {
     phone: '',
   });
 
+  // Load user info vào form
+  useEffect(() => {
+    if (context.user) {
+      setFormFields(prev => ({
+        ...prev,
+        fullName: context.user.name || '',
+        email: context.user.email || '',
+        phone: context.user.mobile || ''
+      }));
+    }
+  }, [context.user]);
+
+  // Redirect nếu chưa login
+  useEffect(() => {
+    if (!context.isLogin) {
+      context.openAlertBox('error', 'Vui lòng đăng nhập để thanh toán');
+      navigate('/login');
+    }
+  }, [context.isLogin]);
+
+  // Redirect nếu giỏ hàng trống (chỉ khi không phải vừa đặt hàng thành công)
+  useEffect(() => {
+    if (context.isLogin && !context.cartLoading && context.cartItems.length === 0 && !orderSuccess) {
+      context.openAlertBox('error', 'Giỏ hàng trống');
+      navigate('/cart');
+    }
+  }, [context.cartItems, context.cartLoading, context.isLogin, orderSuccess]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormFields({ ...formFields, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  // Tính tổng tiền
+  const subtotal = context.cartItems.reduce((sum, item) => {
+    const price = item.productId?.price || 0;
+    const qty = item.quantity || 1;
+    return sum + (price * qty);
+  }, 0);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Xử lý đặt hàng
-    console.log('Order submitted:', formFields);
+    
+    // Validate form
+    if (!formFields.fullName || !formFields.email || !formFields.streetAddress || !formFields.city || !formFields.phone) {
+      context.openAlertBox('error', 'Vui lòng điền đầy đủ thông tin');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Prepare order data
+      const orderData = {
+        products: context.cartItems.map(item => ({
+          productId: item.productId?._id,
+          name: item.productId?.name,
+          image: item.productId?.images?.[0] || '',
+          quantity: item.quantity,
+          price: item.productId?.price
+        })),
+        shippingAddress: {
+          fullName: formFields.fullName,
+          email: formFields.email,
+          phone: formFields.phone,
+          address: `${formFields.streetAddress}${formFields.apartment ? ', ' + formFields.apartment : ''}`,
+          city: formFields.city,
+          state: formFields.state,
+          zipCode: formFields.zipCode
+        },
+        totalAmount: subtotal,
+        subTotalAmount: subtotal
+      };
+
+      const response = await createOrder(orderData);
+
+      if (response.success) {
+        // Đánh dấu order thành công để không bị redirect về /cart
+        setOrderSuccess(true);
+        context.openAlertBox('success', 'Đặt hàng thành công!');
+        // Redirect to orders page trước khi clear cart
+        navigate('/my-orders');
+        // Clear cart in context sau khi đã redirect
+        context.setCartItems([]);
+      } else {
+        context.openAlertBox('error', response.message || 'Đặt hàng thất bại');
+      }
+    } catch (error) {
+      console.error('Order error:', error);
+      context.openAlertBox('error', error.response?.data?.message || 'Đặt hàng thất bại');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Dữ liệu giỏ hàng mẫu
-  const cartItems = [
-    { id: 1, name: 'A-Line Kurti With Sh...', quantity: 1, price: 1300, image: 'https://api.spicezgold.com/download/file_1734690981297_011618e4-4682-4123-be80-1fb7737d34ad1714702040213RARERABBITMenComfortOpaqueCasualShirt1.jpg' },
-    { id: 2, name: 'A-Line Kurti With Sh...', quantity: 1, price: 1300, image: 'https://api.spicezgold.com/download/file_1734690981297_011618e4-4682-4123-be80-1fb7737d34ad1714702040213RARERABBITMenComfortOpaqueCasualShirt1.jpg' },
-    { id: 3, name: 'A-Line Kurti With Sh...', quantity: 1, price: 1300, image: 'https://api.spicezgold.com/download/file_1734690981297_011618e4-4682-4123-be80-1fb7737d34ad1714702040213RARERABBITMenComfortOpaqueCasualShirt1.jpg' },
-    { id: 4, name: 'A-Line Kurti With Sh...', quantity: 1, price: 1300, image: 'https://api.spicezgold.com/download/file_1734690981297_011618e4-4682-4123-be80-1fb7737d34ad1714702040213RARERABBITMenComfortOpaqueCasualShirt1.jpg' },
-  ];
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  if (context.cartLoading) {
+    return (
+      <section className="py-10 bg-[#f5f5f5]">
+        <div className="container flex justify-center items-center min-h-[400px]">
+          <CircularProgress sx={{ color: '#ff5252' }} />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-10 bg-[#f5f5f5]">
@@ -50,23 +143,25 @@ export const Checkout = () => {
                 <div className="col w-[50%]">
                   <TextField
                     className="w-full"
-                    placeholder="Full Name"
+                    label="Full Name *"
                     variant="outlined"
                     size="small"
                     name="fullName"
                     value={formFields.fullName}
                     onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="col w-[50%]">
                   <TextField
                     className="w-full"
-                    placeholder="Email"
+                    label="Email *"
                     variant="outlined"
                     size="small"
                     name="email"
                     value={formFields.email}
                     onChange={handleChange}
+                    required
                   />
                 </div>
               </div>
@@ -82,6 +177,7 @@ export const Checkout = () => {
                   name="streetAddress"
                   value={formFields.streetAddress}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <div className="mb-5">
@@ -101,18 +197,19 @@ export const Checkout = () => {
                 <div className="col w-[50%]">
                   <TextField
                     className="w-full"
-                    placeholder="Town / City *"
+                    label="Town / City *"
                     variant="outlined"
                     size="small"
                     name="city"
                     value={formFields.city}
                     onChange={handleChange}
+                    required
                   />
                 </div>
                 <div className="col w-[50%]">
                   <TextField
                     className="w-full"
-                    placeholder="State / County *"
+                    label="State / County"
                     variant="outlined"
                     size="small"
                     name="state"
@@ -122,42 +219,29 @@ export const Checkout = () => {
                 </div>
               </div>
 
-              {/* ZIP Code */}
-              <p className="text-[14px] font-medium mb-2">Postcode / ZIP *</p>
-              <div className="mb-5">
-                <TextField
-                  className="w-full"
-                  placeholder="Zip Code"
-                  variant="outlined"
-                  size="small"
-                  name="zipCode"
-                  value={formFields.zipCode}
-                  onChange={handleChange}
-                />
-              </div>
-
-              {/* Phone & Email */}
+              {/* ZIP Code & Phone */}
               <div className="flex items-center gap-5">
                 <div className="col w-[50%]">
                   <TextField
                     className="w-full"
-                    placeholder="Phone Number"
+                    label="Postcode / ZIP"
                     variant="outlined"
                     size="small"
-                    name="phone"
-                    value={formFields.phone}
+                    name="zipCode"
+                    value={formFields.zipCode}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="col w-[50%]">
                   <TextField
                     className="w-full"
-                    placeholder="Email Address"
+                    label="Phone Number *"
                     variant="outlined"
                     size="small"
-                    name="email"
-                    value={formFields.email}
+                    name="phone"
+                    value={formFields.phone}
                     onChange={handleChange}
+                    required
                   />
                 </div>
               </div>
@@ -178,26 +262,47 @@ export const Checkout = () => {
 
             {/* Cart Items with scroll */}
             <div className="max-h-[280px] overflow-y-auto pr-2">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100">
+              {context.cartItems.map((item) => (
+                <div key={item._id} className="flex items-center justify-between py-3 border-b border-gray-100">
                   <div className="flex items-center gap-3">
                     <div className="w-[60px] h-[60px] rounded-md overflow-hidden border border-gray-200">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img 
+                        src={item.productId?.images?.[0] || 'https://via.placeholder.com/60'} 
+                        alt={item.productId?.name} 
+                        className="w-full h-full object-cover" 
+                      />
                     </div>
                     <div>
-                      <p className="text-[13px] font-medium text-gray-800">{item.name}</p>
+                      <p className="text-[13px] font-medium text-gray-800 line-clamp-2 max-w-[120px]">
+                        {item.productId?.name}
+                      </p>
                       <p className="text-[12px] text-gray-500">Qty: {item.quantity}</p>
                     </div>
                   </div>
-                  <span className="text-[14px] font-medium">₹{item.price.toLocaleString()}</span>
+                  <span className="text-[14px] font-medium">
+                    ${((item.productId?.price || 0) * item.quantity).toLocaleString()}
+                  </span>
                 </div>
               ))}
+            </div>
+
+            {/* Subtotal */}
+            <div className="flex justify-between border-t border-gray-200 pt-3 mt-3">
+              <span className="font-semibold text-[15px]">Total</span>
+              <span className="font-bold text-[18px] text-[#ff5252]">${subtotal.toLocaleString()}</span>
+            </div>
+
+            {/* Payment Method */}
+            <div className="mt-4 p-3 bg-gray-50 rounded-md">
+              <p className="text-[14px] font-medium">Payment Method</p>
+              <p className="text-[13px] text-gray-600">💵 Cash On Delivery (COD)</p>
             </div>
 
             {/* Checkout Button */}
             <Button
               type="submit"
               onClick={handleSubmit}
+              disabled={loading || context.cartItems.length === 0}
               className="w-full mt-5"
               sx={{
                 backgroundColor: '#ff5252',
@@ -212,10 +317,20 @@ export const Checkout = () => {
                 '&:hover': {
                   backgroundColor: '#e04848',
                 },
+                '&:disabled': {
+                  backgroundColor: '#ccc',
+                  color: '#fff',
+                },
               }}
             >
-              <IoBagCheckOutline className="text-[18px]" />
-              Checkout
+              {loading ? (
+                <CircularProgress size={22} color="inherit" />
+              ) : (
+                <>
+                  <IoBagCheckOutline className="text-[18px]" />
+                  Place Order
+                </>
+              )}
             </Button>
           </div>
         </div>

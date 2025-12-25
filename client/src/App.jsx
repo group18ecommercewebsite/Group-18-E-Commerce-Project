@@ -47,6 +47,19 @@ function App() {
     return !!(token && user);
   });
 
+  // Global user state - để Header và các component khác có thể cập nhật khi profile thay đổi
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+
   const [openCartPanel, setOpenCartPanel] = useState(false);
   
   // Global cart state
@@ -113,6 +126,9 @@ function App() {
     openAlertBox,
     isLogin,
     setIsLogin,
+    // Global user state
+    user,
+    setUser,
     // Global cart state
     cartItems,
     setCartItems,

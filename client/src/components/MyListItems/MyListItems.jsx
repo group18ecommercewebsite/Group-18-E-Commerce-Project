@@ -1,42 +1,65 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { IoCloseSharp } from 'react-icons/io5';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import { GoTriangleDown } from 'react-icons/go';
 import Rating from '@mui/material/Rating';
 
-const MyListItems = (props) => {
-  
+const MyListItems = ({ item, onRemove }) => {
+  // Tính phần trăm giảm giá
+  const discountPercent = item.discount || 
+    (item.oldPrice && item.price ? Math.round((1 - item.price / item.oldPrice) * 100) : 0);
+
   return (
     <div className="cartItem w-full p-3 flex items-center gap-4 pb-5 border-b border-[rgba(0,0,0,0.1)]">
       <div className="img w-[15%] rounded-md overflow-hidden">
-        <Link to={'/product/7854'} className="group">
+        <Link to={`/product/${item.productId}`} className="group">
           <img
-            src="https://serviceapi.spicezgold.com/download/1753722939206_125c18d6-592d-4082-84e5-49707ae9a4fd1749366193911-Flying-Machine-Women-Wide-Leg-High-Rise-Light-Fade-Stretchab-1.jpg"
+            src={item.image || 'https://via.placeholder.com/150'}
+            alt={item.productTitle}
             className="w-full group-hover:scale-105 transition-all"
           />
         </Link>
       </div>
 
       <div className="info w-[85%] relative">
-        <IoCloseSharp className="absolute cursor-pointer top-[0px] right-[0px] text-[22px] link transition-all" />
-        <span className="text-[13px]">Flying Machine</span>
-        <h3 className="text-[15px]">
-          <Link className="link" to={'/product/7854'}>
-            Women Wide Leg Killer
+        <button 
+          onClick={onRemove}
+          className="absolute cursor-pointer top-[0px] right-[0px] text-[22px] link transition-all hover:text-[#ff5252]"
+        >
+          <IoCloseSharp />
+        </button>
+        
+        {item.brand && (
+          <span className="text-[13px] text-gray-500">{item.brand}</span>
+        )}
+        
+        <h3 className="text-[15px] pr-8">
+          <Link className="link hover:text-[#ff5252]" to={`/product/${item.productId}`}>
+            {item.productTitle}
           </Link>
         </h3>
 
-        <Rating name="size-small" defaultValue={2} size="small" readOnly />
-
+        <Rating 
+          name="read-only" 
+          value={item.rating || 0} 
+          size="small" 
+          readOnly 
+          precision={0.5}
+        />
 
         <div className="flex items-center gap-4 mt-2">
-          <span className="price text-[14px] font-[600]">$58.00</span>
-          <span className="oldPrice line-through text-gray-500 text-[14px] font-medium">
-            $58.00
+          <span className="price text-[14px] font-[600]">
+            ${item.price?.toLocaleString() || '0'}
           </span>
-          <span className="price text-[#ff5252] text-[14px] font-[600]">55% OFF</span>
+          {item.oldPrice && item.oldPrice > item.price && (
+            <span className="oldPrice line-through text-gray-500 text-[14px] font-medium">
+              ${item.oldPrice?.toLocaleString()}
+            </span>
+          )}
+          {discountPercent > 0 && (
+            <span className="price text-[#ff5252] text-[14px] font-[600]">
+              {discountPercent}% OFF
+            </span>
+          )}
         </div>
       </div>
     </div>

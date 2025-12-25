@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
     orderId: {
         type: String,
         required: [true, "Provide orderId"],
-        unique: true
+        unique: false  // Changed: multiple products per order share same orderId
     },
     productId: {
         type: mongoose.Schema.ObjectId,
@@ -16,7 +16,9 @@ const orderSchema = new mongoose.Schema({
     },
     product_details: {
         name: String,
-        image: Array
+        image: Array,
+        quantity: Number,
+        price: Number
     },
     paymentId: {
         type: String,
@@ -26,9 +28,15 @@ const orderSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    // Changed: Store shipping address as embedded object instead of ObjectId reference
     delivery_address: {
-        type: mongoose.Schema.ObjectId,
-        ref: "address"
+        fullName: String,
+        email: String,
+        phone: String,
+        address: String,
+        city: String,
+        state: String,
+        zipCode: String
     },
     subTotalAmt: {
         type: Number,
@@ -37,6 +45,11 @@ const orderSchema = new mongoose.Schema({
     totalAmt: {
         type: Number,
         default: 0
+    },
+    order_status: {
+        type: String,
+        enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+        default: 'pending'
     },
     invoice_receipt: {
         type: String,
