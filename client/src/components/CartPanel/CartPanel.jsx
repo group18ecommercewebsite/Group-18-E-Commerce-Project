@@ -35,7 +35,7 @@ const CartPanel = () => {
     const price = item.productId?.price || 0;
     return sum + (price * item.quantity);
   }, 0);
-  const shipping = subtotal > 100 ? 0 : 10;
+  const shipping = 0; // Free shipping
   const total = subtotal + shipping;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 

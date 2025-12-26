@@ -112,6 +112,7 @@ export const getMyOrdersController = async (request, response) => {
                     orderId: order.orderId,
                     paymentId: order.paymentId,
                     payment_status: order.payment_status,
+                    order_status: order.order_status, // Thêm order_status
                     delivery_address: order.delivery_address,
                     totalAmt: order.totalAmt,
                     createdAt: order.createdAt,

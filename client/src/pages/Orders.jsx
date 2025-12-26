@@ -218,7 +218,7 @@ export const Orders = () => {
                           <td className="py-3 px-3">{order.products?.length || 0} items</td>
                           <td className="py-3 px-3 font-medium">${order.totalAmt?.toLocaleString()}</td>
                           <td className="py-3 px-3">
-                            <Badge status="pending" />
+                            <Badge status={order.order_status || 'pending'} />
                           </td>
                           <td className="py-3 px-3">{formatDate(order.createdAt)}</td>
                         </tr>

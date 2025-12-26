@@ -2,16 +2,21 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import { IoBagCheckOutline } from 'react-icons/io5';
 import CircularProgress from '@mui/material/CircularProgress';
 import { MyContext } from '../App';
 import { createOrder } from '../api/orderApi';
+import { createSePayPayment } from '../api/paymentApi';
 
 export const Checkout = () => {
   const context = useContext(MyContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cod');
 
   const [formFields, setFormFields] = useState({
     fullName: '',
@@ -98,18 +103,44 @@ export const Checkout = () => {
         subTotalAmount: subtotal
       };
 
-      const response = await createOrder(orderData);
+      if (paymentMethod === 'cod') {
+        // COD - Tạo order trực tiếp
+        const response = await createOrder(orderData);
 
-      if (response.success) {
-        // Đánh dấu order thành công để không bị redirect về /cart
-        setOrderSuccess(true);
-        context.openAlertBox('success', 'Đặt hàng thành công!');
-        // Redirect to orders page trước khi clear cart
-        navigate('/my-orders');
-        // Clear cart in context sau khi đã redirect
-        context.setCartItems([]);
-      } else {
-        context.openAlertBox('error', response.message || 'Đặt hàng thất bại');
+        if (response.success) {
+          setOrderSuccess(true);
+          context.openAlertBox('success', 'Đặt hàng thành công!');
+          navigate('/my-orders');
+          context.setCartItems([]);
+        } else {
+          context.openAlertBox('error', response.message || 'Đặt hàng thất bại');
+        }
+      } else if (paymentMethod === 'sepay') {
+        // SePay - Tạo payment và redirect bằng form
+        context.openAlertBox('info', 'Đang chuyển đến cổng thanh toán...');
+        
+        const paymentResponse = await createSePayPayment(orderData);
+
+        if (paymentResponse.success && paymentResponse.data.checkout_url && paymentResponse.data.fields) {
+          // Tạo form và submit để redirect đến SePay
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = paymentResponse.data.checkout_url;
+
+          // Thêm các hidden fields
+          Object.keys(paymentResponse.data.fields).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = paymentResponse.data.fields[key];
+            form.appendChild(input);
+          });
+
+          document.body.appendChild(form);
+          form.submit();
+        } else {
+          context.openAlertBox('error', paymentResponse.message || 'Không thể tạo thanh toán');
+        }
       }
     } catch (error) {
       console.error('Order error:', error);
@@ -261,11 +292,11 @@ export const Checkout = () => {
             </div>
 
             {/* Cart Items with scroll */}
-            <div className="max-h-[280px] overflow-y-auto pr-2">
+            <div className="max-h-[180px] overflow-y-auto pr-2">
               {context.cartItems.map((item) => (
-                <div key={item._id} className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-[60px] h-[60px] rounded-md overflow-hidden border border-gray-200">
+                <div key={item._id} className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-[45px] h-[45px] rounded-md overflow-hidden border border-gray-200">
                       <img 
                         src={item.productId?.images?.[0] || 'https://via.placeholder.com/60'} 
                         alt={item.productId?.name} 
@@ -273,14 +304,14 @@ export const Checkout = () => {
                       />
                     </div>
                     <div>
-                      <p className="text-[13px] font-medium text-gray-800 line-clamp-2 max-w-[120px]">
+                      <p className="text-[12px] font-medium text-gray-800 line-clamp-1 max-w-[90px]">
                         {item.productId?.name}
                       </p>
-                      <p className="text-[12px] text-gray-500">Qty: {item.quantity}</p>
+                      <p className="text-[11px] text-gray-500">x{item.quantity}</p>
                     </div>
                   </div>
-                  <span className="text-[14px] font-medium">
-                    ${((item.productId?.price || 0) * item.quantity).toLocaleString()}
+                  <span className="text-[13px] font-medium">
+                    ${((item.productId?.price || 0) * item.quantity).toFixed(2)}
                   </span>
                 </div>
               ))}
@@ -289,13 +320,42 @@ export const Checkout = () => {
             {/* Subtotal */}
             <div className="flex justify-between border-t border-gray-200 pt-3 mt-3">
               <span className="font-semibold text-[15px]">Total</span>
-              <span className="font-bold text-[18px] text-[#ff5252]">${subtotal.toLocaleString()}</span>
+              <span className="font-bold text-[18px] text-[#ff5252]">${subtotal.toFixed(2)}</span>
             </div>
 
-            {/* Payment Method */}
+            {/* Payment Method Selection */}
             <div className="mt-4 p-3 bg-gray-50 rounded-md">
-              <p className="text-[14px] font-medium">Payment Method</p>
-              <p className="text-[13px] text-gray-600">💵 Cash On Delivery (COD)</p>
+              <p className="text-[14px] font-semibold mb-3">Payment Method</p>
+              <RadioGroup
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              >
+                <FormControlLabel 
+                  value="cod" 
+                  control={<Radio size="small" sx={{ color: '#ff5252', '&.Mui-checked': { color: '#ff5252' } }} />} 
+                  label={
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px]">💵 Cash On Delivery (COD)</span>
+                    </div>
+                  }
+                />
+                <FormControlLabel 
+                  value="sepay" 
+                  control={<Radio size="small" sx={{ color: '#ff5252', '&.Mui-checked': { color: '#ff5252' } }} />} 
+                  label={
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px]">💳 SePay (VietQR / Card)</span>
+                      <span className="text-[10px] text-purple-600 bg-purple-50 px-1 rounded">Online</span>
+                    </div>
+                  }
+                />
+              </RadioGroup>
+              
+              {paymentMethod === 'sepay' && (
+                <div className="mt-2 p-2 bg-blue-50 rounded text-[11px] text-blue-700">
+                  ⚠️ Bạn sẽ được chuyển đến cổng thanh toán SePay để hoàn tất
+                </div>
+              )}
             </div>
 
             {/* Checkout Button */}
@@ -305,7 +365,7 @@ export const Checkout = () => {
               disabled={loading || context.cartItems.length === 0}
               className="w-full mt-5"
               sx={{
-                backgroundColor: '#ff5252',
+                backgroundColor: paymentMethod === 'sepay' ? '#7c3aed' : '#ff5252',
                 color: '#fff',
                 height: 48,
                 fontSize: 14,
@@ -315,7 +375,7 @@ export const Checkout = () => {
                 gap: 1,
                 textTransform: 'uppercase',
                 '&:hover': {
-                  backgroundColor: '#e04848',
+                  backgroundColor: paymentMethod === 'sepay' ? '#6d28d9' : '#e04848',
                 },
                 '&:disabled': {
                   backgroundColor: '#ccc',
@@ -328,7 +388,7 @@ export const Checkout = () => {
               ) : (
                 <>
                   <IoBagCheckOutline className="text-[18px]" />
-                  Place Order
+                  {paymentMethod === 'cod' ? 'Place Order' : 'Pay with SePay'}
                 </>
               )}
             </Button>

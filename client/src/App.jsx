@@ -26,6 +26,7 @@ import { Checkout } from './pages/Checkout';
 import { Account } from './pages/Account';
 import MyList from './pages/MyList';
 import { Orders } from './pages/Orders';
+import PaymentResult from './pages/PaymentResult';
 
 import toast, { Toaster } from 'react-hot-toast';
 import { duration } from '@mui/material';
@@ -156,6 +157,7 @@ function App() {
               <Route path="/my-account" exact={true} element={<Account />} />
               <Route path="/my-list" exact={true} element={<MyList />} />
               <Route path="/my-orders" exact={true} element={<Orders />} />
+              <Route path="/payment-result" exact={true} element={<PaymentResult />} />
             </Routes>
             <Footer/>
 

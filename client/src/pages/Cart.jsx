@@ -26,7 +26,7 @@ const CartPage = () => {
     return sum + (price * item.quantity);
   }, 0);
 
-  const shipping = subtotal > 100 ? 0 : 10; // Free shipping over $100
+  const shipping = 0; // Free shipping
   const total = subtotal + shipping;
 
   // Callback when item is removed or updated - cập nhật global cart state
