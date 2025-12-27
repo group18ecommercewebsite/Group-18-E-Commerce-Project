@@ -14,6 +14,7 @@ import myListRouter from './route/mylist.route.js';
 import orderRouter from './route/order.route.js';
 import reviewRouter from './route/review.route.js';
 import paymentRouter from './route/payment.route.js';
+import adminRouter from './route/admin.route.js';
 
 
 const app = express();
@@ -48,6 +49,7 @@ app.use('/api/myList', myListRouter)
 app.use('/api/order', orderRouter)
 app.use('/api/review', reviewRouter)
 app.use('/api/payment', paymentRouter)
+app.use('/api/admin', adminRouter)
 
 connectDB().then(() => {
     app.listen(process.env.PORT, () => {

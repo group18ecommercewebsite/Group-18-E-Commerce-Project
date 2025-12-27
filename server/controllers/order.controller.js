@@ -104,22 +104,24 @@ export const getMyOrdersController = async (request, response) => {
         const orders = await OrderModel.find({ userId: userId })
             .sort({ createdAt: -1 });
 
-        // Group orders by orderId
+        // Group orders by base orderId (bỏ suffix -1, -2, -3...)
         const groupedOrders = orders.reduce((acc, order) => {
-            const key = order.orderId;
-            if (!acc[key]) {
-                acc[key] = {
-                    orderId: order.orderId,
+            // Lấy base orderId: ORD-XXXXXX-YYYY (bỏ phần -1, -2 ở cuối)
+            const baseOrderId = order.orderId.split('-').slice(0, 3).join('-');
+            
+            if (!acc[baseOrderId]) {
+                acc[baseOrderId] = {
+                    orderId: baseOrderId,
                     paymentId: order.paymentId,
                     payment_status: order.payment_status,
-                    order_status: order.order_status, // Thêm order_status
+                    order_status: order.order_status,
                     delivery_address: order.delivery_address,
                     totalAmt: order.totalAmt,
                     createdAt: order.createdAt,
                     products: []
                 };
             }
-            acc[key].products.push({
+            acc[baseOrderId].products.push({
                 _id: order._id,
                 productId: order.productId,
                 name: order.product_details?.name || '',
