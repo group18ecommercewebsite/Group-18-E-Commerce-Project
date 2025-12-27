@@ -57,10 +57,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             id: 'products',
             label: 'Products',
             icon: RiProductHuntLine,
-            submenu: [
-                { label: 'Product List', path: '/products', onClick: null },
-                { label: 'Add Product', path: null, onClick: openPanel }
-            ]
+            path: '/products'
         },
         {
             id: 'category',

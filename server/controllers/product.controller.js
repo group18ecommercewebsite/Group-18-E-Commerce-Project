@@ -60,7 +60,7 @@ export async function createProduct(request, response) {
         let product = new ProductModel({
             name: request.body.name,
             description: request.body.description,
-            images: imagesArr,
+            images: request.body.images || [],
             brand: request.body.brand,
             price: request.body.price,
             oldPrice: request.body.oldPrice,
@@ -70,6 +70,7 @@ export async function createProduct(request, response) {
             subCat: request.body.subCat,
             thirdsubCat: request.body.thirdsubCat,
             thirdsubCatId: request.body.thirdsubCatId,
+            category: request.body.catId, // Also set category ObjectId ref
             countInStock: request.body.countInStock,
             rating: request.body.rating,
             isFeatured: request.body.isFeatured,
@@ -666,7 +667,7 @@ export async function deleteProduct(request, response) {
 
         const images = product.images;
 
-        for (img of images) {
+        for (const img of images) {
             const imgUrl = img;
             const urlArr = imgUrl.split("/");
             const image = urlArr[urlArr.length - 1];
@@ -770,7 +771,7 @@ export async function updateProduct(request, response) {
             {
                 name: request.body.name,
                 description: request.body.description,
-                images: imagesArr,
+                images: request.body.images,
                 brand: request.body.brand,
                 price: request.body.price,
                 oldPrice: request.body.oldPrice,

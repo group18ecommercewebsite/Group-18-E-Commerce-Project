@@ -89,6 +89,9 @@ import Categories from './Pages/Categories';
 import AddCategory from './Pages/AddCategory';
 import EditCategory from './Pages/EditCategory';
 import AddSubCategory from './Pages/AddSubCategory';
+import Products from './Pages/Products';
+import EditProduct from './Pages/EditProduct';
+import AddProduct from './Pages/AddProduct';
 import Users from './Pages/Users';
 import Orders from './Pages/Orders';
 import ForgotPassword from './Pages/ForgotPassword';
@@ -162,6 +165,28 @@ function App() {
         {
           index: true,
           element: <HomeSlides />
+        }
+      ]
+    },
+    {
+      path: "/products",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Products />
+        },
+        {
+          path: "add",
+          element: <AddProduct />
+        },
+        {
+          path: "edit/:id",
+          element: <EditProduct />
         }
       ]
     },

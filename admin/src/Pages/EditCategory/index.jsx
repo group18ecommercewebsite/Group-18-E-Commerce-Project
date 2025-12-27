@@ -77,7 +77,8 @@ const EditCategory = () => {
         setFormData(prev => ({
             ...prev,
             image: null,
-            imagePreview: null
+            imagePreview: null,
+            currentImage: '' // Clear current image so it gets removed on save
         }));
     };
 
@@ -93,7 +94,7 @@ const EditCategory = () => {
             setSaving(true);
             setError('');
 
-            let imageUrl = formData.currentImage;
+            let imageUrl = formData.currentImage; // Will be empty if user removed the image
 
             // Upload new image if changed
             if (formData.image) {
@@ -113,10 +114,10 @@ const EditCategory = () => {
                 imageUrl = uploadedImages[0];
             }
 
-            // Update category
+            // Update category - send images as array (empty array means no image)
             const updateData = {
                 name: formData.name.trim(),
-                image: imageUrl
+                images: imageUrl ? [imageUrl] : [] // Send as array, empty if removed
             };
 
             const updateRes = await updateCategory(id, updateData);
