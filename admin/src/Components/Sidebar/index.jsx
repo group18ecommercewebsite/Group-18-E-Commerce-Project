@@ -42,10 +42,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             id: 'home-slides',
             label: 'Home Slides',
             icon: FaRegImage,
-            submenu: [
-                { label: 'Slides List', path: '/home-slides' },
-                { label: 'Add Slide', path: '/home-slides/add' }
-            ]
+            path: '/home-slides'
         },
         {
             id: 'users',

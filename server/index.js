@@ -15,6 +15,7 @@ import orderRouter from './route/order.route.js';
 import reviewRouter from './route/review.route.js';
 import paymentRouter from './route/payment.route.js';
 import adminRouter from './route/admin.route.js';
+import bannerRouter from './route/banner.route.js';
 
 
 const app = express();
@@ -28,7 +29,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(express.json()); // Parse body JSON
+app.use(express.json({ limit: '50mb' })); // Parse body JSON with increased limit for image uploads
 app.use(cookieParser());
 app.use(morgan("dev")); // Ghi log request HTTP
 app.use(helmet({
@@ -50,6 +51,7 @@ app.use('/api/order', orderRouter)
 app.use('/api/review', reviewRouter)
 app.use('/api/payment', paymentRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/banner', bannerRouter)
 
 connectDB().then(() => {
     app.listen(process.env.PORT, () => {
