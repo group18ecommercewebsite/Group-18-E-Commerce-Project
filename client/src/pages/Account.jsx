@@ -1,22 +1,27 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
 import { FiUser } from 'react-icons/fi';
 import { GoHeart } from 'react-icons/go';
 import { IoBagCheckOutline } from 'react-icons/io5';
-import { IoLogOutOutline } from 'react-icons/io5';
+import { IoLogOutOutline, IoCameraOutline, IoImageOutline } from 'react-icons/io5';
 import { MyContext } from '../App';
-import { getUserDetails, updateUser, logoutUser } from '../api/userApi';
+import { getUserDetails, updateUser, logoutUser, uploadAvatar } from '../api/userApi';
 import CircularProgress from '@mui/material/CircularProgress';
 
 export const Account = () => {
   const context = useContext(MyContext);
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+  const [showAvatarPreview, setShowAvatarPreview] = useState(false);
   const [formFields, setFormFields] = useState({
     name: '',
     email: '',
@@ -47,7 +52,6 @@ export const Account = () => {
             email: userData.email || '',
             mobile: userData.mobile || '',
           });
-          // Update localStorage với data mới từ API
           localStorage.setItem('user', JSON.stringify(userData));
         }
       } catch (error) {
@@ -60,6 +64,17 @@ export const Account = () => {
 
     fetchUserDetails();
   }, [context.isLogin]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showAvatarMenu && !e.target.closest('.avatar-menu-container')) {
+        setShowAvatarMenu(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showAvatarMenu]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,11 +94,9 @@ export const Account = () => {
       
       if (response.success) {
         context.openAlertBox('success', 'Cập nhật profile thành công!');
-        // Update localStorage và global context với data mới
         const updatedUser = response.user || { ...user, ...formFields };
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
-        // Cập nhật global context để Header cập nhật ngay
         context.setUser(updatedUser);
       } else {
         context.openAlertBox('error', response.message || 'Cập nhật thất bại');
@@ -93,6 +106,72 @@ export const Account = () => {
       context.openAlertBox('error', error.response?.data?.message || 'Cập nhật thất bại');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Handle avatar click - show menu or direct upload
+  const handleAvatarClick = (e) => {
+    e.stopPropagation();
+    if (user?.avatar) {
+      // Có avatar -> show menu
+      setShowAvatarMenu(!showAvatarMenu);
+    } else {
+      // Chưa có avatar -> upload trực tiếp
+      fileInputRef.current?.click();
+    }
+  };
+
+  // Handle view avatar
+  const handleViewAvatar = () => {
+    setShowAvatarMenu(false);
+    setShowAvatarPreview(true);
+  };
+
+  // Handle change avatar
+  const handleChangeAvatar = () => {
+    setShowAvatarMenu(false);
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      context.openAlertBox('error', 'Vui lòng chọn file ảnh');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      context.openAlertBox('error', 'File ảnh không được vượt quá 5MB');
+      return;
+    }
+
+    try {
+      setUploadingAvatar(true);
+      
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await uploadAvatar(formData);
+      
+      if (response && response.avatar) {
+        const updatedUser = { ...user, avatar: response.avatar };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        context.setUser(updatedUser);
+        context.openAlertBox('success', 'Cập nhật avatar thành công!');
+      } else {
+        context.openAlertBox('error', 'Upload avatar thất bại');
+      }
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      context.openAlertBox('error', error.response?.data?.message || 'Upload avatar thất bại');
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -132,21 +211,66 @@ export const Account = () => {
           {/* Left Sidebar */}
           <div className="w-[280px]">
             <div className="card bg-white shadow-md rounded-md p-5">
-              {/* User Avatar */}
+              {/* User Avatar with Menu */}
               <div className="flex flex-col items-center mb-6">
-                <div className="w-[100px] h-[100px] rounded-full bg-[#ff5252] flex items-center justify-center text-white text-[40px] font-semibold mb-3 overflow-hidden">
-                  {user?.avatar ? (
-                    <img 
-                      src={user.avatar} 
-                      alt="User Avatar" 
-                      className="w-full h-full rounded-full object-cover" 
-                    />
-                  ) : (
-                    <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                <div className="avatar-menu-container relative">
+                  <div 
+                    className="relative w-[100px] h-[100px] rounded-full bg-[#ff5252] flex items-center justify-center text-white text-[40px] font-semibold mb-3 overflow-hidden cursor-pointer group"
+                    onClick={handleAvatarClick}
+                  >
+                    {uploadingAvatar ? (
+                      <CircularProgress size={40} sx={{ color: '#fff' }} />
+                    ) : user?.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt="User Avatar" 
+                        className="w-full h-full rounded-full object-cover" 
+                      />
+                    ) : (
+                      <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                    )}
+                    
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                      <IoCameraOutline className="text-white text-[28px]" />
+                    </div>
+                  </div>
+
+                  {/* Dropdown Menu - chỉ hiện khi có avatar */}
+                  {showAvatarMenu && user?.avatar && (
+                    <div className="absolute top-[110px] left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-lg py-2 z-50 min-w-[160px] border border-gray-100">
+                      <button
+                        onClick={handleViewAvatar}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-50 transition"
+                      >
+                        <IoImageOutline className="text-[16px]" />
+                        Xem ảnh
+                      </button>
+                      <button
+                        onClick={handleChangeAvatar}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-50 transition"
+                      >
+                        <IoCameraOutline className="text-[16px]" />
+                        Thay đổi ảnh
+                      </button>
+                    </div>
                   )}
                 </div>
+                
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                
                 <h3 className="text-[16px] font-semibold">{user?.name || 'User'}</h3>
                 <p className="text-[13px] text-gray-500">{user?.email || ''}</p>
+                <p className="text-[11px] text-gray-400 mt-1">
+                  {user?.avatar ? 'Click vào ảnh để xem hoặc thay đổi' : 'Click vào ảnh để thêm avatar'}
+                </p>
               </div>
 
               {/* Menu */}
@@ -259,6 +383,21 @@ export const Account = () => {
           </div>
         </div>
       </div>
+
+      {/* Avatar Preview Dialog */}
+      <Dialog 
+        open={showAvatarPreview} 
+        onClose={() => setShowAvatarPreview(false)}
+        maxWidth="sm"
+      >
+        <div className="p-4">
+          <img 
+            src={user?.avatar} 
+            alt="Avatar Preview" 
+            className="max-w-[400px] max-h-[400px] object-contain rounded-lg"
+          />
+        </div>
+      </Dialog>
     </section>
   );
 };

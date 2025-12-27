@@ -92,7 +92,18 @@ export const Header = () => {
                 {context.isLogin ? (
                   <div className='relative group'>
                     <div className='flex items-center gap-2 cursor-pointer'>
-                      <FaUserCircle className='text-4xl text-gray-600' />
+                      {/* Avatar - hiển thị ảnh nếu có, otherwise icon hoặc chữ cái */}
+                      <div className='w-10 h-10 rounded-full bg-[#ff5252] flex items-center justify-center text-white overflow-hidden'>
+                        {user?.avatar ? (
+                          <img 
+                            src={user.avatar} 
+                            alt={user.name} 
+                            className='w-full h-full object-cover'
+                          />
+                        ) : (
+                          <span className='text-lg font-semibold'>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                        )}
+                      </div>
                       <div className='hidden sm:block'>
                         <p className='text-[14px] font-[600] !m-0'>{user?.name}</p>
                         <p className='text-[11px] text-gray-500 !m-0'>{user?.email}</p>
