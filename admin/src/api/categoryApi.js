@@ -8,7 +8,7 @@ export const getCategories = async () => {
 
 // Lấy chi tiết danh mục theo ID
 export const getCategoryById = async (id) => {
-  const response = await apiClient.get(`/category/get/${id}`);
+  const response = await apiClient.get(`/category/${id}`);
   return response.data;
 };
 
@@ -20,13 +20,13 @@ export const createCategory = async (data) => {
 
 // Cập nhật danh mục
 export const updateCategory = async (id, data) => {
-  const response = await apiClient.put(`/category/update/${id}`, data);
+  const response = await apiClient.put(`/category/${id}`, data);
   return response.data;
 };
 
 // Xóa danh mục
 export const deleteCategory = async (id) => {
-  const response = await apiClient.delete(`/category/delete/${id}`);
+  const response = await apiClient.delete(`/category/${id}`);
   return response.data;
 };
 

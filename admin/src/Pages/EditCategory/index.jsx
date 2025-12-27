@@ -1,54 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getCategories, createCategory, uploadCategoryImages } from '../../api/categoryApi';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FiUpload, FiTrash2 } from 'react-icons/fi';
+import { getCategoryById, updateCategory, uploadCategoryImages } from '../../api/categoryApi';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const AddSubCategory = () => {
+const EditCategory = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [parentCategories, setParentCategories] = useState([]);
-    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         name: '',
-        parentId: '',
         image: null,
-        imagePreview: null
+        imagePreview: null,
+        currentImage: ''
     });
+    const [error, setError] = useState('');
 
-    // Fetch parent categories
+    // Fetch category data
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchCategory = async () => {
             try {
                 setLoading(true);
-                const response = await getCategories();
-                if (response.success) {
-                    // Flatten all categories (including nested ones) for parent selection
-                    const flattenCategories = (cats, level = 0) => {
-                        let result = [];
-                        cats.forEach(cat => {
-                            result.push({ ...cat, level });
-                            if (cat.children?.length > 0) {
-                                result = result.concat(flattenCategories(cat.children, level + 1));
-                            }
-                        });
-                        return result;
-                    };
-                    setParentCategories(flattenCategories(response.data || []));
+                const response = await getCategoryById(id);
+                console.log('Category data:', response);
+                
+                if (response.success && (response.data || response.category)) {
+                    const cat = response.data || response.category;
+                    const catImage = cat.images?.[0] || cat.image || '';
+                    setFormData({
+                        name: cat.name || '',
+                        image: null,
+                        imagePreview: catImage || null,
+                        currentImage: catImage
+                    });
+                } else {
+                    setError('Không tìm thấy danh mục');
                 }
             } catch (err) {
-                console.error('Failed to fetch categories:', err);
-                setError('Lỗi khi tải danh mục');
+                console.error('Failed to fetch category:', err);
+                setError('Lỗi khi tải thông tin danh mục');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchCategories();
-    }, []);
+        if (id) {
+            fetchCategory();
+        }
+    }, [id]);
 
-    const handleImageUpload = (e) => {
+    const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
@@ -87,50 +89,46 @@ const AddSubCategory = () => {
             return;
         }
 
-        if (!formData.parentId) {
-            setError('Vui lòng chọn danh mục cha');
-            return;
-        }
-
         try {
             setSaving(true);
             setError('');
 
-            let imageUrl = '';
+            let imageUrl = formData.currentImage;
 
-            // Upload image if selected
+            // Upload new image if changed
             if (formData.image) {
                 const imageFormData = new FormData();
                 imageFormData.append('images', formData.image);
 
                 const uploadRes = await uploadCategoryImages(imageFormData);
+                console.log('Upload response:', uploadRes);
+                
+                // Server trả về {images: [...]} hoặc {success: true, data: [...]}
                 const uploadedImages = uploadRes.images || uploadRes.data;
                 
-                if (uploadedImages?.[0]) {
-                    imageUrl = uploadedImages[0];
+                if (!uploadedImages || !uploadedImages[0]) {
+                    throw new Error('Upload ảnh thất bại');
                 }
+
+                imageUrl = uploadedImages[0];
             }
 
-            // Create subcategory (category with parentId)
-            const categoryData = {
+            // Update category
+            const updateData = {
                 name: formData.name.trim(),
-                parentId: formData.parentId
+                image: imageUrl
             };
 
-            if (imageUrl) {
-                categoryData.images = [imageUrl];
-            }
+            const updateRes = await updateCategory(id, updateData);
 
-            const createRes = await createCategory(categoryData);
-
-            if (createRes.success) {
+            if (updateRes.success) {
                 navigate('/categories');
             } else {
-                throw new Error(createRes.message || 'Tạo danh mục phụ thất bại');
+                throw new Error(updateRes.message || 'Cập nhật danh mục thất bại');
             }
 
         } catch (err) {
-            console.error('Error creating subcategory:', err);
+            console.error('Error updating category:', err);
             setError(err.response?.data?.message || err.message || 'Có lỗi xảy ra');
         } finally {
             setSaving(false);
@@ -150,75 +148,56 @@ const AddSubCategory = () => {
             <div className="max-w-2xl mx-auto">
                 {/* Header */}
                 <div className="mb-6 bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-                    <h1 className="text-2xl font-bold text-gray-900">Thêm danh mục con</h1>
-                    <p className="text-gray-600 mt-1">Nhập thông tin để tạo danh mục con mới</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Chỉnh sửa danh mục</h1>
+                    <p className="text-gray-600 mt-1">Cập nhật thông tin danh mục</p>
                 </div>
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
-                    {/* Error */}
+                    {/* Error Message */}
                     {error && (
                         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
                             {error}
                         </div>
                     )}
 
-                    {/* Parent Category */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Danh mục cha <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            value={formData.parentId}
-                            onChange={(e) => setFormData(prev => ({ ...prev, parentId: e.target.value }))}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
-                        >
-                            <option value="">Chọn danh mục cha</option>
-                            {parentCategories.map((cat) => (
-                                <option key={cat._id} value={cat._id}>
-                                    {'—'.repeat(cat.level)} {cat.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
                     {/* Name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Tên danh mục con <span className="text-red-500">*</span>
+                            Tên danh mục <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                            placeholder="Nhập tên danh mục con"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            placeholder="Nhập tên danh mục"
                         />
                     </div>
 
-                    {/* Image (Optional) */}
+                    {/* Image */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Hình ảnh (Tùy chọn)
+                            Hình ảnh đại diện
                         </label>
                         {formData.imagePreview ? (
                             <div className="space-y-4">
                                 <div className="relative group">
                                     <img
                                         src={formData.imagePreview}
-                                        alt="Preview"
-                                        className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                                        alt="Category preview"
+                                        className="w-full h-64 object-cover rounded-lg border border-gray-200"
                                     />
                                     <button
                                         type="button"
                                         onClick={removeImage}
-                                        className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                                     >
-                                        <FiTrash2 className="w-4 h-4" />
+                                        <FiTrash2 className="w-5 h-5" />
                                     </button>
                                 </div>
-                                <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors w-fit text-sm">
-                                    <FiUpload className="w-4 h-4" />
+                                <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors w-fit">
+                                    <FiUpload className="w-5 h-5" />
                                     <span>Thay đổi ảnh</span>
                                     <input
                                         type="file"
@@ -229,9 +208,14 @@ const AddSubCategory = () => {
                                 </label>
                             </div>
                         ) : (
-                            <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                <FiUpload className="w-10 h-10 text-gray-400 mb-2" />
-                                <p className="text-sm text-gray-500">Click để tải ảnh</p>
+                            <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-blue-400 transition-all">
+                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <FiUpload className="w-12 h-12 text-gray-400 mb-4" />
+                                    <p className="mb-2 text-sm text-gray-500">
+                                        <span className="font-semibold text-blue-600">Click để tải ảnh</span> hoặc kéo thả
+                                    </p>
+                                    <p className="text-xs text-gray-500">PNG, JPG, WEBP (Tối đa 5MB)</p>
+                                </div>
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -260,10 +244,10 @@ const AddSubCategory = () => {
                             {saving ? (
                                 <>
                                     <CircularProgress size={18} color="inherit" />
-                                    <span>Đang tạo...</span>
+                                    <span>Đang lưu...</span>
                                 </>
                             ) : (
-                                'Thêm danh mục con'
+                                'Lưu thay đổi'
                             )}
                         </button>
                     </div>
@@ -273,4 +257,4 @@ const AddSubCategory = () => {
     );
 };
 
-export default AddSubCategory;
+export default EditCategory;

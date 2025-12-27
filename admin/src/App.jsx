@@ -86,8 +86,8 @@ import BannerPanel from './Components/BannerPanel';
 import { BannerProvider } from './Context/BannerContext';
 import HomeSlides from './Pages/HomeSlides';
 import Categories from './Pages/Categories';
-import SubCategories from './Pages/SubCategories';
 import AddCategory from './Pages/AddCategory';
+import EditCategory from './Pages/EditCategory';
 import AddSubCategory from './Pages/AddSubCategory';
 import Users from './Pages/Users';
 import Orders from './Pages/Orders';
@@ -180,11 +180,15 @@ function App() {
         {
           path: "add",
           element: <AddCategory />
+        },
+        {
+          path: "edit/:id",
+          element: <EditCategory />
         }
       ]
     },
     {
-      path: "/category/subCat",
+      path: "/category/subCat/add",
       element: (
         <ProtectedRoute>
           <Layout />
@@ -193,10 +197,6 @@ function App() {
       children: [
         {
           index: true,
-          element: <SubCategories />
-        },
-        {
-          path: "add",
           element: <AddSubCategory />
         }
       ]
