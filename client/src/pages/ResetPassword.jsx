@@ -1,13 +1,16 @@
 import React, { useState, useContext } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { MyContext } from '../App';
+import { resetPassword } from '../api/userApi';
 
 const ResetPassword = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formFields, setFormFields] = useState({
     newPassword: '',
     confirmPassword: '',
@@ -21,7 +24,7 @@ const ResetPassword = () => {
     setFormFields({ ...formFields, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formFields.newPassword === '') {
@@ -44,10 +47,49 @@ const ResetPassword = () => {
       return;
     }
 
-    // TODO: Gọi API reset password ở đây
-    console.log('Reset password:', formFields.newPassword);
-    context.openAlertBox('success', 'Password reset successfully!');
-    navigate('/login');
+    try {
+      setIsLoading(true);
+      
+      // Xác định email: ưu tiên user đã đăng nhập, nếu không thì dùng resetEmail từ forgot password flow
+      let email = null;
+      const isLoggedIn = context.isLogin;
+      
+      if (isLoggedIn && context.user?.email) {
+        email = context.user.email;
+      } else {
+        email = localStorage.getItem('resetEmail');
+      }
+      
+      if (!email) {
+        context.openAlertBox('error', 'Session expired. Please try again.');
+        navigate('/login');
+        return;
+      }
+
+      const response = await resetPassword({
+        email,
+        newPassword: formFields.newPassword,
+        confirmPassword: formFields.confirmPassword,
+      });
+
+      if (response.success) {
+        context.openAlertBox('success', 'Password reset successfully!');
+        localStorage.removeItem('resetEmail');
+        
+        // Nếu đang đăng nhập thì quay về trang account, nếu không thì về login
+        if (isLoggedIn) {
+          navigate('/my-account');
+        } else {
+          navigate('/login');
+        }
+      } else {
+        context.openAlertBox('error', response.message || 'Failed to reset password');
+      }
+    } catch (error) {
+      context.openAlertBox('error', error.response?.data?.message || 'Failed to reset password');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -110,6 +152,7 @@ const ResetPassword = () => {
               <Button
                 type="submit"
                 className="btn-org w-full"
+                disabled={isLoading}
                 sx={{
                   backgroundColor: '#ff5252',
                   color: '#fff',
@@ -121,7 +164,7 @@ const ResetPassword = () => {
                   },
                 }}
               >
-                Reset Password
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Reset Password'}
               </Button>
             </div>
 

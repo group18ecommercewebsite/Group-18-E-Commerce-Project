@@ -247,54 +247,68 @@ export async function removeImageFromCloudinary(request, response) {
 
 
 export async function deleteCategory(request, response) {
-    const category = await CategoryModel.findById(request.params.id);
-    const images = category.images;
-
-    for (img of images) {
-        const imgUrl = img;
-        const urlArr = imgUrl.split("/");
-        const image = urlArr[urlArr.length - 1];
-
-        const imageName = image.split(".")[0];
-
-        if (imageName) {
-            cloudinary.uploader.destroy(imageName, (error, result) => {
-
+    try {
+        const category = await CategoryModel.findById(request.params.id);
+        
+        if (!category) {
+            return response.status(404).json({
+                message: "Category not found.",
+                success: false,
+                error: true
             });
         }
-    }
+        
+        const images = category.images || [];
 
-    const subCategory = await CategoryModel.find({
-        parentId: request.params.id
-    });
+        for (const img of images) {
+            const imgUrl = img;
+            const urlArr = imgUrl.split("/");
+            const image = urlArr[urlArr.length - 1];
+            const imageName = image.split(".")[0];
 
-    for (let i = 0; i < subCategory.length; i++) {
-
-        const thirdsubCategory = await CategoryModel.find({
-            parentId: subCategory[i]._id
-        });
-
-        for (let i = 0; i < thirdsubCategory.length; i++) {
-            const deletedThirdSubCat = await CategoryModel.findByIdAndDelete(thirdsubCategory[i]._id)
+            if (imageName) {
+                cloudinary.uploader.destroy(imageName, (error, result) => {});
+            }
         }
 
-        const deletedSubCat = await CategoryModel.findByIdAndDelete(subCategory[i]._id);
-    }
+        const subCategory = await CategoryModel.find({
+            parentId: request.params.id
+        });
 
-    const deleteCat = await CategoryModel.findByIdAndDelete(request.params.id);
-    if (!deleteCat) {
-        response.status(404).json({
-            message: "Category not found.",
-            success: false,
-            error: true
+        for (let i = 0; i < subCategory.length; i++) {
+            const thirdsubCategory = await CategoryModel.find({
+                parentId: subCategory[i]._id
+            });
+
+            for (let j = 0; j < thirdsubCategory.length; j++) {
+                await CategoryModel.findByIdAndDelete(thirdsubCategory[j]._id);
+            }
+
+            await CategoryModel.findByIdAndDelete(subCategory[i]._id);
+        }
+
+        const deleteCat = await CategoryModel.findByIdAndDelete(request.params.id);
+        
+        if (!deleteCat) {
+            return response.status(404).json({
+                message: "Category not found.",
+                success: false,
+                error: true
+            });
+        }
+
+        return response.status(200).json({
+            message: "Category deleted!",
+            success: true,
+            error: false
+        });
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
         });
     }
-
-    response.status(200).json({
-        message: "Category deleted!.",
-        success: true,
-        error: false
-    });
 }
 
 
@@ -305,7 +319,7 @@ export async function updateCategory(request, response) {
             request.params.id,
             {
                 name: request.body.name,
-                images: imagesArr.length > 0 ? imagesArr[0] : request.body.images,
+                images: request.body.images, // Use images from request body directly
                 parentId: request.body.parentId,
                 parentCatName: request.body.parentCatName
             },

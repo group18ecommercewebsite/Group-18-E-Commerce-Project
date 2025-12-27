@@ -60,7 +60,7 @@ export async function createProduct(request, response) {
         let product = new ProductModel({
             name: request.body.name,
             description: request.body.description,
-            images: imagesArr,
+            images: request.body.images || [],
             brand: request.body.brand,
             price: request.body.price,
             oldPrice: request.body.oldPrice,
@@ -70,6 +70,7 @@ export async function createProduct(request, response) {
             subCat: request.body.subCat,
             thirdsubCat: request.body.thirdsubCat,
             thirdsubCatId: request.body.thirdsubCatId,
+            category: request.body.catId, // Also set category ObjectId ref
             countInStock: request.body.countInStock,
             rating: request.body.rating,
             isFeatured: request.body.isFeatured,
@@ -142,6 +143,44 @@ export async function getAllProducts(request, response) {
             page: page
         });
 
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+}
+
+
+// search products by name
+export async function searchProducts(request, response) {
+    try {
+        const { q, limit = 10 } = request.query;
+
+        if (!q || q.trim() === '') {
+            return response.status(200).json({
+                error: false,
+                success: true,
+                products: []
+            });
+        }
+
+        // Search by name with case-insensitive regex
+        const products = await ProductModel.find({
+            name: { $regex: q, $options: 'i' }
+        })
+        .populate("category")
+        .limit(parseInt(limit))
+        .exec();
+
+        return response.status(200).json({
+            error: false,
+            success: true,
+            products: products,
+            query: q
+        });
 
     } catch (error) {
         return response.status(500).json({
@@ -628,7 +667,7 @@ export async function deleteProduct(request, response) {
 
         const images = product.images;
 
-        for (img of images) {
+        for (const img of images) {
             const imgUrl = img;
             const urlArr = imgUrl.split("/");
             const image = urlArr[urlArr.length - 1];
@@ -732,7 +771,7 @@ export async function updateProduct(request, response) {
             {
                 name: request.body.name,
                 description: request.body.description,
-                images: imagesArr,
+                images: request.body.images,
                 brand: request.body.brand,
                 price: request.body.price,
                 oldPrice: request.body.oldPrice,

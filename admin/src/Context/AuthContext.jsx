@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { loginUser } from '../api/userApi';
 
 const AuthContext = createContext();
 
@@ -21,40 +22,54 @@ export const AuthProvider = ({ children }) => {
         const userData = localStorage.getItem('admin_user');
         
         if (token && userData) {
-            setIsAuthenticated(true);
-            setUser(JSON.parse(userData));
+            const parsedUser = JSON.parse(userData);
+            // Kiểm tra role là ADMIN
+            if (parsedUser.role === 'ADMIN') {
+                setIsAuthenticated(true);
+                setUser(parsedUser);
+            } else {
+                // Nếu không phải admin thì clear
+                localStorage.removeItem('admin_token');
+                localStorage.removeItem('admin_user');
+            }
         }
         setLoading(false);
     }, []);
 
     const login = async (email, password) => {
         try {
-            // TODO: Gọi API login thực tế
-            // const response = await fetch('/api/admin/login', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ email, password })
-            // });
-            // const data = await response.json();
+            // Gọi API login thực tế
+            const response = await loginUser({ email, password });
             
-            // Tạm thời giả lập login thành công
-            const userData = {
-                id: 1,
-                email: email,
-                name: 'Admin User',
-                role: 'ADMIN'
-            };
-            const token = 'mock_token_' + Date.now();
+            if (response.success) {
+                // Server trả về data.user chứa thông tin user
+                const userData = response.data?.user || response.data;
+                const token = response.data?.accessToken || response.token || 'token_' + Date.now();
+                
+                console.log('Login response:', response);
+                console.log('User data:', userData);
+                console.log('User role:', userData?.role);
+                
+                // Kiểm tra role phải là ADMIN
+                if (userData?.role !== 'ADMIN') {
+                    return { 
+                        success: false, 
+                        error: 'Bạn không có quyền truy cập trang Admin. Chỉ tài khoản ADMIN mới được phép đăng nhập.' 
+                    };
+                }
 
-            localStorage.setItem('admin_token', token);
-            localStorage.setItem('admin_user', JSON.stringify(userData));
-            setIsAuthenticated(true);
-            setUser(userData);
-            
-            return { success: true, user: userData };
+                localStorage.setItem('admin_token', token);
+                localStorage.setItem('admin_user', JSON.stringify(userData));
+                setIsAuthenticated(true);
+                setUser(userData);
+                
+                return { success: true, user: userData };
+            } else {
+                return { success: false, error: response.message || 'Đăng nhập thất bại' };
+            }
         } catch (error) {
             console.error('Login error:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: error.response?.data?.message || error.message || 'Đăng nhập thất bại' };
         }
     };
 
@@ -79,4 +94,3 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-

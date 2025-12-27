@@ -7,7 +7,7 @@ const categoryRouter = Router();
 
 categoryRouter.post('/uploadImages', auth, upload.array('images'), uploadImages);
 categoryRouter.post('/create', auth, createCategory);
-categoryRouter.get('/get', auth, getCategories);
+categoryRouter.get('/get', getCategories);  // Public - không cần auth
 categoryRouter.get('/get/count', auth, getCategoriesCount);
 categoryRouter.get('/get/count/subCat', auth, getSubCategoriesCount);
 categoryRouter.get('/:id', getCategory);

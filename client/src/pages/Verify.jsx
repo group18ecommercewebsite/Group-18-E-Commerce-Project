@@ -1,19 +1,26 @@
 import React, { useState, useContext } from 'react';
 import Button from '@mui/material/Button';
-import { useNavigate } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MyContext } from '../App';
 import OtpBox from '../components/OtpBox/OtpBox';
+import { verifyEmail, verifyForgotPasswordOtp, forgotPassword } from '../api/userApi';
 
 export const Verify = () => {
   const [otpCode, setOtpCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const context = useContext(MyContext);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Xác định loại verify: register hoặc forgot-password
+  const verifyType = searchParams.get('type') || 'register';
 
   const handleOtpChange = (code) => {
     setOtpCode(code);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (otpCode.length !== 6) {
@@ -21,15 +28,68 @@ export const Verify = () => {
       return;
     }
 
-    // TODO: Gọi API verify OTP ở đây
-    console.log('OTP submitted:', otpCode);
-    context.openAlertBox('success', 'OTP verified successfully!');
-    navigate('/reset-password'); // Chuyển đến trang đặt lại mật khẩu
+    try {
+      setIsLoading(true);
+      
+      if (verifyType === 'register') {
+        // Verify email sau khi đăng ký
+        const email = localStorage.getItem('verifyEmail');
+        if (!email) {
+          context.openAlertBox('error', 'Session expired. Please register again.');
+          navigate('/register');
+          return;
+        }
+        const response = await verifyEmail(email, otpCode);
+        if (response.success) {
+          context.openAlertBox('success', 'Email verified successfully!');
+          localStorage.removeItem('verifyEmail');
+          navigate('/login');
+        } else {
+          context.openAlertBox('error', response.message || 'Verification failed');
+        }
+      } else if (verifyType === 'forgot-password') {
+        // Verify OTP forgot password
+        const email = localStorage.getItem('resetEmail');
+        const response = await verifyForgotPasswordOtp({ email, otp: otpCode });
+        if (response.success) {
+          context.openAlertBox('success', 'OTP verified successfully!');
+          navigate('/reset-password');
+        } else {
+          context.openAlertBox('error', response.message || 'Verification failed');
+        }
+      }
+    } catch (error) {
+      context.openAlertBox('error', error.response?.data?.message || 'Verification failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleResendOTP = () => {
-    // TODO: Gọi API gửi lại OTP
-    context.openAlertBox('success', 'OTP has been resent to your email');
+  const handleResendOTP = async () => {
+    try {
+      setIsLoading(true);
+      const email = verifyType === 'register' 
+        ? localStorage.getItem('verifyEmail') 
+        : localStorage.getItem('resetEmail');
+      
+      if (!email) {
+        context.openAlertBox('error', 'Email not found. Please try again.');
+        navigate(verifyType === 'register' ? '/register' : '/login');
+        return;
+      }
+
+      // Gửi lại OTP (sử dụng forgot-password API cho cả hai trường hợp)
+      const response = await forgotPassword(email);
+      if (response.success) {
+        context.openAlertBox('success', 'OTP has been resent to your email');
+      } else {
+        context.openAlertBox('error', response.message || 'Failed to resend OTP');
+      }
+    } catch (error) {
+      context.openAlertBox('error', error.response?.data?.message || 'Failed to resend OTP');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,6 +110,7 @@ export const Verify = () => {
               <Button 
                 type="submit" 
                 className="btn-org w-full"
+                disabled={isLoading}
                 sx={{
                   backgroundColor: '#ff5252',
                   color: '#fff',
@@ -61,7 +122,7 @@ export const Verify = () => {
                   },
                 }}
               >
-                Verify OTP
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Verify OTP'}
               </Button>
             </div>
 

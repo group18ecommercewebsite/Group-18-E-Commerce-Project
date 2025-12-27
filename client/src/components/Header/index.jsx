@@ -16,6 +16,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import Tooltip from '@mui/material/Tooltip';
 import { Navigation } from './Navigation/index';
 import { MyContext } from '../../App';
+import { logoutUser } from '../../api/userApi';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -32,14 +33,23 @@ export const Header = () => {
   const context = useContext(MyContext);
   const navigate = useNavigate();
   
-  // Lấy user info - TODO: Thêm user vào context sau khi tích hợp API
-  const user = {
-    name: 'Kiệt Nguyễn Tuấn',
-    email: 'Tuankiet24022020@Gmail.Com'
-  };
+  // Sử dụng user từ global context thay vì local state
+  const user = context.user;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      // Vẫn logout ở client dù API lỗi
+      console.error('Logout API error:', error);
+    }
+    
+    // Clear localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    
     context.setIsLogin(false);
+    context.openAlertBox('success', 'Logged out successfully');
     navigate('/login');
   };
 
@@ -82,7 +92,18 @@ export const Header = () => {
                 {context.isLogin ? (
                   <div className='relative group'>
                     <div className='flex items-center gap-2 cursor-pointer'>
-                      <FaUserCircle className='text-4xl text-gray-600' />
+                      {/* Avatar - hiển thị ảnh nếu có, otherwise icon hoặc chữ cái */}
+                      <div className='w-10 h-10 rounded-full bg-[#ff5252] flex items-center justify-center text-white overflow-hidden'>
+                        {user?.avatar ? (
+                          <img 
+                            src={user.avatar} 
+                            alt={user.name} 
+                            className='w-full h-full object-cover'
+                          />
+                        ) : (
+                          <span className='text-lg font-semibold'>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                        )}
+                      </div>
                       <div className='hidden sm:block'>
                         <p className='text-[14px] font-[600] !m-0'>{user?.name}</p>
                         <p className='text-[11px] text-gray-500 !m-0'>{user?.email}</p>
@@ -151,7 +172,7 @@ export const Header = () => {
               </li>
               <li>
                 <Tooltip title="Wishlist">
-                  <IconButton aria-label="wishlist">
+                  <IconButton aria-label="wishlist" component={Link} to="/my-list">
                     <StyledBadge badgeContent={4} color="secondary">
                       <FaRegHeart />
                     </StyledBadge>

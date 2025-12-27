@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import auth from '../middlewares/auth.js';
 import upload from '../middlewares/multer.js';
-import { createProduct, deleteProduct, getAllFeaturedProducts, getAllProducts, getAllProductsByCatId, getAllProductsByCatName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCatId, getAllProductsBySubCatName, getAllProductsByThirdLavelCatId, getAllProductsByThirdLavelCatName, getProduct, getProductsCount, removeImageFromCloudinary, updateProduct, uploadImages } from '../controllers/product.controller.js';
+import { createProduct, deleteProduct, getAllFeaturedProducts, getAllProducts, getAllProductsByCatId, getAllProductsByCatName, getAllProductsByPrice, getAllProductsByRating, getAllProductsBySubCatId, getAllProductsBySubCatName, getAllProductsByThirdLavelCatId, getAllProductsByThirdLavelCatName, getProduct, getProductsCount, removeImageFromCloudinary, searchProducts, updateProduct, uploadImages } from '../controllers/product.controller.js';
 
 
 const productRouter = Router();
 
 productRouter.post('/uploadImages', auth, upload.array('images'), uploadImages);
 productRouter.post('/create', auth, createProduct);
+productRouter.get('/search', searchProducts);
 productRouter.get('/getAllProducts', getAllProducts);
 productRouter.get('/getAllProductsByCatId/:id', getAllProductsByCatId);
 productRouter.get('/getAllProductsByCatName', getAllProductsByCatName);

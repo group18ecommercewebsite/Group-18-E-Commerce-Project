@@ -1,271 +1,215 @@
 import React, { useState } from "react";
 import Button from '@mui/material/Button';
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { RxDashboard } from "react-icons/rx";
 import { FaRegImage } from "react-icons/fa";
-import { FiUsers } from "react-icons/fi";
+import { FiUsers, FiChevronDown, FiChevronRight, FiX } from "react-icons/fi";
 import { RiProductHuntLine } from "react-icons/ri";
 import { TbCategory } from "react-icons/tb";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { IoMdLogOut } from "react-icons/io";
-import { FaAngleDown } from "react-icons/fa6";
-import { FiX } from "react-icons/fi";
 import { Collapse } from "react-collapse";
 import { useAddProduct } from "../../Context/AddProductContext";
 import { useAuth } from "../../Context/AuthContext";
-import { useNavigate } from "react-router-dom";
-
-const AddProductButton = () => {
-    const { openPanel } = useAddProduct();
-    
-    return (
-        <Button 
-            onClick={openPanel}
-            className="!text-[rgba(0,0,0,0.7)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3"
-        >
-            <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.1)] flex-shrink-0 mt-2"></span>
-            <span className="truncate">Product Upload</span>
-        </Button>
-    );
-};
 
 const Sidebar = ({ isOpen, onClose }) => {
-    const { logout } = useAuth();
-    const navigate = useNavigate();
-    const [submenuIndex, setSubmenuIndex] = useState(null);
+    const { logout, user } = useAuth();
+    const location = useLocation();
+    const [expandedMenu, setExpandedMenu] = useState(null);
+    const { openPanel } = useAddProduct();
 
-    const handleLogout = (e) => {
-        e?.preventDefault();
-        e?.stopPropagation();
-        
-        // Xóa authentication data
+    const handleLogout = () => {
         logout();
-        
-        // Force redirect với window.location để đảm bảo reload hoàn toàn
-        setTimeout(() => {
-            window.location.href = '/login';
-        }, 50);
+        window.location.href = '/login';
     };
-    const isOpenSubMenu = (index) => {
-        if (submenuIndex === index) {
-            setSubmenuIndex(null);
-        } else {
-            setSubmenuIndex(index);
+
+    const toggleMenu = (menuId) => {
+        setExpandedMenu(expandedMenu === menuId ? null : menuId);
+    };
+
+    const isActive = (path) => location.pathname === path;
+    const isMenuActive = (paths) => paths.some(p => location.pathname.startsWith(p));
+
+    // Menu items configuration
+    const menuItems = [
+        {
+            id: 'dashboard',
+            label: 'Dashboard',
+            icon: RxDashboard,
+            path: '/'
+        },
+        {
+            id: 'home-slides',
+            label: 'Home Slides',
+            icon: FaRegImage,
+            submenu: [
+                { label: 'Slides List', path: '/home-slides' },
+                { label: 'Add Slide', path: '/home-slides/add' }
+            ]
+        },
+        {
+            id: 'users',
+            label: 'Users',
+            icon: FiUsers,
+            path: '/users'
+        },
+        {
+            id: 'products',
+            label: 'Products',
+            icon: RiProductHuntLine,
+            path: '/products'
+        },
+        {
+            id: 'category',
+            label: 'Category',
+            icon: TbCategory,
+            path: '/categories'
+        },
+        {
+            id: 'orders',
+            label: 'Orders',
+            icon: IoBagCheckOutline,
+            path: '/orders'
         }
-    }
+    ];
 
     return (
         <>
-            {/* Overlay khi sidebar mở trên mobile */}
+            {/* Overlay for mobile */}
             {isOpen && (
                 <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
                     onClick={onClose}
-                ></div>
+                />
             )}
             
-            <div className={`sidebar fixed top-0 left-0 bg-[#fff] h-full border-r border-[rgba(0,0,0,0.1)] py-2 transition-all duration-300 ease-in-out z-50 overflow-y-auto ${
-                isOpen 
-                    ? 'w-[280px] lg:translate-x-0 translate-x-0' 
-                    : 'w-[80px] lg:translate-x-0 -translate-x-full lg:!translate-x-0'
-            }`}>
-                {/* Header với logo và nút đóng */}
-                <div className={`py-2 px-2 flex items-center justify-between sticky top-0 bg-white z-10 border-b border-gray-100 ${!isOpen ? 'flex-col gap-2' : ''}`}>
-                    {isOpen && (
-                        <Link to="/" className="flex-1">
-                            <img src="https://ecme-react.themenate.net/img/logo/logo-light-full.png" className="w-[150px]" alt="Logo" />
-                        </Link>
-                    )}
-                    {!isOpen && (
-                        <Link to="/" className="flex items-center justify-center w-full">
-                            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                                D
+            {/* Sidebar Container */}
+            <div className={`sidebar fixed top-0 left-0 h-full bg-gradient-to-b from-slate-900 to-slate-800 z-50 transition-all duration-300 shadow-2xl ${
+                isOpen ? 'w-[260px]' : 'w-[70px]'
+            } ${!isOpen && 'max-lg:hidden'}`}>
+                
+                {/* Logo Header */}
+                <div className={`h-16 flex items-center border-b border-slate-700/50 ${isOpen ? 'px-5 justify-between' : 'justify-center'}`}>
+                    {isOpen ? (
+                        <>
+                            <Link to="/" className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <span className="text-white font-bold text-sm">A</span>
+                                </div>
+                                <span className="text-white font-semibold text-lg">Admin Panel</span>
+                            </Link>
+                            <button onClick={onClose} className="lg:hidden text-slate-400 hover:text-white">
+                                <FiX size={20} />
+                            </button>
+                        </>
+                    ) : (
+                        <Link to="/">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold">A</span>
                             </div>
                         </Link>
                     )}
-                    {isOpen && onClose && (
-                        <button
-                            onClick={onClose}
-                            className="p-2 rounded-md hover:bg-gray-100 transition-colors lg:hidden"
-                            aria-label="Đóng sidebar"
-                        >
-                            <FiX className="w-5 h-5 text-gray-600" />
-                        </button>
-                    )}
                 </div>
 
-                <ul className="mt-4 px-2">
-                    <li>
-                        <Link to="/">
-                            <Button 
-                                className={`w-full !capitalize !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] font-500] items-center !py-2 hover:!bg-[#f1f1f1] ${!isOpen ? '!justify-center !px-2' : ''}`}
-                                title={!isOpen ? "Dashboard" : ""}
-                            >
-                                <RxDashboard className="text-[18px] flex-shrink-0" /> 
-                                {isOpen && <span className="truncate">Dashboard</span>}
-                            </Button>
-                        </Link>
-                    </li>
+                {/* Navigation */}
+                <nav className="py-4 px-2 flex-1 overflow-y-auto">
+                    <ul className="space-y-1">
+                        {menuItems.map((item) => {
+                            const Icon = item.icon;
+                            const hasSubmenu = item.submenu && item.submenu.length > 0;
+                            const isExpanded = expandedMenu === item.id;
+                            const active = item.path ? isActive(item.path) : isMenuActive(item.submenu?.map(s => s.path).filter(Boolean) || []);
 
-                    <li>
-                        <Button 
-                            className={`w-full !capitalize !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] font-500] items-center !py-2 hover:!bg-[#f1f1f1] ${!isOpen ? '!justify-center !px-2' : ''}`}
-                            onClick={() => isOpenSubMenu(1)}
-                            title={!isOpen ? "Home Slides" : ""}
-                        >
-                            <FaRegImage className="text-[20px] flex-shrink-0" /> 
-                            {isOpen && <span className="truncate flex-1">Home Slides</span>}
-                            {isOpen && (
-                                <span className="ml-auto block w-[30px] h-[30px] flex items-center justify-center flex-shrink-0">
-                                    <FaAngleDown className={`transition-all ${submenuIndex === 1 ? 'rotate-180' : ''}`} />
-                                </span>
-                            )}
-                        </Button>
-
-                        {isOpen && (
-                            <Collapse isOpened={submenuIndex === 1 ? true : false}>
-                                <ul>
-                                    <li>
-                                        <Link to="/home-slides">
-                                            <Button className="!text-[rgba(0,0,0,0.7)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3">
-                                                <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.1)] flex-shrink-0 mt-2"></span>
-                                                <span className="truncate">Home Slides List</span>
-                                            </Button>
+                            return (
+                                <li key={item.id}>
+                                    {hasSubmenu ? (
+                                        <>
+                                            <button
+                                                onClick={() => toggleMenu(item.id)}
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group
+                                                    ${active ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'}`}
+                                            >
+                                                <Icon className={`text-lg flex-shrink-0 ${active ? 'text-blue-400' : ''}`} />
+                                                {isOpen && (
+                                                    <>
+                                                        <span className="flex-1 text-left text-sm font-medium">{item.label}</span>
+                                                        {isExpanded ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+                                                    </>
+                                                )}
+                                            </button>
+                                            {isOpen && (
+                                                <Collapse isOpened={isExpanded}>
+                                                    <ul className="mt-1 ml-4 pl-4 border-l border-slate-700/50 space-y-1">
+                                                        {item.submenu.map((sub, idx) => (
+                                                            <li key={idx}>
+                                                                {sub.path ? (
+                                                                    <Link
+                                                                        to={sub.path}
+                                                                        className={`block px-3 py-2 text-sm rounded-lg transition-colors
+                                                                            ${isActive(sub.path) 
+                                                                                ? 'text-blue-400 bg-blue-600/10' 
+                                                                                : 'text-slate-400 hover:text-white hover:bg-slate-700/30'}`}
+                                                                    >
+                                                                        {sub.label}
+                                                                    </Link>
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={sub.onClick}
+                                                                        className="block w-full text-left px-3 py-2 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/30 transition-colors"
+                                                                    >
+                                                                        {sub.label}
+                                                                    </button>
+                                                                )}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </Collapse>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <Link
+                                            to={item.path}
+                                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                                                ${active 
+                                                    ? 'bg-blue-600/20 text-blue-400' 
+                                                    : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'}`}
+                                            title={!isOpen ? item.label : ''}
+                                        >
+                                            <Icon className={`text-lg flex-shrink-0 ${active ? 'text-blue-400' : ''}`} />
+                                            {isOpen && <span className="text-sm font-medium">{item.label}</span>}
                                         </Link>
-                                    </li>
-                                </ul>
-                            </Collapse>
-                        )}
-                    </li>
+                                    )}
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </nav>
 
-                    <li>
-                        <Link to="/users">
-                            <Button 
-                                className={`w-full !capitalize !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] font-500] items-center !py-2 hover:!bg-[#f1f1f1] ${!isOpen ? '!justify-center !px-2' : ''}`}
-                                title={!isOpen ? "Users" : ""}
-                            >
-                                <FiUsers className="text-[20px] flex-shrink-0" /> 
-                                {isOpen && <span className="truncate">Users</span>}
-                            </Button>
-                        </Link>
-                    </li>
-
-                    <li>
-                        <Button 
-                            className={`w-full !capitalize !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] font-500] items-center !py-2 hover:!bg-[#f1f1f1] ${!isOpen ? '!justify-center !px-2' : ''}`}
-                            onClick={() => isOpenSubMenu(3)}
-                            title={!isOpen ? "Products" : ""}
-                        >
-                            <RiProductHuntLine className="text-[20px] flex-shrink-0" /> 
-                            {isOpen && <span className="truncate flex-1">Products</span>}
-                            {isOpen && (
-                                <span className="ml-auto block w-[30px] h-[30px] flex items-center justify-center flex-shrink-0">
-                                    <FaAngleDown className={`transition-all ${submenuIndex === 3 ? 'rotate-180' : ''}`} />
-                                </span>
-                            )}
-                        </Button>
-
-                        {isOpen && (
-                            <Collapse isOpened={submenuIndex === 3 ? true : false}>
-                                <ul className="w-full">
-                                    <li className="w-full">
-                                        <Link to="/products">
-                                            <Button className="!text-[rgba(0,0,0,0.7)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3">
-                                                <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.1)] flex-shrink-0 mt-2"></span>
-                                                <span className="truncate">Product List</span>
-                                            </Button>
-                                        </Link>
-                                    </li>
-                                    <li className="w-full">
-                                        <AddProductButton />
-                                    </li>
-                                </ul>
-                            </Collapse>
-                        )}
-                    </li>
-
-                    <li>
-                        <Button 
-                            className={`w-full !capitalize !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] font-500] items-center !py-2 hover:!bg-[#f1f1f1] ${!isOpen ? '!justify-center !px-2' : ''}`}
-                            onClick={() => isOpenSubMenu(4)}
-                            title={!isOpen ? "Category" : ""}
-                        >
-                            <TbCategory className="text-[20px] flex-shrink-0" /> 
-                            {isOpen && <span className="truncate flex-1">Category</span>}
-                            {isOpen && (
-                                <span className="ml-auto block w-[30px] h-[30px] flex items-center justify-center flex-shrink-0">
-                                    <FaAngleDown className={`transition-all ${submenuIndex === 4 ? 'rotate-180' : ''}`} />
-                                </span>
-                            )}
-                        </Button>
-
-                        {isOpen && (
-                            <Collapse isOpened={submenuIndex === 4 ? true : false}>
-                                <ul className="w-full">
-                                    <li className="w-full">
-                                        <Link to="/categories">
-                                            <Button className="!text-[rgba(0,0,0,0.7)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3">
-                                                <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.1)] flex-shrink-0 mt-2"></span>
-                                                <span className="truncate">Category List</span>
-                                            </Button>
-                                        </Link>
-                                    </li>
-                                    <li className="w-full">
-                                        <Link to="/categories/add">
-                                            <Button className="!text-[rgba(0,0,0,0.7)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3">
-                                                <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.1)] flex-shrink-0 mt-2"></span>
-                                                <span className="truncate">Add A Category</span>
-                                            </Button>
-                                        </Link>
-                                    </li>
-                                    <li className="w-full">
-                                        <Link to="/category/subCat">
-                                            <Button className="!text-[rgba(0,0,0,0.7)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3">
-                                                <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.1)] flex-shrink-0 mt-2"></span>
-                                                <span className="truncate">Sub Category List</span>
-                                            </Button>
-                                        </Link>
-                                    </li>
-                                    <li className="w-full">
-                                        <Link to="/category/subCat/add">
-                                            <Button className="!text-[rgba(0,0,0,0.7)] !capitalize !justify-start !w-full !text-[13px] !font-[500] !pl-9 flex gap-3">
-                                                <span className="block w-[5px] h-[5px] rounded-full bg-[rgba(0,0,0,0.1)] flex-shrink-0 mt-2"></span>
-                                                <span className="truncate">Add A Sub Category</span>
-                                            </Button>
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </Collapse>
-                        )}
-                    </li>
-
-                    <li>
-                        <Link to="/category/subCar/add">
-                            <Button 
-                                className={`w-full !capitalize !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] font-500] items-center !py-2 hover:!bg-[#f1f1f1] ${!isOpen ? '!justify-center !px-2' : ''}`}
-                                title={!isOpen ? "Orders" : ""}
-                            >
-                                <IoBagCheckOutline className="text-[20px] flex-shrink-0" /> 
-                                {isOpen && <span className="truncate">Orders</span>}
-                            </Button>
-                        </Link>
-                    </li>
-
-                    <li>
-                        <Button 
-                            type="button"
-                            onClick={handleLogout}
-                            className={`w-full !capitalize !justify-start flex gap-3 text-[14px] !text-[rgba(0,0,0,0.8)] font-500] items-center !py-2 hover:!bg-[#f1f1f1] ${!isOpen ? '!justify-center !px-2' : ''}`}
-                            title={!isOpen ? "Logout" : ""}
-                        >
-                            <IoMdLogOut className="text-[20px] flex-shrink-0" /> 
-                            {isOpen && <span className="truncate">Logout</span>}
-                        </Button>
-                    </li>
-                </ul>
+                {/* Footer - User & Logout */}
+                <div className="border-t border-slate-700/50 p-3">
+                    {isOpen && user && (
+                        <div className="flex items-center gap-3 px-2 py-2 mb-2">
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                                {user.name?.charAt(0)?.toUpperCase() || 'A'}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-white truncate">{user.name || 'Admin'}</p>
+                                <p className="text-xs text-slate-400 truncate">{user.email || ''}</p>
+                            </div>
+                        </div>
+                    )}
+                    <button
+                        onClick={handleLogout}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-400 transition-colors ${!isOpen && 'justify-center'}`}
+                        title={!isOpen ? 'Logout' : ''}
+                    >
+                        <IoMdLogOut className="text-lg" />
+                        {isOpen && <span className="text-sm font-medium">Logout</span>}
+                    </button>
+                </div>
             </div>
         </>
-    )
-}
+    );
+};
 
 export default Sidebar;
