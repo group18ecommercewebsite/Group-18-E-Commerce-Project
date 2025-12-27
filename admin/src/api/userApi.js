@@ -20,7 +20,19 @@ export const getUserDetails = async () => {
 
 // Lấy tất cả users (admin only)
 export const getAllUsers = async () => {
-  const response = await apiClient.get('/user/get-all-users');
+  const response = await apiClient.get('/admin/users');
+  return response.data;
+};
+
+// Xóa user (admin only)
+export const deleteUser = async (userId) => {
+  const response = await apiClient.delete(`/admin/users/${userId}`);
+  return response.data;
+};
+
+// Cập nhật role user (admin only)
+export const updateUserRole = async (userId, role) => {
+  const response = await apiClient.put(`/admin/users/${userId}/role`, { role });
   return response.data;
 };
 
@@ -39,3 +51,4 @@ export const uploadAvatar = async (formData) => {
   });
   return response.data;
 };
+

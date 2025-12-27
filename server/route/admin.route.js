@@ -4,7 +4,10 @@ import {
     getAllOrders,
     updateOrderStatus,
     getDashboardStats,
-    getOrderDetails
+    getOrderDetails,
+    getAllUsers,
+    deleteUser,
+    updateUserRole
 } from '../controllers/admin.controller.js';
 
 const adminRouter = Router();
@@ -24,5 +27,10 @@ adminRouter.get('/dashboard-stats', auth, getDashboardStats);
 adminRouter.get('/orders', auth, getAllOrders);
 adminRouter.get('/orders/:orderId', auth, getOrderDetails);
 adminRouter.put('/orders/:orderId/status', auth, updateOrderStatus);
+
+// Users management
+adminRouter.get('/users', auth, getAllUsers);
+adminRouter.delete('/users/:userId', auth, deleteUser);
+adminRouter.put('/users/:userId/role', auth, updateUserRole);
 
 export default adminRouter;

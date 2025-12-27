@@ -2,6 +2,7 @@ import { SePayPgClient } from 'sepay-pg-node';
 import OrderModel from '../models/order.model.js';
 import CartProductModel from '../models/cartproduct.model.js';
 import UserModel from '../models/user.model.js';
+import ProductModel from '../models/product.model.js';
 
 // SePay Config
 const sepayClient = new SePayPgClient({
@@ -161,7 +162,17 @@ export const sePayCallback = async (request, response) => {
                     } 
                 }
             );
-            console.log('✅ Orders updated to PAID:', orderId);
+
+            // Giảm số lượng sản phẩm trong kho khi thanh toán thành công
+            for (const order of orders) {
+                const quantity = order.product_details?.quantity || 1;
+                await ProductModel.findByIdAndUpdate(
+                    order.productId,
+                    { $inc: { countInStock: -quantity } }
+                );
+            }
+
+            console.log('✅ Orders updated to PAID and stock reduced:', orderId);
         } else {
             // Thanh toán thất bại
             await OrderModel.updateMany(
@@ -200,11 +211,34 @@ export const confirmPayment = async (request, response) => {
             });
         }
 
-        // Cập nhật orders thành Paid - update tất cả orders có orderId matching
-        const result = await OrderModel.updateMany(
-            { 
-                orderId: { $regex: orderId, $options: 'i' }
-            },
+        // Tìm orders trước để giảm kho
+        const orders = await OrderModel.find({ 
+            orderId: { $regex: orderId, $options: 'i' } 
+        });
+
+        if (orders.length === 0) {
+            return response.status(404).json({
+                success: false,
+                error: true,
+                message: 'Order not found'
+            });
+        }
+
+        // Kiểm tra xem đã được xử lý chưa (tránh trừ kho 2 lần)
+        const firstOrder = orders[0];
+        if (firstOrder.payment_status?.includes('Paid')) {
+            console.log('⚠️ Order already paid, skipping stock reduction:', orderId);
+            return response.status(200).json({
+                success: true,
+                error: false,
+                message: 'Payment already confirmed',
+                data: { orderId, updated: 0 }
+            });
+        }
+
+        // Cập nhật orders thành Paid
+        await OrderModel.updateMany(
+            { orderId: { $regex: orderId, $options: 'i' } },
             { 
                 $set: { 
                     payment_status: 'Paid via SePay',
@@ -213,13 +247,23 @@ export const confirmPayment = async (request, response) => {
             }
         );
 
-        console.log('✅ Payment confirmed for:', orderId, 'Updated:', result.modifiedCount);
+        // Giảm số lượng sản phẩm trong kho
+        for (const order of orders) {
+            const quantity = order.product_details?.quantity || 1;
+            await ProductModel.findByIdAndUpdate(
+                order.productId,
+                { $inc: { countInStock: -quantity } }
+            );
+            console.log(`📦 Stock reduced: Product ${order.productId}, Qty: -${quantity}`);
+        }
+
+        console.log('✅ Payment confirmed and stock reduced for:', orderId);
 
         return response.status(200).json({
             success: true,
             error: false,
             message: 'Payment confirmed',
-            data: { orderId, updated: result.modifiedCount }
+            data: { orderId, updated: orders.length }
         });
 
     } catch (error) {

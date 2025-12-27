@@ -237,3 +237,135 @@ export const getOrderDetails = async (request, response) => {
         });
     }
 };
+
+/**
+ * Lấy tất cả users (Admin only)
+ * GET /api/admin/users
+ */
+export const getAllUsers = async (request, response) => {
+    try {
+        const users = await UserModel.find()
+            .select('name email mobile avatar role status createdAt')
+            .sort({ createdAt: -1 });
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            data: users,
+            count: users.length
+        });
+
+    } catch (error) {
+        console.error('Get all users error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};
+
+/**
+ * Xóa user (Admin only)
+ * DELETE /api/admin/users/:userId
+ */
+export const deleteUser = async (request, response) => {
+    try {
+        const { userId } = request.params;
+
+        // Không cho xóa chính mình
+        if (userId === request.userId) {
+            return response.status(400).json({
+                message: 'Không thể xóa tài khoản của chính bạn',
+                error: true,
+                success: false
+            });
+        }
+
+        const user = await UserModel.findByIdAndDelete(userId);
+
+        if (!user) {
+            return response.status(404).json({
+                message: 'User không tồn tại',
+                error: true,
+                success: false
+            });
+        }
+
+        console.log('✅ User deleted:', userId, user.email);
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            message: 'Xóa người dùng thành công'
+        });
+
+    } catch (error) {
+        console.error('Delete user error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};
+
+/**
+ * Cập nhật role user (Admin only)
+ * PUT /api/admin/users/:userId/role
+ */
+export const updateUserRole = async (request, response) => {
+    try {
+        const { userId } = request.params;
+        const { role } = request.body;
+
+        const validRoles = ['USER', 'ADMIN'];
+        if (!validRoles.includes(role)) {
+            return response.status(400).json({
+                message: `Role không hợp lệ. Các role hợp lệ: ${validRoles.join(', ')}`,
+                error: true,
+                success: false
+            });
+        }
+
+        // Không cho thay đổi role của chính mình
+        if (userId === request.userId) {
+            return response.status(400).json({
+                message: 'Không thể thay đổi role của chính bạn',
+                error: true,
+                success: false
+            });
+        }
+
+        const user = await UserModel.findByIdAndUpdate(
+            userId,
+            { role },
+            { new: true }
+        ).select('name email role');
+
+        if (!user) {
+            return response.status(404).json({
+                message: 'User không tồn tại',
+                error: true,
+                success: false
+            });
+        }
+
+        console.log('✅ User role updated:', userId, 'to', role);
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            message: `Đã cập nhật role thành ${role}`,
+            data: user
+        });
+
+    } catch (error) {
+        console.error('Update user role error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};

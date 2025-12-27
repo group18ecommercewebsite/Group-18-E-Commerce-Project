@@ -1,6 +1,7 @@
 import OrderModel from "../models/order.model.js";
 import CartProductModel from "../models/cartproduct.model.js";
 import UserModel from "../models/user.model.js";
+import ProductModel from "../models/product.model.js";
 import mongoose from "mongoose";
 
 // Generate unique order ID
@@ -66,6 +67,12 @@ export const createOrderController = async (request, response) => {
 
             const savedOrder = await order.save();
             orders.push(savedOrder);
+
+            // Giảm số lượng sản phẩm trong kho
+            await ProductModel.findByIdAndUpdate(
+                product.productId,
+                { $inc: { countInStock: -product.quantity } }
+            );
         }
 
         // Clear cart after successful order
