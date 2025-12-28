@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+ 
 const bannerSchema = new mongoose.Schema({
     image: {
         type: String,
@@ -24,7 +24,7 @@ const bannerSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
+ 
 const BannerModel = mongoose.model('Banner', bannerSchema);
-
+ 
 export default BannerModel;

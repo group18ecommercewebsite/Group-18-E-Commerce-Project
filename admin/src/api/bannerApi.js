@@ -29,4 +29,3 @@ export const uploadBannerImage = async (imageBase64) => {
   const response = await apiClient.post('/banner/upload', { image: imageBase64 });
   return response.data;
 };
-

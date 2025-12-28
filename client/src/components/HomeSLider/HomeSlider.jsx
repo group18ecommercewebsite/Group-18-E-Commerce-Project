@@ -57,11 +57,7 @@ const HomeSlider = () => {
           {banners.map((banner) => (
             <SwiperSlide key={banner._id}>
               <div className="item rounded-[20px] overflow-hidden">
-                <img
-                  src={banner.image}
-                  alt={banner.title || 'Banner slide'}
-                  className="w-full"
-                />
+                <img src={banner.image} alt={banner.title || 'Banner slide'} className="w-full" />
               </div>
             </SwiperSlide>
           ))}

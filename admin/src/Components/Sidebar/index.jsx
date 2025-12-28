@@ -11,25 +11,25 @@ import { IoMdLogOut } from "react-icons/io";
 import { Collapse } from "react-collapse";
 import { useAddProduct } from "../../Context/AddProductContext";
 import { useAuth } from "../../Context/AuthContext";
-
+ 
 const Sidebar = ({ isOpen, onClose }) => {
     const { logout, user } = useAuth();
     const location = useLocation();
     const [expandedMenu, setExpandedMenu] = useState(null);
     const { openPanel } = useAddProduct();
-
+ 
     const handleLogout = () => {
         logout();
         window.location.href = '/login';
     };
-
+ 
     const toggleMenu = (menuId) => {
         setExpandedMenu(expandedMenu === menuId ? null : menuId);
     };
-
+ 
     const isActive = (path) => location.pathname === path;
     const isMenuActive = (paths) => paths.some(p => location.pathname.startsWith(p));
-
+ 
     // Menu items configuration
     const menuItems = [
         {
@@ -69,12 +69,12 @@ const Sidebar = ({ isOpen, onClose }) => {
             path: '/orders'
         }
     ];
-
+ 
     return (
         <>
             {/* Overlay for mobile */}
             {isOpen && (
-                <div 
+                <div
                     className="fixed inset-0 bg-black/50 z-40 lg:hidden"
                     onClick={onClose}
                 />
@@ -107,7 +107,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                         </Link>
                     )}
                 </div>
-
+ 
                 {/* Navigation */}
                 <nav className="py-4 px-2 flex-1 overflow-y-auto">
                     <ul className="space-y-1">
@@ -116,7 +116,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                             const hasSubmenu = item.submenu && item.submenu.length > 0;
                             const isExpanded = expandedMenu === item.id;
                             const active = item.path ? isActive(item.path) : isMenuActive(item.submenu?.map(s => s.path).filter(Boolean) || []);
-
+ 
                             return (
                                 <li key={item.id}>
                                     {hasSubmenu ? (
@@ -143,8 +143,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                                                                     <Link
                                                                         to={sub.path}
                                                                         className={`block px-3 py-2 text-sm rounded-lg transition-colors
-                                                                            ${isActive(sub.path) 
-                                                                                ? 'text-blue-400 bg-blue-600/10' 
+                                                                            ${isActive(sub.path)
+                                                                                ? 'text-blue-400 bg-blue-600/10'
                                                                                 : 'text-slate-400 hover:text-white hover:bg-slate-700/30'}`}
                                                                     >
                                                                         {sub.label}
@@ -167,8 +167,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                                         <Link
                                             to={item.path}
                                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
-                                                ${active 
-                                                    ? 'bg-blue-600/20 text-blue-400' 
+                                                ${active
+                                                    ? 'bg-blue-600/20 text-blue-400'
                                                     : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'}`}
                                             title={!isOpen ? item.label : ''}
                                         >
@@ -181,7 +181,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                         })}
                     </ul>
                 </nav>
-
+ 
                 {/* Footer - User & Logout */}
                 <div className="border-t border-slate-700/50 p-3">
                     {isOpen && user && (
@@ -208,5 +208,5 @@ const Sidebar = ({ isOpen, onClose }) => {
         </>
     );
 };
-
+ 
 export default Sidebar;
