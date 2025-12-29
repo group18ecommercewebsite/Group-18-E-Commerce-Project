@@ -126,9 +126,15 @@ export const updateOrderStatus = async (request, response) => {
  */
 export const getDashboardStats = async (request, response) => {
     try {
-        const [totalUsers, totalOrders, totalProducts, totalCategories] = await Promise.all([
+        // Đếm số đơn hàng unique (bỏ suffix -1, -2 cho multi-product orders)
+        const allOrderIds = await OrderModel.distinct('orderId');
+        const uniqueBaseOrderIds = new Set(
+            allOrderIds.map(id => id.split('-').slice(0, 3).join('-'))
+        );
+        const totalOrders = uniqueBaseOrderIds.size;
+
+        const [totalUsers, totalProducts, totalCategories] = await Promise.all([
             UserModel.countDocuments(),
-            OrderModel.distinct('orderId').then(ids => ids.length),
             ProductModel.countDocuments(),
             CategoryModel.countDocuments()
         ]);
