@@ -23,3 +23,16 @@ export const getDashboardStats = async () => {
   const response = await apiClient.get('/admin/dashboard-stats');
   return response.data;
 };
+
+// Lấy danh sách yêu cầu hủy đơn cần hoàn tiền
+export const getCancellationRequests = async () => {
+  const response = await apiClient.get('/admin/cancellation-requests');
+  return response.data;
+};
+
+// Đánh dấu đã hoàn tiền
+export const markAsRefunded = async (orderId) => {
+  const response = await apiClient.put(`/admin/mark-refunded/${orderId}`);
+  return response.data;
+};
+

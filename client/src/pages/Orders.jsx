@@ -2,13 +2,50 @@ import React, { useState, useEffect, useContext } from "react";
 import { MyContext } from "../App";
 import { FiUser } from "react-icons/fi";
 import { GoHeart } from "react-icons/go";
-import { IoBagCheckOutline, IoLogOutOutline } from "react-icons/io5";
+import { IoBagCheckOutline, IoLogOutOutline, IoClose } from "react-icons/io5";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import Badge from "../components/Badge";
-import { getMyOrders } from "../api/orderApi";
+import { getMyOrders, cancelOrder } from "../api/orderApi";
 import { logoutUser } from "../api/userApi";
 import CircularProgress from "@mui/material/CircularProgress";
+
+// Danh sách ngân hàng Việt Nam
+const VIETNAM_BANKS = [
+  "Vietcombank",
+  "VietinBank",
+  "BIDV",
+  "Agribank",
+  "Techcombank",
+  "MBBank",
+  "ACB",
+  "VPBank",
+  "TPBank",
+  "Sacombank",
+  "HDBank",
+  "VIB",
+  "SHB",
+  "SeABank",
+  "OCB",
+  "MSB",
+  "Eximbank",
+  "LienVietPostBank",
+  "NamABank",
+  "BacABank",
+  "PVcomBank",
+  "Khác"
+];
+
+// Lý do hủy đơn
+const CANCEL_REASONS = [
+  "Đổi ý không muốn mua nữa",
+  "Tìm thấy giá rẻ hơn ở nơi khác",
+  "Đặt nhầm sản phẩm",
+  "Muốn thay đổi địa chỉ giao hàng",
+  "Muốn thay đổi phương thức thanh toán",
+  "Thời gian giao hàng quá lâu",
+  "Lý do khác"
+];
 
 export const Orders = () => {
   const context = useContext(MyContext);
@@ -18,6 +55,15 @@ export const Orders = () => {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Cancel order states
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountHolder, setAccountHolder] = useState("");
+  const [cancelling, setCancelling] = useState(false);
 
   // Sử dụng user từ global context
   const user = context.user;
@@ -64,6 +110,83 @@ export const Orders = () => {
 
   const toggleOrderDetails = (orderId) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  };
+
+  // Mở modal hủy đơn
+  const openCancelModal = (order) => {
+    setSelectedOrder(order);
+    setCancelReason("");
+    setBankName("");
+    setAccountNumber("");
+    setAccountHolder("");
+    setShowCancelModal(true);
+  };
+
+  // Đóng modal
+  const closeCancelModal = () => {
+    setShowCancelModal(false);
+    setSelectedOrder(null);
+  };
+
+  // Kiểm tra xem đơn có cần nhập thông tin bank không
+  const needsBankInfo = (order) => {
+    return order.order_status === 'paid' && 
+           (order.payment_status?.includes('SePay') || order.payment_status?.includes('Paid'));
+  };
+
+  // Xử lý hủy đơn
+  const handleCancelOrder = async () => {
+    if (!cancelReason) {
+      context.openAlertBox('error', 'Vui lòng chọn lý do hủy đơn');
+      return;
+    }
+
+    if (needsBankInfo(selectedOrder)) {
+      if (!bankName || !accountNumber || !accountHolder) {
+        context.openAlertBox('error', 'Vui lòng điền đầy đủ thông tin ngân hàng để nhận hoàn tiền');
+        return;
+      }
+    }
+
+    try {
+      setCancelling(true);
+      
+      const cancelData = {
+        cancel_reason: cancelReason,
+      };
+
+      if (needsBankInfo(selectedOrder)) {
+        cancelData.refund_info = {
+          bank_name: bankName,
+          account_number: accountNumber,
+          account_holder: accountHolder.toUpperCase()
+        };
+      }
+
+      const response = await cancelOrder(selectedOrder.orderId, cancelData);
+      
+      if (response.success) {
+        context.openAlertBox('success', response.message);
+        // Refresh orders
+        const ordersResponse = await getMyOrders();
+        if (ordersResponse.success) {
+          setOrders(ordersResponse.data || []);
+        }
+        closeCancelModal();
+      } else {
+        context.openAlertBox('error', response.message || 'Không thể hủy đơn hàng');
+      }
+    } catch (error) {
+      console.error('Cancel order error:', error);
+      context.openAlertBox('error', error.response?.data?.message || 'Không thể hủy đơn hàng');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  // Kiểm tra xem đơn có thể hủy không
+  const canCancelOrder = (order) => {
+    return ['pending', 'paid'].includes(order.order_status);
   };
 
   const menuItems = [
@@ -191,7 +314,9 @@ export const Orders = () => {
                       <th className="py-3 px-3 text-left font-medium uppercase">Products</th>
                       <th className="py-3 px-3 text-left font-medium uppercase">Total</th>
                       <th className="py-3 px-3 text-left font-medium uppercase">Status</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Hoàn tiền</th>
                       <th className="py-3 px-3 text-left font-medium uppercase">Date</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -220,13 +345,36 @@ export const Orders = () => {
                           <td className="py-3 px-3">
                             <Badge status={order.order_status || 'pending'} />
                           </td>
+                          <td className="py-3 px-3">
+                            {order.order_status === 'cancelled' && order.refund_status && order.refund_status !== 'none' ? (
+                              <span className={`px-2 py-1 rounded-full text-[11px] font-semibold ${
+                                order.refund_status === 'pending_refund' 
+                                  ? 'bg-yellow-100 text-yellow-800' 
+                                  : 'bg-green-100 text-green-800'
+                              }`}>
+                                {order.refund_status === 'pending_refund' ? 'Chưa hoàn tiền' : 'Đã hoàn tiền'}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 text-[11px]">-</span>
+                            )}
+                          </td>
                           <td className="py-3 px-3">{formatDate(order.createdAt)}</td>
+                          <td className="py-3 px-3">
+                            {canCancelOrder(order) && (
+                              <button
+                                onClick={() => openCancelModal(order)}
+                                className="px-3 py-1.5 text-[12px] bg-red-500 text-white rounded hover:bg-red-600 transition"
+                              >
+                                Hủy đơn
+                              </button>
+                            )}
+                          </td>
                         </tr>
 
                         {/* Order Details (Products) - Expandable */}
                         {expandedOrder === order.orderId && (
                           <tr>
-                            <td colSpan="7" className="p-0">
+                            <td colSpan="9" className="p-0">
                               <div className="bg-[#fff8f0] p-4 border-l-4 border-[#ff5252]">
                                 <table className="w-full text-[13px]">
                                   <thead>
@@ -278,6 +426,129 @@ export const Orders = () => {
           </div>
         </div>
       </div>
+
+      {/* Cancel Order Modal */}
+      {showCancelModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">Hủy đơn hàng</h3>
+              <button
+                onClick={closeCancelModal}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center"
+              >
+                <IoClose className="text-xl" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-4">
+              <p className="text-sm text-gray-600 mb-4">
+                Bạn có chắc muốn hủy đơn hàng <span className="font-semibold text-[#ff5252]">{selectedOrder.orderId}</span>?
+              </p>
+
+              {/* Lý do hủy */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Lý do hủy đơn <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff5252] focus:border-transparent"
+                >
+                  <option value="">-- Chọn lý do --</option>
+                  {CANCEL_REASONS.map((reason) => (
+                    <option key={reason} value={reason}>{reason}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Thông tin ngân hàng (chỉ hiện khi đơn đã thanh toán) */}
+              {needsBankInfo(selectedOrder) && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                  <p className="text-sm font-medium text-yellow-800 mb-3">
+                    💳 Thông tin nhận hoàn tiền
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Ngân hàng <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff5252] focus:border-transparent"
+                      >
+                        <option value="">-- Chọn ngân hàng --</option>
+                        {VIETNAM_BANKS.map((bank) => (
+                          <option key={bank} value={bank}>{bank}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Số tài khoản <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={accountNumber}
+                        onChange={(e) => setAccountNumber(e.target.value)}
+                        placeholder="Nhập số tài khoản"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff5252] focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tên chủ tài khoản <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={accountHolder}
+                        onChange={(e) => setAccountHolder(e.target.value)}
+                        placeholder="VD: NGUYEN VAN A"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#ff5252] focus:border-transparent uppercase"
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-yellow-700 mt-3">
+                    ⚠️ Hoàn tiền sẽ được xử lý trong 3-5 ngày làm việc
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex gap-3 p-4 border-t">
+              <button
+                onClick={closeCancelModal}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+              >
+                Đóng
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                disabled={cancelling}
+                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {cancelling ? (
+                  <>
+                    <CircularProgress size={16} sx={{ color: 'white' }} />
+                    Đang xử lý...
+                  </>
+                ) : (
+                  'Xác nhận hủy đơn'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

@@ -54,6 +54,25 @@ const orderSchema = new mongoose.Schema({
     invoice_receipt: {
         type: String,
         default: ""
+    },
+    // Cancel order fields
+    cancel_reason: {
+        type: String,
+        default: ""
+    },
+    cancelled_at: {
+        type: Date,
+        default: null
+    },
+    refund_status: {
+        type: String,
+        enum: ['none', 'pending_refund', 'refunded'],
+        default: 'none'
+    },
+    refund_info: {
+        bank_name: { type: String, default: "" },
+        account_number: { type: String, default: "" },
+        account_holder: { type: String, default: "" }
     }
 },
     { timestamps: true }

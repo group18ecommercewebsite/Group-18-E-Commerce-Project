@@ -7,7 +7,9 @@ import {
     getOrderDetails,
     getAllUsers,
     deleteUser,
-    updateUserRole
+    updateUserRole,
+    getCancellationRequests,
+    markAsRefunded
 } from '../controllers/admin.controller.js';
 
 const adminRouter = Router();
@@ -28,9 +30,14 @@ adminRouter.get('/orders', auth, getAllOrders);
 adminRouter.get('/orders/:orderId', auth, getOrderDetails);
 adminRouter.put('/orders/:orderId/status', auth, updateOrderStatus);
 
+// Cancellation requests (refund management)
+adminRouter.get('/cancellation-requests', auth, getCancellationRequests);
+adminRouter.put('/mark-refunded/:orderId', auth, markAsRefunded);
+
 // Users management
 adminRouter.get('/users', auth, getAllUsers);
 adminRouter.delete('/users/:userId', auth, deleteUser);
 adminRouter.put('/users/:userId/role', auth, updateUserRole);
 
 export default adminRouter;
+

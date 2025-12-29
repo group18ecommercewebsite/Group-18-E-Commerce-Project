@@ -29,6 +29,7 @@ export const getAllOrders = async (request, response) => {
                     paymentId: order.paymentId,
                     payment_status: order.payment_status,
                     order_status: order.order_status,
+                    refund_status: order.refund_status,
                     delivery_address: order.delivery_address,
                     totalAmt: order.totalAmt,
                     createdAt: order.createdAt,
@@ -375,3 +376,109 @@ export const updateUserRole = async (request, response) => {
         });
     }
 };
+
+/**
+ * Lấy danh sách yêu cầu hủy đơn cần hoàn tiền (Admin only)
+ * GET /api/admin/cancellation-requests
+ */
+export const getCancellationRequests = async (request, response) => {
+    try {
+        // Lấy tất cả orders có refund_status = 'pending_refund'
+        const orders = await OrderModel.find({ refund_status: 'pending_refund' })
+            .populate('userId', 'name email mobile')
+            .sort({ cancelled_at: -1 });
+
+        // Group orders theo orderId
+        const groupedOrders = orders.reduce((acc, order) => {
+            const baseOrderId = order.orderId.split('-').slice(0, 3).join('-');
+            
+            if (!acc[baseOrderId]) {
+                acc[baseOrderId] = {
+                    orderId: baseOrderId,
+                    userId: order.userId?._id || order.userId,
+                    userName: order.userId?.name || 'Unknown',
+                    userEmail: order.userId?.email || '',
+                    userPhone: order.userId?.mobile || '',
+                    payment_status: order.payment_status,
+                    totalAmt: order.totalAmt,
+                    cancel_reason: order.cancel_reason,
+                    cancelled_at: order.cancelled_at,
+                    refund_status: order.refund_status,
+                    refund_info: order.refund_info,
+                    products: []
+                };
+            }
+            
+            acc[baseOrderId].products.push({
+                _id: order._id,
+                productId: order.productId,
+                name: order.product_details?.name || '',
+                image: order.product_details?.image?.[0] || '',
+                quantity: order.product_details?.quantity || 1,
+                price: order.product_details?.price || 0,
+                subTotal: order.subTotalAmt
+            });
+            
+            return acc;
+        }, {});
+
+        const requestList = Object.values(groupedOrders);
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            data: requestList,
+            count: requestList.length
+        });
+
+    } catch (error) {
+        console.error('Get cancellation requests error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};
+
+/**
+ * Đánh dấu đã hoàn tiền (Admin only)
+ * PUT /api/admin/mark-refunded/:orderId
+ */
+export const markAsRefunded = async (request, response) => {
+    try {
+        const { orderId } = request.params;
+
+        // Cập nhật tất cả orders có cùng base orderId
+        const result = await OrderModel.updateMany(
+            { orderId: { $regex: orderId, $options: 'i' }, refund_status: 'pending_refund' },
+            { $set: { refund_status: 'refunded' } }
+        );
+
+        if (result.matchedCount === 0) {
+            return response.status(404).json({
+                message: 'Không tìm thấy yêu cầu hoàn tiền',
+                error: true,
+                success: false
+            });
+        }
+
+        console.log(`✅ Order ${orderId} marked as refunded`);
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            message: 'Đã đánh dấu hoàn tiền thành công',
+            data: { orderId, updated: result.modifiedCount }
+        });
+
+    } catch (error) {
+        console.error('Mark as refunded error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};
+

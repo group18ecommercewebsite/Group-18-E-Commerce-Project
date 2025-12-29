@@ -8,6 +8,7 @@ import { RiProductHuntLine } from "react-icons/ri";
 import { TbCategory } from "react-icons/tb";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { IoMdLogOut } from "react-icons/io";
+import { MdOutlineMoneyOff } from "react-icons/md";
 import { Collapse } from "react-collapse";
 import { useAddProduct } from "../../Context/AddProductContext";
 import { useAuth } from "../../Context/AuthContext";
@@ -67,6 +68,12 @@ const Sidebar = ({ isOpen, onClose }) => {
             label: 'Orders',
             icon: IoBagCheckOutline,
             path: '/orders'
+        },
+        {
+            id: 'cancellation-requests',
+            label: 'Yêu cầu hoàn tiền',
+            icon: MdOutlineMoneyOff,
+            path: '/cancellation-requests'
         }
     ];
  

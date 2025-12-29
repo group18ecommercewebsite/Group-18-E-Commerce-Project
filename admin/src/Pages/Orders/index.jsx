@@ -160,13 +160,14 @@ const Orders = () => {
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">THANH TOÁN</th>
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">TỔNG TIỀN</th>
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">TRẠNG THÁI</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">HOÀN TIỀN</th>
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">NGÀY ĐẶT</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {filteredOrders.length === 0 ? (
                                 <tr>
-                                    <td colSpan="8" className="px-4 py-12 text-center text-gray-500">
+                                    <td colSpan="9" className="px-4 py-12 text-center text-gray-500">
                                         {searchTerm ? 'Không tìm thấy đơn hàng phù hợp.' : 'Chưa có đơn hàng nào.'}
                                     </td>
                                 </tr>
@@ -220,6 +221,19 @@ const Orders = () => {
                                                     )}
                                                 </div>
                                             </td>
+                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                {order.order_status === 'cancelled' && order.refund_status && order.refund_status !== 'none' ? (
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                                        order.refund_status === 'pending_refund' 
+                                                            ? 'bg-yellow-100 text-yellow-800' 
+                                                            : 'bg-green-100 text-green-800'
+                                                    }`}>
+                                                        {order.refund_status === 'pending_refund' ? 'Chưa hoàn tiền' : 'Đã hoàn tiền'}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-400 text-xs">-</span>
+                                                )}
+                                            </td>
                                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                                                 {formatDate(order.createdAt)}
                                             </td>
@@ -227,7 +241,7 @@ const Orders = () => {
                                         {/* Expanded row with product details */}
                                         {expandedRows[order.orderId] && (
                                             <tr className="bg-gray-50">
-                                                <td colSpan="8" className="px-4 py-4">
+                                                <td colSpan="9" className="px-4 py-4">
                                                     <div className="bg-white rounded-lg p-4 border border-gray-200">
                                                         <div className="flex items-center gap-2 mb-4">
                                                             <FiPackage className="w-5 h-5 text-gray-600" />

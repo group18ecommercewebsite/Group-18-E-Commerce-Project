@@ -17,3 +17,10 @@ export const getOrderById = async (orderId) => {
   const response = await apiClient.get(`/order/${orderId}`);
   return response.data;
 };
+
+// Hủy đơn hàng
+export const cancelOrder = async (orderId, cancelData) => {
+  const response = await apiClient.post(`/order/cancel/${orderId}`, cancelData);
+  return response.data;
+};
+

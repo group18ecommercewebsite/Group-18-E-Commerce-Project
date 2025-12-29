@@ -94,6 +94,7 @@ import EditProduct from './Pages/EditProduct';
 import AddProduct from './Pages/AddProduct';
 import Users from './Pages/Users';
 import Orders from './Pages/Orders';
+import CancellationRequests from './pages/CancellationRequests';
 import ForgotPassword from './Pages/ForgotPassword';
 import VerifyOTP from './Pages/VerifyOTP';
 import ChangePassword from './Pages/ChangePassword';
@@ -251,6 +252,20 @@ function App() {
         {
           index: true,
           element: <Orders />
+        }
+      ]
+    },
+    {
+      path: "/cancellation-requests",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <CancellationRequests />
         }
       ]
     }

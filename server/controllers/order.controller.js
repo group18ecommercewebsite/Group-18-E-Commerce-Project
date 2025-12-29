@@ -122,6 +122,7 @@ export const getMyOrdersController = async (request, response) => {
                     paymentId: order.paymentId,
                     payment_status: order.payment_status,
                     order_status: order.order_status,
+                    refund_status: order.refund_status,
                     delivery_address: order.delivery_address,
                     totalAmt: order.totalAmt,
                     createdAt: order.createdAt,
@@ -209,3 +210,110 @@ export const getOrderByIdController = async (request, response) => {
         });
     }
 };
+
+// Cancel order by user
+export const cancelOrderController = async (request, response) => {
+    try {
+        const userId = request.userId;
+        const { orderId } = request.params;
+        const { cancel_reason, refund_info } = request.body;
+
+        if (!orderId) {
+            return response.status(400).json({
+                message: "Order ID is required",
+                error: true,
+                success: false
+            });
+        }
+
+        // Lấy base orderId (bỏ suffix -1, -2, -3...)
+        const baseOrderId = orderId.split('-').slice(0, 3).join('-');
+
+        // Tìm tất cả order records có cùng baseOrderId và userId
+        const orders = await OrderModel.find({
+            orderId: { $regex: `^${baseOrderId}` },
+            userId: userId
+        });
+
+        if (!orders || orders.length === 0) {
+            return response.status(404).json({
+                message: "Order not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Kiểm tra trạng thái có thể hủy
+        const currentStatus = orders[0].order_status;
+        if (!['pending', 'paid'].includes(currentStatus)) {
+            return response.status(400).json({
+                message: `Không thể hủy đơn hàng có trạng thái "${currentStatus}". Chỉ có thể hủy đơn ở trạng thái Pending hoặc Paid.`,
+                error: true,
+                success: false
+            });
+        }
+
+        // Kiểm tra nếu đơn đã thanh toán qua SePay cần có thông tin bank
+        const isPaidViaSePay = orders[0].payment_status?.includes('SePay') || 
+                               orders[0].payment_status?.includes('Paid');
+        
+        if (isPaidViaSePay && currentStatus === 'paid') {
+            if (!refund_info || !refund_info.bank_name || !refund_info.account_number || !refund_info.account_holder) {
+                return response.status(400).json({
+                    message: "Vui lòng cung cấp thông tin ngân hàng để nhận hoàn tiền",
+                    error: true,
+                    success: false
+                });
+            }
+        }
+
+        // Xác định refund_status
+        let refundStatus = 'none';
+        if (currentStatus === 'paid' && isPaidViaSePay) {
+            refundStatus = 'pending_refund';
+        }
+
+        // Update tất cả orders
+        await OrderModel.updateMany(
+            { orderId: { $regex: `^${baseOrderId}` }, userId: userId },
+            {
+                $set: {
+                    order_status: 'cancelled',
+                    cancel_reason: cancel_reason || '',
+                    cancelled_at: new Date(),
+                    refund_status: refundStatus,
+                    refund_info: refund_info || {}
+                }
+            }
+        );
+
+        // Hoàn lại số lượng sản phẩm vào kho
+        for (const order of orders) {
+            const quantity = order.product_details?.quantity || 1;
+            await ProductModel.findByIdAndUpdate(
+                order.productId,
+                { $inc: { countInStock: quantity } }
+            );
+        }
+
+        return response.status(200).json({
+            message: refundStatus === 'pending_refund' 
+                ? "Đã hủy đơn hàng. Yêu cầu hoàn tiền đang được xử lý."
+                : "Đã hủy đơn hàng thành công.",
+            error: false,
+            success: true,
+            data: {
+                orderId: baseOrderId,
+                refund_status: refundStatus
+            }
+        });
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+};
+
