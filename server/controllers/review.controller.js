@@ -1,11 +1,61 @@
 import ReviewModel from "../models/review.model.js";
 import ProductModel from "../models/product.model.js";
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
+
+// Cloudinary config
+cloudinary.config({
+    cloud_name: process.env.cloudinary_Config_Cloud_Name,
+    api_key: process.env.cloudinary_Config_api_key,
+    api_secret: process.env.cloudinary_Config_api_secret,
+});
+
+// Upload review images to Cloudinary
+export async function uploadReviewImages(request, response) {
+    try {
+        const uploadedImages = [];
+
+        for (const file of request.files) {
+            const img = await cloudinary.uploader.upload(
+                file.path,
+                {
+                    folder: 'reviews',
+                    quality: 'auto:good'
+                }
+            );
+            uploadedImages.push(img.secure_url);
+
+            // Xóa file tạm sau khi upload lên Cloudinary
+            fs.unlinkSync(file.path);
+        }
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            images: uploadedImages
+        });
+    } catch (error) {
+        // Xóa file tạm nếu có lỗi
+        if (request.files) {
+            request.files.forEach(file => {
+                if (fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            });
+        }
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+}
 
 // Add a review
 export const addReviewController = async (request, response) => {
     try {
         const userId = request.userId;
-        const { productId, rating, review, userName, userAvatar } = request.body;
+        const { productId, rating, review, userName, userAvatar, images } = request.body;
 
         if (!productId || !rating || !review) {
             return response.status(400).json({
@@ -42,7 +92,8 @@ export const addReviewController = async (request, response) => {
             userName: userName || 'Anonymous',
             userAvatar: userAvatar || '',
             rating,
-            review
+            review,
+            images: images || []
         });
 
         await newReview.save();

@@ -28,6 +28,10 @@ const reviewSchema = new mongoose.Schema({
     review: {
         type: String,
         required: true
+    },
+    images: {
+        type: [String],
+        default: []
     }
 }, { timestamps: true });
 

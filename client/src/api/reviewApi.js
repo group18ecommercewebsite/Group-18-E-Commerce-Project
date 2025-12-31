@@ -1,5 +1,15 @@
 import apiClient from './apiClient';
 
+// Upload review images
+export const uploadReviewImages = async (formData) => {
+  const response = await apiClient.post('/review/uploadImages', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+  return response.data;
+};
+
 // Thêm review cho sản phẩm
 export const addReview = async (reviewData) => {
   const response = await apiClient.post('/review/add', reviewData);

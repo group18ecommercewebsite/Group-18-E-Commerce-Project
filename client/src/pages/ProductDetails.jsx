@@ -8,9 +8,10 @@ import TextField from '@mui/material/TextField';
 import ProductsSlider from '../components/ProductsSlider/ProductsSlider';
 import ProductDetailsComponent from '../components/ProductDetailsComponent/ProductDetailsComponent';
 import { getProductById, getProductsByCategoryId } from '../api/productApi';
-import { getProductReviews, addReview } from '../api/reviewApi';
+import { getProductReviews, addReview, uploadReviewImages } from '../api/reviewApi';
 import CircularProgress from '@mui/material/CircularProgress';
 import { MyContext } from '../App';
+import { IoImages, IoClose } from 'react-icons/io5';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -28,6 +29,8 @@ const ProductDetails = () => {
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [submitting, setSubmitting] = useState(false);
+  const [reviewImages, setReviewImages] = useState([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -109,13 +112,15 @@ const ProductDetails = () => {
         rating: reviewRating,
         review: reviewText,
         userName: context.user?.name || 'Anonymous',
-        userAvatar: context.user?.avatar || ''
+        userAvatar: context.user?.avatar || '',
+        images: reviewImages
       });
 
       if (response.success) {
         context.openAlertBox('success', 'Đánh giá đã được gửi thành công!');
         setReviewText('');
         setReviewRating(5);
+        setReviewImages([]);
         
         // Refresh reviews
         const reviewsResponse = await getProductReviews(id);
@@ -140,6 +145,35 @@ const ProductDetails = () => {
       month: '2-digit',
       day: '2-digit'
     });
+  };
+
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    if (reviewImages.length + files.length > 5) {
+      context.openAlertBox('error', 'Tối đa 5 hình ảnh cho mỗi đánh giá');
+      return;
+    }
+
+    try {
+      setUploadingImages(true);
+      const formData = new FormData();
+      files.forEach(file => formData.append('images', file));
+
+      const response = await uploadReviewImages(formData);
+      if (response.success) {
+        setReviewImages(prev => [...prev, ...response.images]);
+      }
+    } catch (error) {
+      context.openAlertBox('error', 'Không thể tải ảnh lên');
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
+  const removeImage = (index) => {
+    setReviewImages(prev => prev.filter((_, i) => i !== index));
   };
 
   if (loading) {
@@ -352,6 +386,20 @@ const ProductDetails = () => {
                             <p className="mt-0 mb-0 text-[14px] text-gray-700">
                               {review.review}
                             </p>
+                            {/* Review Images */}
+                            {review.images && review.images.length > 0 && (
+                              <div className="flex gap-2 mt-3 flex-wrap">
+                                {review.images.map((img, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={img}
+                                    alt={`Review ${idx + 1}`}
+                                    className="w-16 h-16 object-cover rounded-lg cursor-pointer hover:opacity-80 border border-gray-200"
+                                    onClick={() => window.open(img, '_blank')}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <Rating value={review.rating} readOnly size="small" />
@@ -387,6 +435,42 @@ const ProductDetails = () => {
                           onChange={(e, newValue) => setReviewRating(newValue || 5)}
                           disabled={submitting}
                         />
+                      </div>
+
+                      {/* Image Upload */}
+                      <div className="mb-4">
+                        <label className="text-[14px] block mb-2">Thêm hình ảnh (tối đa 5):</label>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          {reviewImages.map((img, idx) => (
+                            <div key={idx} className="relative">
+                              <img src={img} alt="" className="w-16 h-16 object-cover rounded-lg border" />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(idx)}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                              >
+                                <IoClose size={14} />
+                              </button>
+                            </div>
+                          ))}
+                          {reviewImages.length < 5 && (
+                            <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-[#ff5252] transition">
+                              {uploadingImages ? (
+                                <CircularProgress size={20} />
+                              ) : (
+                                <IoImages className="text-2xl text-gray-400" />
+                              )}
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleImageUpload}
+                                disabled={uploadingImages || submitting}
+                              />
+                            </label>
+                          )}
+                        </div>
                       </div>
 
                       <Button
