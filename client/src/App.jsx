@@ -32,7 +32,9 @@ import CouponsPage from './pages/Coupons';
 import toast, { Toaster } from 'react-hot-toast';
 import { duration } from '@mui/material';
 import { CategoryProvider } from './context/CategoryContext';
+import { CompareProvider } from './context/CompareContext';
 import { getCart } from './api/cartApi';
+import Compare from './pages/Compare';
 
 const MyContext = createContext();
 
@@ -141,9 +143,10 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <CategoryProvider>
-          <MyContext.Provider value={values}>
-            <Header />
+        <CompareProvider>
+          <CategoryProvider>
+            <MyContext.Provider value={values}>
+              <Header />
             <Routes>
               <Route path="/" exact={true} element={<Home />} />
               <Route path="/login" exact={true} element={<Login />} />
@@ -160,6 +163,7 @@ function App() {
               <Route path="/my-orders" exact={true} element={<Orders />} />
               <Route path="/payment-result" exact={true} element={<PaymentResult />} />
               <Route path="/coupons" exact={true} element={<CouponsPage />} />
+              <Route path="/compare" exact={true} element={<Compare />} />
             </Routes>
             <Footer/>
 
@@ -193,6 +197,7 @@ function App() {
             </Dialog>
           </MyContext.Provider>
         </CategoryProvider>
+      </CompareProvider>
       </BrowserRouter>
       <Toaster
         toastOptions={{

@@ -18,6 +18,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { Navigation } from './Navigation/index';
 import { MyContext } from '../../App';
 import { logoutUser } from '../../api/userApi';
+import { useCompare } from '../../context/CompareContext';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -33,6 +34,7 @@ export const Header = () => {
 
   const context = useContext(MyContext);
   const navigate = useNavigate();
+  const { compareCount } = useCompare();
   
   // Sử dụng user từ global context thay vì local state
   const user = context.user;
@@ -154,9 +156,9 @@ export const Header = () => {
                 )}
               </li>
               <li>
-                <Tooltip title="Compare">
-                  <IconButton aria-label="compare">
-                    <StyledBadge badgeContent={4} color="secondary">
+                <Tooltip title="So sánh">
+                  <IconButton aria-label="compare" component={Link} to="/compare">
+                    <StyledBadge badgeContent={compareCount} color="secondary">
                       <IoIosGitCompare />
                     </StyledBadge>
                   </IconButton>

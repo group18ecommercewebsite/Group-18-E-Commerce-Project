@@ -10,11 +10,13 @@ import { MyContext } from '../../App';
 import { addToMyList } from '../../api/myListApi';
 import CircularProgress from '@mui/material/CircularProgress';
 import { formatCurrency } from '../../utils/formatCurrency';
+import { useCompare } from '../../context/CompareContext';
 
 const ProductItem = ({ product }) => {
   const context = useContext(MyContext);
   const navigate = useNavigate();
   const [addingToWishlist, setAddingToWishlist] = useState(false);
+  const { addToCompare, isInCompare } = useCompare();
 
   // Handle both prop formats - full product object or individual props
   const productData = product || {};
@@ -76,6 +78,19 @@ const ProductItem = ({ product }) => {
     context.setOpenProductDetailsModal(productData);
   };
 
+  const handleAddToCompare = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const result = addToCompare(productData);
+    if (result.success) {
+      context.openAlertBox('success', result.message);
+    } else {
+      context.openAlertBox('error', result.message);
+    }
+  };
+
+  const inCompare = isInCompare(productId);
+
   return (
     <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)]">
       <div className="group imgWrapper w-[100%] overflow-hidden rounded-md relative">
@@ -108,8 +123,11 @@ const ProductItem = ({ product }) => {
             <MdZoomOutMap className="text-[18px] !text-black group-hover:text-white hover:!text-white " />
           </Button>
 
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-[#ff5252] hover:text-white group">
-            <IoIosGitCompare className="text-[18px] !text-black group-hover:text-white hover:!text-white " />
+          <Button 
+            className={`!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-[#ff5252] hover:text-white group ${inCompare ? '!bg-[#ff5252]' : ''}`}
+            onClick={handleAddToCompare}
+          >
+            <IoIosGitCompare className={`text-[18px] group-hover:text-white hover:!text-white ${inCompare ? '!text-white' : '!text-black'}`} />
           </Button>
 
           <Button 
