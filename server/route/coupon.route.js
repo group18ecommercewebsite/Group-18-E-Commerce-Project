@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import auth from '../middlewares/auth.js';
+import auth, { optionalAuth } from '../middlewares/auth.js';
 import { validateCouponController, getActiveCouponsController } from '../controllers/coupon.controller.js';
 
 const couponRouter = Router();
@@ -7,7 +7,7 @@ const couponRouter = Router();
 // Validate coupon (user phải login)
 couponRouter.post('/validate', auth, validateCouponController);
 
-// Get active coupons (public - không cần login)
-couponRouter.get('/list', getActiveCouponsController);
+// Get active coupons (optionalAuth - lọc mã đã dùng nếu login)
+couponRouter.get('/list', optionalAuth, getActiveCouponsController);
 
 export default couponRouter;

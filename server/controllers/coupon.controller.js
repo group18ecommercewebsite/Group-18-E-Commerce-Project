@@ -165,14 +165,16 @@ export const recordCouponUsage = async (couponCode, userId, orderId) => {
 };
 
 /**
- * Lấy tất cả coupon đang hoạt động (Public API cho client)
+ * Lấy tất cả coupon đang hoạt động (có thể filter theo user đã dùng)
  * GET /coupon/list
  */
 export const getActiveCouponsController = async (request, response) => {
     try {
         const now = new Date();
+        const userId = request.userId; // Có thể null nếu không login
 
-        const coupons = await CouponModel.find({
+        // Lấy tất cả coupon đang active
+        let coupons = await CouponModel.find({
             isActive: true,
             startDate: { $lte: now },
             endDate: { $gte: now },
@@ -181,6 +183,14 @@ export const getActiveCouponsController = async (request, response) => {
                 { $expr: { $lt: ['$usedCount', '$usageLimit'] } }
             ]
         }).select('code description discountType discountValue minOrderAmount maxDiscountAmount endDate');
+
+        // Nếu user đã login, lọc bỏ các coupon đã dùng
+        if (userId) {
+            const usedCoupons = await CouponUsageModel.find({ userId }).select('couponId');
+            const usedCouponIds = usedCoupons.map(u => u.couponId.toString());
+            
+            coupons = coupons.filter(coupon => !usedCouponIds.includes(coupon._id.toString()));
+        }
 
         return response.status(200).json({
             success: true,
