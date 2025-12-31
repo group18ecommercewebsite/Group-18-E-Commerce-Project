@@ -47,7 +47,7 @@ const ProductListing = () => {
 
   // State cho sidebar filter
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 200]);
+  const [priceRange, setPriceRange] = useState([0, 5000000]);
   const [selectedRating, setSelectedRating] = useState(null);
 
   // Tìm tên category từ ID

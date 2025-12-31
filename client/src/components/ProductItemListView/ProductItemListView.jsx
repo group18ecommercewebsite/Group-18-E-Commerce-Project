@@ -8,6 +8,7 @@ import { IoIosGitCompare } from 'react-icons/io';
 import { MdZoomOutMap } from 'react-icons/md';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import { MyContext } from '../../App';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const ProductItemListView = ({ product }) => {
   const context = useContext(MyContext);
@@ -87,11 +88,11 @@ const ProductItemListView = ({ product }) => {
 
         <div className="flex items-center gap-4">
           {oldPrice > 0 && oldPrice !== price && (
-            <span className="oldPrice line-through text-gray-500 text-[15px] font-medium">
-              ${oldPrice.toFixed(2)}
+            <span className="oldPrice line-through text-gray-500 text-[14px] font-medium">
+              {formatCurrency(oldPrice)}
             </span>
           )}
-          <span className="price text-[#ff5252] text-[15px] font-[600]">${price.toFixed(2)}</span>
+          <span className="price text-[#ff5252] text-[14px] font-[600]">{formatCurrency(price)}</span>
         </div>
 
         <div className="mt-3">

@@ -10,6 +10,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { MyContext } from '../App';
 import { createOrder } from '../api/orderApi';
 import { createSePayPayment } from '../api/paymentApi';
+import { validateCoupon } from '../api/couponApi';
+import { formatCurrency } from '../utils/formatCurrency';
 
 export const Checkout = () => {
   const context = useContext(MyContext);
@@ -17,6 +19,11 @@ export const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discountAmount, description }
 
   const [formFields, setFormFields] = useState({
     fullName: '',
@@ -69,6 +76,47 @@ export const Checkout = () => {
     return sum + (price * qty);
   }, 0);
 
+  // Tổng sau giảm giá
+  const discountAmount = appliedCoupon?.discountAmount || 0;
+  const total = subtotal - discountAmount;
+
+  // Xử lý áp dụng mã giảm giá
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      context.openAlertBox('error', 'Vui lòng nhập mã giảm giá');
+      return;
+    }
+
+    try {
+      setCouponLoading(true);
+      const response = await validateCoupon(couponCode, subtotal);
+      
+      if (response.success) {
+        setAppliedCoupon({
+          code: response.data.code,
+          discountAmount: response.data.discountAmount,
+          description: response.data.description,
+          discountType: response.data.discountType,
+          discountValue: response.data.discountValue
+        });
+        context.openAlertBox('success', response.message);
+      } else {
+        context.openAlertBox('error', response.message);
+      }
+    } catch (error) {
+      context.openAlertBox('error', error.response?.data?.message || 'Mã giảm giá không hợp lệ');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  // Xóa mã giảm giá
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    context.openAlertBox('info', 'Đã xóa mã giảm giá');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -99,8 +147,10 @@ export const Checkout = () => {
           state: formFields.state,
           zipCode: formFields.zipCode
         },
-        totalAmount: subtotal,
-        subTotalAmount: subtotal
+        totalAmount: total,
+        subTotalAmount: subtotal,
+        couponCode: appliedCoupon?.code || '',
+        discountAmount: discountAmount
       };
 
       if (paymentMethod === 'cod') {
@@ -311,16 +361,76 @@ export const Checkout = () => {
                     </div>
                   </div>
                   <span className="text-[13px] font-medium">
-                    ${((item.productId?.price || 0) * item.quantity).toFixed(2)}
+                    {formatCurrency((item.productId?.price || 0) * item.quantity)}
                   </span>
                 </div>
               ))}
             </div>
 
-            {/* Subtotal */}
-            <div className="flex justify-between border-t border-gray-200 pt-3 mt-3">
-              <span className="font-semibold text-[15px]">Total</span>
-              <span className="font-bold text-[18px] text-[#ff5252]">${subtotal.toFixed(2)}</span>
+            {/* Coupon Input */}
+            <div className="border-t border-gray-200 pt-3 mt-3">
+              <p className="text-[13px] font-semibold mb-2">🎟️ Mã giảm giá</p>
+              {appliedCoupon ? (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[13px] font-bold text-green-700">✅ {appliedCoupon.code}</span>
+                    <button 
+                      onClick={handleRemoveCoupon}
+                      className="text-[11px] text-red-500 hover:text-red-700"
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                  <p className="text-[12px] text-green-600 font-medium">
+                    {appliedCoupon.discountType === 'percentage' 
+                      ? `Giảm ${appliedCoupon.discountValue}%` 
+                      : `Giảm ${formatCurrency(appliedCoupon.discountValue)}`}
+                  </p>
+                  <div className="text-[10px] text-gray-500 mt-1 space-y-0.5">
+                    {appliedCoupon.minOrderAmount > 0 && (
+                      <p>• Đơn tối thiểu: {formatCurrency(appliedCoupon.minOrderAmount)}</p>
+                    )}
+                    {appliedCoupon.discountType === 'percentage' && appliedCoupon.maxDiscountAmount > 0 && (
+                      <p>• Giảm tối đa: {formatCurrency(appliedCoupon.maxDiscountAmount)}</p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Nhập mã..."
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    className="flex-1 px-3 py-2 text-[12px] border border-gray-300 rounded-md focus:outline-none focus:border-[#ff5252]"
+                  />
+                  <button
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading}
+                    className="px-3 py-2 text-[12px] bg-[#ff5252] text-white rounded-md hover:bg-[#e04848] disabled:bg-gray-300"
+                  >
+                    {couponLoading ? '...' : 'Áp dụng'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Order Breakdown */}
+            <div className="border-t border-gray-200 pt-3 mt-3 space-y-2">
+              <div className="flex justify-between text-[13px]">
+                <span className="text-gray-600">Tạm tính</span>
+                <span>{formatCurrency(subtotal)}</span>
+              </div>
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-[13px] text-green-600">
+                  <span>Giảm giá</span>
+                  <span>-{formatCurrency(discountAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold pt-2 border-t border-gray-100">
+                <span className="text-[15px]">Tổng cộng</span>
+                <span className="text-[16px] text-[#ff5252]">{formatCurrency(total)}</span>
+              </div>
             </div>
 
             {/* Payment Method Selection */}

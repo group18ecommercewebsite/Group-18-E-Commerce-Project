@@ -12,7 +12,7 @@ import {
   FiShoppingBag,
   FiCreditCard,
 } from 'react-icons/fi';
-import { MdOutlineMoneyOff } from 'react-icons/md';
+import { MdOutlineMoneyOff, MdLocalOffer } from 'react-icons/md';
 import { IoMdLogOut } from 'react-icons/io';
 import { Collapse } from 'react-collapse';
 import { useAuth } from '../../Context/AuthContext';
@@ -83,6 +83,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       label: 'Yêu cầu hoàn tiền',
       icon: MdOutlineMoneyOff,
       path: '/cancellation-requests',
+    },
+    {
+      id: 'coupons',
+      label: 'Mã giảm giá',
+      icon: MdLocalOffer,
+      path: '/coupons',
     },
   ];
 

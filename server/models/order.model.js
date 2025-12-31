@@ -73,6 +73,15 @@ const orderSchema = new mongoose.Schema({
         bank_name: { type: String, default: "" },
         account_number: { type: String, default: "" },
         account_holder: { type: String, default: "" }
+    },
+    // Coupon fields
+    couponCode: {
+        type: String,
+        default: ""
+    },
+    discountAmount: {
+        type: Number,
+        default: 0
     }
 },
     { timestamps: true }

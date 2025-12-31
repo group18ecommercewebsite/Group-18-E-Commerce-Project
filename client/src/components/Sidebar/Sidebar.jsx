@@ -11,13 +11,14 @@ import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Rating from '@mui/material/Rating';
 import { useCategories } from '../../context/CategoryContext';
+import { formatNumber } from '../../utils/formatCurrency';
 
 
 
 const Sidebar = ({ 
   selectedCategoryIds = [], 
   setSelectedCategoryIds,
-  priceRange = [0, 1000],
+  priceRange = [0, 5000000],
   setPriceRange,
   selectedRating = null,
   setSelectedRating
@@ -174,17 +175,17 @@ const Sidebar = ({
           <div className="px-2">
             <RangeSlider 
               min={0} 
-              max={200} 
-              step={10}
+              max={5000000} 
+              step={100000}
               value={priceRange}
               onInput={(value) => setPriceRange && setPriceRange(value)}
             />
             <div className='flex pt-4 pb-2 priceRange'>
                 <span className='text-[13px]'>
-                    From: <strong className='text-dark'>${priceRange[0]}</strong>
+                    Từ: <strong className='text-dark'>{formatNumber(priceRange[0])}đ</strong>
                 </span>
                 <span className='ml-auto text-[13px]'>
-                    To: <strong className='text-dark'>${priceRange[1]}</strong>
+                    Đến: <strong className='text-dark'>{formatNumber(priceRange[1])}đ</strong>
                 </span>
             </div>
           </div>

@@ -9,6 +9,7 @@ import Badge from "../components/Badge";
 import { getMyOrders, cancelOrder } from "../api/orderApi";
 import { logoutUser } from "../api/userApi";
 import CircularProgress from "@mui/material/CircularProgress";
+import { formatCurrency } from "../utils/formatCurrency";
 
 // Danh sách ngân hàng Việt Nam
 const VIETNAM_BANKS = [
@@ -341,7 +342,7 @@ export const Orders = () => {
                             <span className="text-[#ff5252]">{order.payment_status || 'COD'}</span>
                           </td>
                           <td className="py-3 px-3">{order.products?.length || 0} items</td>
-                          <td className="py-3 px-3 font-medium">${order.totalAmt?.toLocaleString()}</td>
+                          <td className="py-3 px-3 font-medium">{formatCurrency(order.totalAmt)}</td>
                           <td className="py-3 px-3">
                             <Badge status={order.order_status || 'pending'} />
                           </td>
@@ -405,9 +406,9 @@ export const Orders = () => {
                                           </Link>
                                         </td>
                                         <td className="py-3 px-4 text-center">{product.quantity}</td>
-                                        <td className="py-3 px-4">${product.price?.toLocaleString()}</td>
+                                        <td className="py-3 px-4">{formatCurrency(product.price)}</td>
                                         <td className="py-3 px-4 font-medium text-[#ff5252]">
-                                          ${product.subTotal?.toLocaleString()}
+                                          {formatCurrency(product.subTotal)}
                                         </td>
                                       </tr>
                                     ))}

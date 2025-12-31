@@ -9,6 +9,7 @@ import { MdZoomOutMap } from 'react-icons/md';
 import { MyContext } from '../../App';
 import { addToMyList } from '../../api/myListApi';
 import CircularProgress from '@mui/material/CircularProgress';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const ProductItem = ({ product }) => {
   const context = useContext(MyContext);
@@ -141,11 +142,11 @@ const ProductItem = ({ product }) => {
 
         <div className="flex items-center gap-4">
           {oldPrice > 0 && oldPrice !== price && (
-            <span className="oldPrice line-through text-gray-500 text-[15px] font-medium">
-              ${oldPrice.toFixed(2)}
+            <span className="oldPrice line-through text-gray-500 text-[14px] font-medium">
+              {formatCurrency(oldPrice)}
             </span>
           )}
-          <span className="price text-[#ff5252] text-[15px] font-[600]">${price.toFixed(2)}</span>
+          <span className="price text-[#ff5252] text-[14px] font-[600]">{formatCurrency(price)}</span>
         </div>
       </div>
     </div>

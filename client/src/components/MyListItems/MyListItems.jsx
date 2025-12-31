@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { IoCloseSharp } from 'react-icons/io5';
 import Rating from '@mui/material/Rating';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const MyListItems = ({ item, onRemove }) => {
   // Tính phần trăm giảm giá
@@ -48,11 +49,11 @@ const MyListItems = ({ item, onRemove }) => {
 
         <div className="flex items-center gap-4 mt-2">
           <span className="price text-[14px] font-[600]">
-            ${item.price?.toLocaleString() || '0'}
+            {formatCurrency(item.price || 0)}
           </span>
           {item.oldPrice && item.oldPrice > item.price && (
             <span className="oldPrice line-through text-gray-500 text-[14px] font-medium">
-              ${item.oldPrice?.toLocaleString()}
+              {formatCurrency(item.oldPrice)}
             </span>
           )}
           {discountPercent > 0 && (

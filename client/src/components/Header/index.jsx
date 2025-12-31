@@ -13,6 +13,7 @@ import { CiLocationOn } from "react-icons/ci";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { GoHeart } from "react-icons/go";
 import { IoLogOutOutline } from "react-icons/io5";
+import { MdLocalOffer } from "react-icons/md";
 import Tooltip from '@mui/material/Tooltip';
 import { Navigation } from './Navigation/index';
 import { MyContext } from '../../App';
@@ -176,6 +177,13 @@ export const Header = () => {
                     <StyledBadge badgeContent={4} color="secondary">
                       <FaRegHeart />
                     </StyledBadge>
+                  </IconButton>
+                </Tooltip>
+              </li>
+              <li>
+                <Tooltip title="Mã giảm giá">
+                  <IconButton aria-label="coupons" component={Link} to="/coupons">
+                    <MdLocalOffer className="text-[20px] text-[#ff5252]" />
                   </IconButton>
                 </Tooltip>
               </li>

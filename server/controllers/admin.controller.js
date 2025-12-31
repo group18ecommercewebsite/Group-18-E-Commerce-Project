@@ -2,6 +2,7 @@ import OrderModel from '../models/order.model.js';
 import UserModel from '../models/user.model.js';
 import ProductModel from '../models/product.model.js';
 import CategoryModel from '../models/category.model.js';
+import CouponModel from '../models/coupon.model.js';
 
 /**
  * Lấy tất cả đơn hàng (Admin only)
@@ -482,3 +483,186 @@ export const markAsRefunded = async (request, response) => {
     }
 };
 
+// ==================== COUPON MANAGEMENT ====================
+
+/**
+ * Lấy tất cả coupons
+ * GET /api/admin/coupons
+ */
+export const getAllCoupons = async (request, response) => {
+    try {
+        const coupons = await CouponModel.find().sort({ createdAt: -1 });
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            data: coupons
+        });
+    } catch (error) {
+        console.error('Get all coupons error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};
+
+/**
+ * Tạo coupon mới
+ * POST /api/admin/coupons
+ */
+export const createCoupon = async (request, response) => {
+    try {
+        const {
+            code,
+            description,
+            discountType,
+            discountValue,
+            minOrderAmount,
+            maxDiscountAmount,
+            usageLimit,
+            startDate,
+            endDate,
+            isActive
+        } = request.body;
+
+        // Validate required fields
+        if (!code || !discountType || !discountValue || !endDate) {
+            return response.status(400).json({
+                message: 'Vui lòng điền đầy đủ thông tin bắt buộc',
+                error: true,
+                success: false
+            });
+        }
+
+        // Check if code exists
+        const existingCoupon = await CouponModel.findOne({ 
+            code: code.toUpperCase().trim() 
+        });
+        if (existingCoupon) {
+            return response.status(400).json({
+                message: 'Mã giảm giá này đã tồn tại',
+                error: true,
+                success: false
+            });
+        }
+
+        const newCoupon = new CouponModel({
+            code: code.toUpperCase().trim(),
+            description: description || '',
+            discountType,
+            discountValue,
+            minOrderAmount: minOrderAmount || 0,
+            maxDiscountAmount: maxDiscountAmount || 0,
+            usageLimit: usageLimit || 0,
+            startDate: startDate || new Date(),
+            endDate,
+            isActive: isActive !== false
+        });
+
+        await newCoupon.save();
+
+        return response.status(201).json({
+            success: true,
+            error: false,
+            message: 'Tạo mã giảm giá thành công',
+            data: newCoupon
+        });
+    } catch (error) {
+        console.error('Create coupon error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};
+
+/**
+ * Cập nhật coupon
+ * PUT /api/admin/coupons/:id
+ */
+export const updateCoupon = async (request, response) => {
+    try {
+        const { id } = request.params;
+        const updateData = request.body;
+
+        // Nếu update code, check trùng
+        if (updateData.code) {
+            const existingCoupon = await CouponModel.findOne({ 
+                code: updateData.code.toUpperCase().trim(),
+                _id: { $ne: id }
+            });
+            if (existingCoupon) {
+                return response.status(400).json({
+                    message: 'Mã giảm giá này đã tồn tại',
+                    error: true,
+                    success: false
+                });
+            }
+            updateData.code = updateData.code.toUpperCase().trim();
+        }
+
+        const updatedCoupon = await CouponModel.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }
+        );
+
+        if (!updatedCoupon) {
+            return response.status(404).json({
+                message: 'Không tìm thấy mã giảm giá',
+                error: true,
+                success: false
+            });
+        }
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            message: 'Cập nhật mã giảm giá thành công',
+            data: updatedCoupon
+        });
+    } catch (error) {
+        console.error('Update coupon error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};
+
+/**
+ * Xóa coupon
+ * DELETE /api/admin/coupons/:id
+ */
+export const deleteCoupon = async (request, response) => {
+    try {
+        const { id } = request.params;
+
+        const deletedCoupon = await CouponModel.findByIdAndDelete(id);
+
+        if (!deletedCoupon) {
+            return response.status(404).json({
+                message: 'Không tìm thấy mã giảm giá',
+                error: true,
+                success: false
+            });
+        }
+
+        return response.status(200).json({
+            success: true,
+            error: false,
+            message: 'Xóa mã giảm giá thành công'
+        });
+    } catch (error) {
+        console.error('Delete coupon error:', error);
+        return response.status(500).json({
+            message: error.message,
+            error: true,
+            success: false
+        });
+    }
+};

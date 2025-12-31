@@ -11,6 +11,7 @@ import { addToCart } from '../../api/cartApi';
 import { addToMyList } from '../../api/myListApi';
 import { MyContext } from '../../App';
 import CircularProgress from '@mui/material/CircularProgress';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const ProductDetailsComponent = ({ product, reviewStats }) => {
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(null);
@@ -119,9 +120,9 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
 
       <div className="flex items-center gap-4 mt-4">
         {oldPrice > 0 && oldPrice !== price && (
-          <span className="oldPrice line-through text-gray-500 text-[20px] font-medium">${oldPrice.toFixed(2)}</span>
+          <span className="oldPrice line-through text-gray-500 text-[18px] font-medium">{formatCurrency(oldPrice)}</span>
         )}
-        <span className="price text-[#ff5252] text-[20px] font-[600]">${price.toFixed(2)}</span>
+        <span className="price text-[#ff5252] text-[18px] font-[600]">{formatCurrency(price)}</span>
 
         {discount > 0 && (
           <span className="bg-[#ff5252] text-white px-2 py-1 rounded text-[12px] font-bold">

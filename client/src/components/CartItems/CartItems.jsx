@@ -8,6 +8,7 @@ import Rating from '@mui/material/Rating';
 import CircularProgress from '@mui/material/CircularProgress';
 import { updateCartQuantity, removeFromCart } from '../../api/cartApi';
 import { MyContext } from '../../App';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const CartItems = ({ cartItem, onUpdate }) => {
   const context = useContext(MyContext);
@@ -146,15 +147,15 @@ const CartItems = ({ cartItem, onUpdate }) => {
           </div>
 
           <span className="text-[12px] text-gray-500">
-            ${price.toFixed(2)} × {quantity} = <span className="font-bold text-black">${(price * quantity).toFixed(2)}</span>
+            {formatCurrency(price)} × {quantity} = <span className="font-bold text-black">{formatCurrency(price * quantity)}</span>
           </span>
         </div>
 
         <div className="flex items-center gap-4 mt-2">
-          <span className="price text-[14px] font-[600]">${price.toFixed(2)}</span>
+          <span className="price text-[14px] font-[600]">{formatCurrency(price)}</span>
           {oldPrice > 0 && oldPrice !== price && (
             <span className="oldPrice line-through text-gray-500 text-[14px] font-medium">
-              ${oldPrice.toFixed(2)}
+              {formatCurrency(oldPrice)}
             </span>
           )}
           {discount > 0 && (

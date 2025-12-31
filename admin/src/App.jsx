@@ -95,6 +95,7 @@ import AddProduct from './Pages/AddProduct';
 import Users from './Pages/Users';
 import Orders from './Pages/Orders';
 import CancellationRequests from './pages/CancellationRequests';
+import Coupons from './pages/Coupons';
 import ForgotPassword from './Pages/ForgotPassword';
 import VerifyOTP from './Pages/VerifyOTP';
 import ChangePassword from './Pages/ChangePassword';
@@ -266,6 +267,20 @@ function App() {
         {
           index: true,
           element: <CancellationRequests />
+        }
+      ]
+    },
+    {
+      path: "/coupons",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Coupons />
         }
       ]
     }

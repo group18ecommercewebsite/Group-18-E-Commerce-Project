@@ -5,6 +5,7 @@ import { Button } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { removeFromCart } from '../../api/cartApi';
 import { MyContext } from '../../App';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const CartPanel = () => {
   const [removingId, setRemovingId] = useState(null);
@@ -119,7 +120,7 @@ const CartPanel = () => {
                       Qty: <span className="font-bold">{item.quantity}</span>
                     </span>
                     <span className="text-[#ff5252] font-bold text-[13px]">
-                      ${((product.price || 0) * item.quantity).toFixed(2)}
+                      {formatCurrency((product.price || 0) * item.quantity)}
                     </span>
                   </p>
 
@@ -148,19 +149,19 @@ const CartPanel = () => {
             <div className="bottomInfo py-3 px-4 w-full border-t border-[rgba(0,0,0,0.1)] flex items-center justify-between flex-col">
               <div className="flex items-center justify-between w-full">
                 <span className="text-[14px] font-[600]">{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
-                <span className="text-[#ff5252] font-bold">${subtotal.toFixed(2)}</span>
+                <span className="text-[#ff5252] font-bold">{formatCurrency(subtotal)}</span>
               </div>
 
               <div className="flex items-center justify-between w-full">
                 <span className="text-[14px] font-[600]">Shipping</span>
-                <span className="font-bold">{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                <span className="font-bold">{shipping === 0 ? 'Free' : formatCurrency(shipping)}</span>
               </div>
             </div>
 
             <div className="bottomInfo py-3 px-4 w-full border-t border-[rgba(0,0,0,0.1)] flex items-center justify-between flex-col">
               <div className="flex items-center justify-between w-full">
                 <span className="text-[14px] font-[600]">Total</span>
-                <span className="text-[#ff5252] font-bold">${total.toFixed(2)}</span>
+                <span className="text-[#ff5252] font-bold">{formatCurrency(total)}</span>
               </div>
 
               <br />

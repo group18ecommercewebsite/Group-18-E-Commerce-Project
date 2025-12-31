@@ -3,6 +3,7 @@ import CartProductModel from "../models/cartproduct.model.js";
 import UserModel from "../models/user.model.js";
 import ProductModel from "../models/product.model.js";
 import mongoose from "mongoose";
+import { recordCouponUsage } from "./coupon.controller.js";
 
 // Generate unique order ID
 function generateOrderId() {
@@ -20,7 +21,9 @@ export const createOrderController = async (request, response) => {
             products,
             shippingAddress,
             totalAmount,
-            subTotalAmount
+            subTotalAmount,
+            couponCode,
+            discountAmount
         } = request.body;
 
         if (!products || products.length === 0) {
@@ -62,7 +65,9 @@ export const createOrderController = async (request, response) => {
                 payment_status: "Cash On Delivery",
                 delivery_address: shippingAddress,
                 subTotalAmt: product.price * product.quantity,
-                totalAmt: totalAmount
+                totalAmt: totalAmount,
+                couponCode: couponCode || '',
+                discountAmount: discountAmount || 0
             });
 
             const savedOrder = await order.save();
@@ -82,6 +87,11 @@ export const createOrderController = async (request, response) => {
         await UserModel.findByIdAndUpdate(userId, {
             shopping_cart: []
         });
+
+        // Record coupon usage if coupon was used
+        if (couponCode) {
+            await recordCouponUsage(couponCode, userId, baseOrderId);
+        }
 
         return response.status(201).json({
             message: "Order placed successfully!",

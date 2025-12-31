@@ -3,6 +3,7 @@ import OrderModel from '../models/order.model.js';
 import CartProductModel from '../models/cartproduct.model.js';
 import UserModel from '../models/user.model.js';
 import ProductModel from '../models/product.model.js';
+import { recordCouponUsage } from './coupon.controller.js';
 
 // SePay Config
 const sepayClient = new SePayPgClient({
@@ -25,7 +26,7 @@ const generateOrderId = () => {
 export const createSePayOrder = async (request, response) => {
     try {
         const userId = request.userId;
-        const { products, shippingAddress, totalAmount, subTotalAmount } = request.body;
+        const { products, shippingAddress, totalAmount, subTotalAmount, couponCode, discountAmount } = request.body;
 
         if (!products || products.length === 0) {
             return response.status(400).json({
@@ -47,8 +48,8 @@ export const createSePayOrder = async (request, response) => {
         const clientUrl = process.env.CLIENT_URL || 'http://localhost:5174';
         const serverUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 8000}`;
 
-        // Số tiền (SePay dùng VND)
-        const amountVND = Math.round(totalAmount * 24000);
+        // Số tiền (SePay dùng VND) - giá đã là VND, không cần chuyển đổi
+        const amountVND = Math.round(totalAmount);
 
         // ===== TẠO ORDER NGAY VÀO DATABASE với status "Pending Payment" =====
         const orders = [];
@@ -71,7 +72,9 @@ export const createSePayOrder = async (request, response) => {
                 delivery_address: shippingAddress,
                 subTotalAmt: product.price * product.quantity,
                 totalAmt: totalAmount,
-                order_status: 'pending' // Chờ thanh toán
+                order_status: 'pending', // Chờ thanh toán
+                couponCode: couponCode || '',
+                discountAmount: discountAmount || 0
             });
 
             const savedOrder = await order.save();
@@ -96,7 +99,7 @@ export const createSePayOrder = async (request, response) => {
             success_url: `${clientUrl}/payment-result?orderId=${orderId}&status=success`,
             error_url: `${clientUrl}/payment-result?orderId=${orderId}&status=failed`,
             cancel_url: `${clientUrl}/cart`,
-            custom_data: JSON.stringify({ userId, orderId })
+            custom_data: JSON.stringify({ userId, orderId, couponCode })
         });
 
         const checkoutUrl = sepayClient.checkout.initCheckoutUrl();
@@ -170,6 +173,12 @@ export const sePayCallback = async (request, response) => {
                     order.productId,
                     { $inc: { countInStock: -quantity } }
                 );
+            }
+
+            // Record coupon usage if coupon was used
+            const firstOrder = orders[0];
+            if (firstOrder?.couponCode) {
+                await recordCouponUsage(firstOrder.couponCode, firstOrder.userId, orderId);
             }
 
             console.log('✅ Orders updated to PAID and stock reduced:', orderId);

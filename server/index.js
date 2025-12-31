@@ -16,6 +16,7 @@ import reviewRouter from './route/review.route.js';
 import paymentRouter from './route/payment.route.js';
 import adminRouter from './route/admin.route.js';
 import bannerRouter from './route/banner.route.js';
+import couponRouter from './route/coupon.route.js';
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use('/api/review', reviewRouter);
 app.use('/api/payment', paymentRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/banner', bannerRouter);
+app.use('/api/coupon', couponRouter);
 
 connectDB().then(() => {
   app.listen(process.env.PORT, () => {

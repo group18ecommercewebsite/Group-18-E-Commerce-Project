@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import CartItems from '../components/CartItems/CartItems';
 import { MyContext } from '../App';
 import CircularProgress from '@mui/material/CircularProgress';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const CartPage = () => {
   const context = useContext(MyContext);
@@ -99,22 +100,22 @@ const CartPage = () => {
 
             <p className="flex items-center justify-between py-2">
               <span className="text-[14px] font-medium">Subtotal</span>
-              <span className="text-[#ff5252] font-bold">${subtotal.toFixed(2)}</span>
+              <span className="text-[#ff5252] font-bold">{formatCurrency(subtotal)}</span>
             </p>
 
             <p className="flex items-center justify-between py-2">
               <span className="text-[14px] font-medium">Shipping</span>
-              <span className="font-bold">{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+              <span className="font-bold">{shipping === 0 ? 'Miễn phí' : formatCurrency(shipping)}</span>
             </p>
 
             <p className="flex items-center justify-between py-2">
               <span className="text-[14px] font-medium">Total</span>
-              <span className="text-[#ff5252] font-bold text-lg">${total.toFixed(2)}</span>
+              <span className="text-[#ff5252] font-bold text-lg">{formatCurrency(total)}</span>
             </p>
 
-            {subtotal > 0 && subtotal < 100 && (
+            {subtotal > 0 && subtotal < 500000 && (
               <p className="text-[12px] text-gray-500 mt-2">
-                Add ${(100 - subtotal).toFixed(2)} more for free shipping!
+                Mua thêm {formatCurrency(500000 - subtotal)} để được miễn phí vận chuyển!
               </p>
             )}
 
