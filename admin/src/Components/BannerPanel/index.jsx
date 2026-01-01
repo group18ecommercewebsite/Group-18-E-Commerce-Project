@@ -1,173 +1,262 @@
 import React, { useState, useEffect } from 'react';
 import { useBanner } from '../../Context/BannerContext';
-import { FiX, FiUpload, FiTrash2 } from 'react-icons/fi';
+import { FiX, FiUpload, FiTrash2, FiAlertCircle } from 'react-icons/fi';
+import CircularProgress from '@mui/material/CircularProgress';
+// import { createBanner, updateBanner, uploadBannerImage } from '../../api/bannerApi'; // Uncomment when ready
 
 const BannerPanel = () => {
     const { isOpen, closePanel, editingBanner } = useBanner();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    
     const [formData, setFormData] = useState({
-        image: null,
-        imagePreview: null
+        imageFile: null,      // The actual File object to upload
+        imagePreview: null,   // The URL for display (blob: or http:)
+        title: '',            // Optional: Title/Alt text
+        link: ''              // Optional: Click link
     });
 
+    // Initialize or Reset Form
     useEffect(() => {
-        if (editingBanner) {
-            setFormData({
-                image: null,
-                imagePreview: editingBanner.image
-            });
-        } else {
-            setFormData({
-                image: null,
-                imagePreview: null
-            });
+        if (isOpen) {
+            setError('');
+            setLoading(false);
+            if (editingBanner) {
+                setFormData({
+                    imageFile: null,
+                    imagePreview: editingBanner.image,
+                    title: editingBanner.title || '',
+                    link: editingBanner.link || ''
+                });
+            } else {
+                setFormData({
+                    imageFile: null,
+                    imagePreview: null,
+                    title: '',
+                    link: ''
+                });
+            }
         }
-    }, [editingBanner, isOpen]);
+    }, [isOpen, editingBanner]);
+
+    // Memory Cleanup: Revoke object URLs to avoid memory leaks
+    useEffect(() => {
+        return () => {
+            if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(formData.imagePreview);
+            }
+        };
+    }, [formData.imagePreview]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
+            // Validate size/type if needed
+            if (file.size > 5 * 1024 * 1024) {
+                setError('File quá lớn (Tối đa 5MB)');
+                return;
+            }
+
+            // Create local preview
             const preview = URL.createObjectURL(file);
-            setFormData({
-                image: file,
+            setFormData(prev => ({
+                ...prev,
+                imageFile: file,
                 imagePreview: preview
-            });
+            }));
+            setError('');
         }
     };
 
     const removeImage = () => {
-        setFormData({
-            image: null,
+        // Revoke old URL before clearing
+        if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+            URL.revokeObjectURL(formData.imagePreview);
+        }
+        
+        setFormData(prev => ({
+            ...prev,
+            imageFile: null,
             imagePreview: null
-        });
+        }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Banner Data:', formData);
-        // TODO: Xử lý submit
-        closePanel();
+        if (!formData.imagePreview) {
+            setError('Vui lòng chọn hình ảnh');
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+
+        try {
+            console.log('Submitting Banner Data:', formData);
+            
+            // TODO: Implement API Logic
+            // 1. If formData.imageFile exists -> Upload Image -> Get URL
+            // 2. Call createBanner or updateBanner with the URL
+            
+            // Simulating API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            closePanel();
+        } catch (err) {
+            console.error(err);
+            setError('Có lỗi xảy ra khi lưu banner.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (!isOpen) return null;
 
     return (
-        <>
+        <div className="fixed inset-0 z-[9998] flex justify-end">
             {/* Overlay */}
             <div 
-                className="fixed inset-0 z-[9998] bg-black bg-opacity-50 transition-opacity duration-300"
+                className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
                 onClick={closePanel}
             />
             
-            {/* Panel trượt từ bên phải */}
+            {/* Sliding Panel */}
             <div 
-                className={`fixed right-0 top-0 h-full w-full lg:w-[90%] xl:w-[85%] bg-white shadow-2xl z-[9999] transform transition-transform duration-300 ease-in-out ${
+                className={`relative w-full md:w-[500px] lg:w-[600px] h-full bg-white shadow-2xl z-[9999] transform transition-transform duration-300 ease-in-out flex flex-col ${
                     isOpen ? 'translate-x-0' : 'translate-x-full'
                 }`}
             >
-                {/* Header */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+                {/* 1. Header (Fixed) */}
+                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white z-10">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">
+                        <h2 className="text-xl font-bold text-gray-900">
                             {editingBanner ? 'Chỉnh sửa Banner' : 'Thêm Banner mới'}
                         </h2>
-                        <p className="text-sm text-gray-500 mt-1">Tải lên hình ảnh banner cho trang chủ</p>
+                        <p className="text-sm text-gray-500 mt-1">Quản lý hình ảnh hiển thị trên trang chủ</p>
                     </div>
                     <button
                         onClick={closePanel}
-                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                        aria-label="Đóng"
+                        className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500"
                     >
-                        <FiX className="w-6 h-6 text-gray-600" />
+                        <FiX className="w-6 h-6" />
                     </button>
                 </div>
 
-                {/* Content */}
-                <div className="h-[calc(100vh-80px)] overflow-y-auto px-6 py-6">
-                    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-                        {/* Image Upload Section */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Hình ảnh Banner</h3>
+                {/* 2. Scrollable Content Body */}
+                <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                    <form id="bannerForm" onSubmit={handleSubmit} className="space-y-6">
+                        
+                        {/* Error Alert */}
+                        {error && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
+                                <FiAlertCircle /> {error}
+                            </div>
+                        )}
+
+                        {/* Image Upload Area */}
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                            <label className="block text-sm font-medium text-gray-700 mb-3">Hình ảnh Banner <span className="text-red-500">*</span></label>
                             
                             {formData.imagePreview ? (
-                                <div className="space-y-4">
-                                    <div className="relative group">
-                                        <img
-                                            src={formData.imagePreview}
-                                            alt="Banner preview"
-                                            className="w-full h-64 object-cover rounded-lg border border-gray-200"
-                                        />
+                                <div className="relative group rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
+                                    <img
+                                        src={formData.imagePreview}
+                                        alt="Banner preview"
+                                        className="w-full h-auto object-contain max-h-[300px]"
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                        <label className="p-2 bg-white text-blue-600 rounded-full cursor-pointer hover:bg-blue-50 transition-colors shadow-lg">
+                                            <FiUpload className="w-5 h-5" />
+                                            <input 
+                                                type="file" 
+                                                accept="image/*" 
+                                                className="hidden" 
+                                                onChange={handleImageUpload} 
+                                            />
+                                        </label>
                                         <button
                                             type="button"
                                             onClick={removeImage}
-                                            className="absolute top-4 right-4 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="p-2 bg-white text-red-600 rounded-full hover:bg-red-50 transition-colors shadow-lg"
                                         >
                                             <FiTrash2 className="w-5 h-5" />
                                         </button>
                                     </div>
-                                    <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors w-fit">
-                                        <FiUpload className="w-5 h-5" />
-                                        <span>Thay đổi ảnh</span>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageUpload}
-                                            className="hidden"
-                                        />
-                                    </label>
                                 </div>
                             ) : (
-                                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all bg-gray-50">
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <FiUpload className="w-12 h-12 text-gray-400 mb-4" />
-                                        <p className="mb-2 text-sm text-gray-500">
-                                            <span className="font-semibold">Click để tải ảnh</span> hoặc kéo thả
-                                        </p>
-                                        <p className="text-xs text-gray-500">PNG, JPG, WEBP (Tối đa 10MB)</p>
+                                        <div className="p-3 bg-blue-100 text-blue-600 rounded-full mb-3">
+                                            <FiUpload className="w-6 h-6" />
+                                        </div>
+                                        <p className="mb-1 text-sm text-gray-700 font-medium">Click để tải ảnh lên</p>
+                                        <p className="text-xs text-gray-500">PNG, JPG, WEBP (Max 5MB)</p>
                                     </div>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleImageUpload}
-                                        className="hidden"
-                                        required={!editingBanner}
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        className="hidden" 
+                                        onChange={handleImageUpload} 
                                     />
                                 </label>
                             )}
-
-                            <div className="mt-4 text-sm text-gray-500">
-                                <p>• Kích thước khuyến nghị: 1920 x 600px</p>
-                                <p>• Định dạng: JPG, PNG, WEBP</p>
-                                <p>• Kích thước tối đa: 10MB</p>
-                            </div>
                         </div>
 
-                        {/* Footer buttons */}
-                        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 -mx-6 mt-6 flex items-center justify-end gap-4">
-                            <button
-                                type="button"
-                                onClick={closePanel}
-                                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                            >
-                                Hủy
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={!formData.imagePreview}
-                                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                                    formData.imagePreview
-                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                }`}
-                            >
-                                {editingBanner ? 'Cập nhật Banner' : 'Thêm Banner'}
-                            </button>
+                        {/* Additional Info Fields */}
+                        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề (Optional)</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                                    placeholder="Nhập tiêu đề banner..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Đường dẫn (Link)</label>
+                                <input
+                                    type="text"
+                                    name="link"
+                                    value={formData.link}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                                    placeholder="https://..."
+                                />
+                            </div>
                         </div>
                     </form>
                 </div>
+
+                {/* 3. Footer (Fixed) */}
+                <div className="p-4 border-t border-gray-200 bg-white flex justify-end gap-3 z-10">
+                    <button
+                        type="button"
+                        onClick={closePanel}
+                        disabled={loading}
+                        className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+                    >
+                        Hủy bỏ
+                    </button>
+                    <button
+                        type="submit"
+                        form="bannerForm"
+                        disabled={loading || !formData.imagePreview}
+                        className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? <CircularProgress size={18} color="inherit" /> : 'Lưu Banner'}
+                    </button>
+                </div>
             </div>
-        </>
+        </div>
     );
 };
 
 export default BannerPanel;
-
