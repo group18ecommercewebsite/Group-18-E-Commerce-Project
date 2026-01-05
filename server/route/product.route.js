@@ -5,7 +5,7 @@ import { createProduct, deleteProduct, getAllFeaturedProducts, getAllProducts, g
 
 
 const productRouter = Router();
-
+// Test API Postman
 productRouter.post('/uploadImages', auth, upload.array('images'), uploadImages);
 productRouter.post('/create', auth, createProduct);
 productRouter.get('/search', searchProducts);
