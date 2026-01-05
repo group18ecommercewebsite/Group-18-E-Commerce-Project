@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+// struction database by Mongodb
 const productSchema = mongoose.Schema({
     name: {
         type: String,
