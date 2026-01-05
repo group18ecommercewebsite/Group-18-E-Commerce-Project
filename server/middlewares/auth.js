@@ -33,5 +33,21 @@ const auth = async (request, response, next) => {
     }
 }
 
+// Optional auth - không block request nếu không có token
+export const optionalAuth = async (request, response, next) => {
+    try {
+        const token = request.cookies.accessToken || request?.headers?.authorization?.split(" ")[1];
+
+        if (token) {
+            const decode = await jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN);
+            if (decode) {
+                request.userId = decode.id;
+            }
+        }
+    } catch (error) {
+        // Bỏ qua lỗi, tiếp tục request mà không có userId
+    }
+    next();
+};
 
 export default auth

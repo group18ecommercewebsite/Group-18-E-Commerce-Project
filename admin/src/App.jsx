@@ -86,14 +86,20 @@ import BannerPanel from './Components/BannerPanel';
 import { BannerProvider } from './Context/BannerContext';
 import HomeSlides from './Pages/HomeSlides';
 import Categories from './Pages/Categories';
-import SubCategories from './Pages/SubCategories';
 import AddCategory from './Pages/AddCategory';
+import EditCategory from './Pages/EditCategory';
 import AddSubCategory from './Pages/AddSubCategory';
+import Products from './Pages/Products';
+import EditProduct from './Pages/EditProduct';
+import AddProduct from './Pages/AddProduct';
 import Users from './Pages/Users';
 import Orders from './Pages/Orders';
+import CancellationRequests from './pages/CancellationRequests';
+import Coupons from './pages/Coupons';
 import ForgotPassword from './Pages/ForgotPassword';
 import VerifyOTP from './Pages/VerifyOTP';
 import ChangePassword from './Pages/ChangePassword';
+import Header from './Components/Header';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -165,6 +171,28 @@ function App() {
       ]
     },
     {
+      path: "/products",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Products />
+        },
+        {
+          path: "add",
+          element: <AddProduct />
+        },
+        {
+          path: "edit/:id",
+          element: <EditProduct />
+        }
+      ]
+    },
+    {
       path: "/categories",
       element: (
         <ProtectedRoute>
@@ -179,11 +207,15 @@ function App() {
         {
           path: "add",
           element: <AddCategory />
+        },
+        {
+          path: "edit/:id",
+          element: <EditCategory />
         }
       ]
     },
     {
-      path: "/category/subCat",
+      path: "/category/subCat/add",
       element: (
         <ProtectedRoute>
           <Layout />
@@ -192,10 +224,6 @@ function App() {
       children: [
         {
           index: true,
-          element: <SubCategories />
-        },
-        {
-          path: "add",
           element: <AddSubCategory />
         }
       ]
@@ -225,6 +253,34 @@ function App() {
         {
           index: true,
           element: <Orders />
+        }
+      ]
+    },
+    {
+      path: "/cancellation-requests",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <CancellationRequests />
+        }
+      ]
+    },
+    {
+      path: "/coupons",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Coupons />
         }
       ]
     }

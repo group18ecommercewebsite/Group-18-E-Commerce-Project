@@ -1,17 +1,88 @@
 import React from 'react'
 import { Button } from '@mui/material';
 import { RiMenu2Line } from "react-icons/ri";
-import { LiaAngleDownSolid } from "react-icons/lia";
+import { LiaAngleDownSolid, LiaAngleRightSolid } from "react-icons/lia";
 import { Link } from 'react-router-dom';
 import { GoRocket } from "react-icons/go";
 import { CategoryPanel } from './CategoryPanel';
 import { useState } from 'react';
+import { useCategories } from '../../../context/CategoryContext';
 
 export const Navigation = () => {
     const [isOpenCategoryPanel, setIsOpenCategoryPanel] = useState(false);
+    const { categories, loading } = useCategories();
+
     const openCategoryPanel = () => {
         setIsOpenCategoryPanel(!isOpenCategoryPanel);
     };
+
+    // Lấy tối đa 6 categories cho navigation bar
+    const navCategories = categories?.slice(0, 6) || [];
+
+    // Render nested subcategories (đệ quy - hỗ trợ nhiều cấp)
+    const renderNestedSubMenu = (children) => {
+        if (!children || children.length === 0) return null;
+        
+        return (
+            <div className='nested-submenu rounded-md absolute min-w-[180px] bg-white shadow-lg p-2 left-full top-0 ml-1 z-20 invisible opacity-0 transition-all duration-200 group-hover/nested:visible group-hover/nested:opacity-100'>
+                <ul>
+                    {children.map((subCat) => (
+                        <li key={subCat._id} className='list-none relative group/deep'>
+                            <Link to={`/productListing/${subCat._id}`} className='flex items-center justify-between'>
+                                <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !text-[13px] !py-1">
+                                    {subCat.name}
+                                </Button>
+                                {subCat.children && subCat.children.length > 0 && (
+                                    <LiaAngleRightSolid className='text-[11px] text-gray-400' />
+                                )}
+                            </Link>
+                            {subCat.children && subCat.children.length > 0 && (
+                                <div className='rounded-md absolute min-w-[160px] bg-white shadow-lg p-2 left-full top-0 ml-1 z-30 invisible opacity-0 transition-all duration-200 group-hover/deep:visible group-hover/deep:opacity-100'>
+                                    <ul>
+                                        {subCat.children.map((deepCat) => (
+                                            <li key={deepCat._id} className='list-none'>
+                                                <Link to={`/productListing/${deepCat._id}`}>
+                                                    <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !text-[12px] !py-1">
+                                                        {deepCat.name}
+                                                    </Button>
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+    };
+
+    // Render subcategories cấp 1 trong dropdown
+    const renderSubMenu = (children) => {
+        if (!children || children.length === 0) return null;
+        
+        return (
+            <div className='submenu rounded-md absolute min-w-[200px] bg-white shadow-lg p-3 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
+                <ul>
+                    {children.map((subCat) => (
+                        <li key={subCat._id} className='list-none relative group/nested'>
+                            <Link to={`/productListing/${subCat._id}`} className='flex items-center justify-between'>
+                                <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">
+                                    {subCat.name}
+                                </Button>
+                                {subCat.children && subCat.children.length > 0 && (
+                                    <LiaAngleRightSolid className='text-[12px] text-gray-400' />
+                                )}
+                            </Link>
+                            {subCat.children && subCat.children.length > 0 && renderNestedSubMenu(subCat.children)}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+    };
+
     return (
         <>
             <nav className='py-2 border-t-[1px] border-b-[1px] border-gray-200 bg-white'>
@@ -30,92 +101,16 @@ export const Navigation = () => {
                                     <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Home</Button>
                                 </Link>
                             </li>
-                            <li className='list-none relative group'>
-                                <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Fashion</Button>
-                                </Link>
-                                <div className='submenu rounded-md absolute min-w-[200px] bg-white shadow-lg p-4 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
-                                    <ul>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Men</Button>
-                                        </li>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Women</Button>
-                                        </li>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Girls</Button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li className='list-none relative group'>
-                                <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Electronics</Button>
-                                </Link>
-                                <div className='submenu rounded-md absolute min-w-[200px] bg-white shadow-lg p-4 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
-                                    <ul>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Smart Watch</Button>
-                                        </li>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Laptops</Button>
-                                        </li>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Mobiles</Button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li className='list-none relative group'>
-                                <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Bags</Button>
-                                </Link>
-                                <div className='submenu rounded-md absolute min-w-[200px] bg-white shadow-lg p-4 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
-                                    <ul>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Women Bags</Button>
-                                        </li>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Men Bags</Button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li className='list-none relative group'>
-                                <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Footwear</Button>
-                                </Link>
-                                <div className='submenu rounded-md absolute min-w-[250px] bg-white shadow-lg p-4 top-full left-0 mt-3 z-10 invisible opacity-0 transition-all duration-300 group-hover:visible group-hover:opacity-100'>
-                                    <ul>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Women Footwears</Button>
-                                        </li>
-                                        <li className='list-none'>
-                                            <Button variant="text" className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case">Men Footwears</Button>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li className='list-none'>
-                                <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Groceries</Button>
-                                </Link>
-                            </li>
-                            <li className='list-none'>
-                                <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Beauty</Button>
-                                </Link>
-                            </li>
-                            <li className='list-none'>
-                                <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Wellness</Button>
-                                </Link>
-                            </li>
-                            <li className='list-none'>
-                                <Link to="/" className='link transition text-[16px] font-[500]'>
-                                    <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>Jewellery</Button>
-                                </Link>
-                            </li>
+                            {navCategories.map((category) => (
+                                <li key={category._id} className='list-none relative group'>
+                                    <Link to={`/productListing/${category._id}`} className='link transition text-[16px] font-[500]'>
+                                        <Button className='link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case'>
+                                            {category.name}
+                                        </Button>
+                                    </Link>
+                                    {category.children && category.children.length > 0 && renderSubMenu(category.children)}
+                                </li>
+                            ))}
                         </ul>
                     </div>
                     <div className='col_3 w-[20%]'>

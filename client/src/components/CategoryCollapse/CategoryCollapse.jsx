@@ -1,237 +1,134 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { LiaAngleDownSolid, LiaAngleUpSolid } from "react-icons/lia";
-import { useState } from 'react';
+import { useCategories } from '../../context/CategoryContext';
+import CircularProgress from '@mui/material/CircularProgress';
 
+const CategoryCollapse = ({ onCategoryClick }) => {
+  const { categories, loading, error } = useCategories();
+  const [openSubmenus, setOpenSubmenus] = useState({});
 
-const CategoryCollapse = () => {
+  const toggleSubmenu = (categoryId) => {
+    setOpenSubmenus((prev) => ({
+      ...prev,
+      [categoryId]: !prev[categoryId],
+    }));
+  };
 
-    // luu trang thai mo tung submenu
-    const [openSubmenus, setOpenSubmenus] = useState({
-        fashion: false,
-        electronics: false,
-        bags: false,
-        footwear: false,
-    });
+  const handleCategoryClick = () => {
+    if (onCategoryClick) {
+      onCategoryClick();
+    }
+  };
 
-    // ham toggle cho tung menu
-    const toggleSubmenu = (name) => {
-        setOpenSubmenus((prev) => ({
-            ...prev,
-            [name]: !prev[name],
-        }));
-    };
-    
-  return (
-    <>
-      <div className="scroll">
-        <ul className="w-full">
-          {/* Fashion */}
-          <li className="list-none flex items-center justify-between !px-3">
-            <Button
-              variant="text"
-              className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-            >
-              Fashion
-            </Button>
-            {openSubmenus.fashion ? (
-              <LiaAngleUpSolid
-                className="cursor-pointer text-[13px]"
-                onClick={() => toggleSubmenu('fashion')}
-              />
-            ) : (
-              <LiaAngleDownSolid
-                className="cursor-pointer text-[13px]"
-                onClick={() => toggleSubmenu('fashion')}
-              />
-            )}
-          </li>
-          <ul className={`submenu pl-6 ${openSubmenus.fashion ? 'block' : 'hidden'}`}>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Men
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Women
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Girls
-              </Button>
-            </li>
-          </ul>
+  // Render subcategories recursively
+  const renderSubCategories = (children, level = 1) => {
+    if (!children || children.length === 0) return null;
 
-          {/* Electronics */}
-          <li className="list-none flex items-center justify-between !px-3">
-            <Button
-              variant="text"
-              className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-            >
-              Electronics
-            </Button>
-            {openSubmenus.electronics ? (
-              <LiaAngleUpSolid
-                className="cursor-pointer text-[13px]"
-                onClick={() => toggleSubmenu('electronics')}
-              />
-            ) : (
-              <LiaAngleDownSolid
-                className="cursor-pointer text-[13px]"
-                onClick={() => toggleSubmenu('electronics')}
-              />
-            )}
+    return (
+      <ul className={`submenu pl-6`}>
+        {children.map((subCat) => (
+          <li key={subCat._id} className="list-none">
+            <div className="flex items-center justify-between px-3">
+              <Link 
+                to={`/productListing/${subCat._id}`}
+                onClick={handleCategoryClick}
+                className="flex-1"
+              >
+                <Button
+                  variant="text"
+                  className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case !text-[13px]"
+                >
+                  {subCat.name}
+                </Button>
+              </Link>
+              {subCat.children && subCat.children.length > 0 && (
+                openSubmenus[subCat._id] ? (
+                  <LiaAngleUpSolid
+                    className="cursor-pointer text-[13px]"
+                    onClick={() => toggleSubmenu(subCat._id)}
+                  />
+                ) : (
+                  <LiaAngleDownSolid
+                    className="cursor-pointer text-[13px]"
+                    onClick={() => toggleSubmenu(subCat._id)}
+                  />
+                )
+              )}
+            </div>
+            <div className={openSubmenus[subCat._id] ? 'block' : 'hidden'}>
+              {renderSubCategories(subCat.children, level + 1)}
+            </div>
           </li>
-          <ul className={`submenu pl-6 ${openSubmenus.electronics ? 'block' : 'hidden'}`}>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Smart Watch
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Laptops
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Mobiles
-              </Button>
-            </li>
-          </ul>
+        ))}
+      </ul>
+    );
+  };
 
-          {/* Bags */}
-          <li className="list-none flex items-center justify-between !px-3">
-            <Button
-              variant="text"
-              className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-            >
-              Bags
-            </Button>
-            {openSubmenus.bags ? (
-              <LiaAngleUpSolid
-                className="cursor-pointer text-[13px]"
-                onClick={() => toggleSubmenu('bags')}
-              />
-            ) : (
-              <LiaAngleDownSolid
-                className="cursor-pointer text-[13px]"
-                onClick={() => toggleSubmenu('bags')}
-              />
-            )}
-          </li>
-          <ul className={`submenu pl-6 ${openSubmenus.bags ? 'block' : 'hidden'}`}>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Women Bags
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Men Bags
-              </Button>
-            </li>
-          </ul>
-          {/* Footwear */}
-          <li className="list-none flex items-center justify-between !px-3">
-            <Button
-              variant="text"
-              className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-            >
-              Footwears
-            </Button>
-            {openSubmenus.footwear ? (
-              <LiaAngleUpSolid
-                className="cursor-pointer text-[13px]"
-                onClick={() => toggleSubmenu('footwear')}
-              />
-            ) : (
-              <LiaAngleDownSolid
-                className="cursor-pointer text-[13px]"
-                onClick={() => toggleSubmenu('footwear')}
-              />
-            )}
-          </li>
-          <ul className={`submenu pl-6 ${openSubmenus.footwear ? 'block' : 'hidden'}`}>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Women Footwear
-              </Button>
-            </li>
-            <li>
-              <Button
-                variant="text"
-                className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-              >
-                Men Footwear
-              </Button>
-            </li>
-          </ul>
-          <li className="list-none flex items-center justify-between !px-3">
-            <Button
-              variant="text"
-              className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-            >
-              Groceries
-            </Button>
-          </li>
-          <li className="list-none flex items-center justify-between !px-3">
-            <Button
-              variant="text"
-              className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-            >
-              Beauty
-            </Button>
-          </li>
-          <li className="list-none flex items-center justify-between !px-3">
-            <Button
-              variant="text"
-              className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-            >
-              Wellness
-            </Button>
-          </li>
-          <li className="list-none flex items-center justify-between !px-3">
-            <Button
-              variant="text"
-              className="w-full !justify-start !text-[rgba(0,0,0,0.8)] !normal-case"
-            >
-              Jewellery
-            </Button>
-          </li>
-        </ul>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <CircularProgress size={30} />
       </div>
-    </>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-4 text-red-500 text-sm">
+        Failed to load categories
+      </div>
+    );
+  }
+
+  if (!categories || categories.length === 0) {
+    return (
+      <div className="text-center py-4 text-gray-500 text-sm">
+        No categories found
+      </div>
+    );
+  }
+
+  return (
+    <div className="scroll max-h-[70vh] overflow-y-auto">
+      <ul className="w-full">
+        {categories.map((category) => (
+          <li key={category._id} className="list-none">
+            <div className="flex items-center justify-between px-3">
+              <Link 
+                to={`/productListing/${category._id}`}
+                onClick={handleCategoryClick}
+                className="flex-1"
+              >
+                <Button
+                  variant="text"
+                  className="w-full !justify-start !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !normal-case"
+                >
+                  {category.name}
+                </Button>
+              </Link>
+              {category.children && category.children.length > 0 && (
+                openSubmenus[category._id] ? (
+                  <LiaAngleUpSolid
+                    className="cursor-pointer text-[13px]"
+                    onClick={() => toggleSubmenu(category._id)}
+                  />
+                ) : (
+                  <LiaAngleDownSolid
+                    className="cursor-pointer text-[13px]"
+                    onClick={() => toggleSubmenu(category._id)}
+                  />
+                )
+              )}
+            </div>
+            <div className={openSubmenus[category._id] ? 'block' : 'hidden'}>
+              {renderSubCategories(category.children)}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search } from '../Search'
 import Badge from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
@@ -8,9 +8,17 @@ import { BsCart3 } from "react-icons/bs";
 import { IoIosGitCompare } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa6";
 import { FaUserCircle } from "react-icons/fa";
+import { FiUser } from "react-icons/fi";
+import { CiLocationOn } from "react-icons/ci";
+import { IoBagCheckOutline } from "react-icons/io5";
+import { GoHeart } from "react-icons/go";
+import { IoLogOutOutline } from "react-icons/io5";
+import { MdLocalOffer } from "react-icons/md";
 import Tooltip from '@mui/material/Tooltip';
 import { Navigation } from './Navigation/index';
 import { MyContext } from '../../App';
+import { logoutUser } from '../../api/userApi';
+import { useCompare } from '../../context/CompareContext';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -25,6 +33,28 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 export const Header = () => {
 
   const context = useContext(MyContext);
+  const navigate = useNavigate();
+  const { compareCount } = useCompare();
+  
+  // Sử dụng user từ global context thay vì local state
+  const user = context.user;
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      // Vẫn logout ở client dù API lỗi
+      console.error('Logout API error:', error);
+    }
+    
+    // Clear localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    
+    context.setIsLogin(false);
+    context.openAlertBox('success', 'Logged out successfully');
+    navigate('/login');
+  };
 
   return (
     <header className='bg-white shadow-sm'>
@@ -61,18 +91,74 @@ export const Header = () => {
           </div>
           <div className='col3 w-[30%] flex items-center justify-end'>
             <ul className='flex items-center gap-4'>
-              <li className='list-none text-sm text-gray-700 flex items-center gap-2'>
-                <FaUserCircle className='text-xl text-gray-600' />
-                <div className='hidden sm:flex gap-2'>
-                  <Link to='/login' className='link transition text-[15px] font-[500] hover:text-[#ff5252]'>Login</Link>
-                  <span className='text-gray-400'>|</span>
-                  <Link to='/register' className='link transition text-[15px] font-[500] hover:text-[#ff5252]'>Register</Link>
-                </div>
+              <li className='list-none text-sm text-gray-700'>
+                {context.isLogin ? (
+                  <div className='relative group'>
+                    <div className='flex items-center gap-2 cursor-pointer'>
+                      {/* Avatar - hiển thị ảnh nếu có, otherwise icon hoặc chữ cái */}
+                      <div className='w-10 h-10 rounded-full bg-[#ff5252] flex items-center justify-center text-white overflow-hidden'>
+                        {user?.avatar ? (
+                          <img 
+                            src={user.avatar} 
+                            alt={user.name} 
+                            className='w-full h-full object-cover'
+                          />
+                        ) : (
+                          <span className='text-lg font-semibold'>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                        )}
+                      </div>
+                      <div className='hidden sm:block'>
+                        <p className='text-[14px] font-[600] !m-0'>{user?.name}</p>
+                        <p className='text-[11px] text-gray-500 !m-0'>{user?.email}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Dropdown Menu */}
+                    <div className='absolute right-0 top-full pt-2 w-[80%] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50'>
+                      <div className='bg-white rounded-md shadow-lg border border-gray-100 py-2 font-semibold'>
+                        <Link to='/my-account' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
+                          <FiUser className='text-[20px]' />
+                          My Account
+                        </Link>
+                        <Link to='/address' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
+                          <CiLocationOn className='text-[20px]' />
+                          Address
+                        </Link>
+                        <Link to='/my-orders' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
+                          <IoBagCheckOutline className='text-[20px]' />
+                          Orders
+                        </Link>
+                        <Link to='/my-list' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
+                          <GoHeart className='text-[20px] ' />
+                          My List
+                        </Link>
+                        <div className='border-t border-gray-100 mt-1 pt-1'>
+                          <button 
+                            onClick={handleLogout}
+                            className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition w-full'
+                          >
+                            <IoLogOutOutline className='text-[20px]' />
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className='flex items-center gap-2'>
+                    <FaUserCircle className='text-xl text-gray-600' />
+                    <div className='hidden sm:flex gap-2'>
+                      <Link to='/login' className='link transition text-[15px] font-[500] hover:text-[#ff5252]'>Login</Link>
+                      <span className='text-gray-400'>|</span>
+                      <Link to='/register' className='link transition text-[15px] font-[500] hover:text-[#ff5252]'>Register</Link>
+                    </div>
+                  </div>
+                )}
               </li>
               <li>
-                <Tooltip title="Compare">
-                  <IconButton aria-label="compare">
-                    <StyledBadge badgeContent={4} color="secondary">
+                <Tooltip title="So sánh">
+                  <IconButton aria-label="compare" component={Link} to="/compare">
+                    <StyledBadge badgeContent={compareCount} color="secondary">
                       <IoIosGitCompare />
                     </StyledBadge>
                   </IconButton>
@@ -89,10 +175,17 @@ export const Header = () => {
               </li>
               <li>
                 <Tooltip title="Wishlist">
-                  <IconButton aria-label="wishlist">
+                  <IconButton aria-label="wishlist" component={Link} to="/my-list">
                     <StyledBadge badgeContent={4} color="secondary">
                       <FaRegHeart />
                     </StyledBadge>
+                  </IconButton>
+                </Tooltip>
+              </li>
+              <li>
+                <Tooltip title="Mã giảm giá">
+                  <IconButton aria-label="coupons" component={Link} to="/coupons">
+                    <MdLocalOffer className="text-[20px] text-[#ff5252]" />
                   </IconButton>
                 </Tooltip>
               </li>
