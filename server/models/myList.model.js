@@ -43,5 +43,5 @@ const myListSchema = new mongoose.Schema({
 
 
 const MyListModel = mongoose.model("MyList", myListSchema)
-
+// export MyListModel
 export default MyListModel
