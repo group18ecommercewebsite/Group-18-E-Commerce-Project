@@ -9,6 +9,7 @@ import ProductListing from './pages/ProductListing';
 import ProductDetails from './pages/ProductDetails';
 import { createContext } from 'react';
 import { useState } from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -141,7 +142,7 @@ function App() {
   };
 
   return (
-    <>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <BrowserRouter>
         <CompareProvider>
           <CategoryProvider>
@@ -204,7 +205,7 @@ function App() {
           duration: 3000
         }}
       />
-    </>
+    </GoogleOAuthProvider>
   );
 }
 

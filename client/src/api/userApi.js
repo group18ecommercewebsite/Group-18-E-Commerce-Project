@@ -69,3 +69,9 @@ export const refreshToken = async () => {
   const response = await apiClient.post('/user/refresh-token');
   return response.data;
 };
+
+// Google Login
+export const googleLogin = async (credential) => {
+  const response = await apiClient.post('/user/google-login', { credential });
+  return response.data;
+};

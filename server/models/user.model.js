@@ -12,7 +12,13 @@ const userSchema = mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, "Provide password"]
+        required: function() {
+            return !this.googleId; // Password không bắt buộc nếu đăng nhập bằng Google
+        }
+    },
+    googleId: {
+        type: String,
+        default: null
     },
     avatar: {
         type: String,

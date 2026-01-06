@@ -4,10 +4,10 @@ import Button from '@mui/material/Button';
 import { IoMdEye } from 'react-icons/io';
 import { IoMdEyeOff } from 'react-icons/io';
 import { Link, useNavigate } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc';
+import { GoogleLogin } from '@react-oauth/google';
 import CircularProgress from '@mui/material/CircularProgress';
 import { MyContext } from '../App';
-import { loginUser, forgotPassword } from '../api/userApi';
+import { loginUser, forgotPassword, googleLogin } from '../api/userApi';
 
 const Login = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
@@ -84,6 +84,35 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
+    try {
+      setIsLoading(true);
+      const response = await googleLogin(credentialResponse.credential);
+
+      if (response.success) {
+        // Lưu access token và thông tin user
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Cập nhật global state
+        context.setUser(response.data.user);
+        context.setIsLogin(true);
+        context.openAlertBox("success", "Đăng nhập Google thành công!");
+        history("/");
+      } else {
+        context.openAlertBox("error", response.message || "Đăng nhập Google thất bại");
+      }
+    } catch (error) {
+      context.openAlertBox("error", error.response?.data?.message || "Đăng nhập Google thất bại");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLoginError = () => {
+    context.openAlertBox("error", "Đăng nhập Google thất bại. Vui lòng thử lại.");
+  };
+
   return (
     <section className="section py-10">
       <div className="container">
@@ -152,10 +181,18 @@ const Login = () => {
 
             <p className="text-center font-medium mt-3 mb-3">Hoặc tiếp tục với mạng xã hội</p>
 
-            <Button className="flex gap-3 w-full !bg-[#f1f1f1] btn-lg !text-black">
-              <FcGoogle className='text-[20px]' />
-              Đăng nhập với Google
-            </Button>
+            <div className="flex justify-center w-full">
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginError}
+                useOneTap
+                theme="outline"
+                size="large"
+                width="320"
+                text="signin_with"
+                shape="rectangular"
+              />
+            </div>
           </form>
         </div>
       </div>

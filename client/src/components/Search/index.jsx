@@ -124,9 +124,9 @@ export const Search = () => {
                 <div className="flex-1 min-w-0">
                   <p className="text-[14px] font-medium text-gray-800 line-clamp-1">{product.name}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[14px] font-semibold text-[#ff5252]">${product.price}</span>
+                    <span className="text-[14px] font-semibold text-[#ff5252]">{product.price?.toLocaleString('vi-VN')} đ</span>
                     {product.oldPrice > product.price && (
-                      <span className="text-[12px] text-gray-400 line-through">${product.oldPrice}</span>
+                      <span className="text-[12px] text-gray-400 line-through">{product.oldPrice?.toLocaleString('vi-VN')} đ</span>
                     )}
                   </div>
                 </div>
