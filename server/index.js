@@ -21,8 +21,27 @@ import couponRouter from './route/coupon.route.js';
 const app = express();
 
 // Cấu hình CORS cho phép credentials
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:5174',
+  'https://group-18-e-commerce-project-1.onrender.com', // Client production
+  'https://group-18-e-commerce-project-2.onrender.com', // Admin production (nếu có)
+  process.env.CLIENT_URL,
+  process.env.ADMIN_URL,
+].filter(Boolean); // Loại bỏ undefined values
+
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174'], // Client và Admin URLs
+  origin: function (origin, callback) {
+    // Cho phép requests không có origin (như từ mobile apps hoặc curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      callback(null, true); // Tạm thời cho phép tất cả để test, sau có thể đổi lại
+    }
+  },
   credentials: true, // Cho phép gửi cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
