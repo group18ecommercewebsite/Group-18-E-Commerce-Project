@@ -9,7 +9,7 @@ import { IoBagCheckOutline } from 'react-icons/io5';
 import CircularProgress from '@mui/material/CircularProgress';
 import { MyContext } from '../App';
 import { createOrder } from '../api/orderApi';
-import { createSePayPayment } from '../api/paymentApi';
+import { createSePayPayment, createVNPayPayment } from '../api/paymentApi';
 import { validateCoupon } from '../api/couponApi';
 import { formatCurrency } from '../utils/formatCurrency';
 
@@ -190,6 +190,18 @@ export const Checkout = () => {
           form.submit();
         } else {
           context.openAlertBox('error', paymentResponse.message || 'Không thể tạo thanh toán');
+        }
+      } else if (paymentMethod === 'vnpay') {
+        // VNPay - Tạo payment URL và redirect
+        context.openAlertBox('info', 'Đang chuyển đến cổng thanh toán VNPay...');
+        
+        const paymentResponse = await createVNPayPayment(orderData);
+
+        if (paymentResponse.success && paymentResponse.data.paymentUrl) {
+          // Redirect đến VNPay
+          window.location.href = paymentResponse.data.paymentUrl;
+        } else {
+          context.openAlertBox('error', paymentResponse.message || 'Không thể tạo thanh toán VNPay');
         }
       }
     } catch (error) {
@@ -459,11 +471,26 @@ export const Checkout = () => {
                     </div>
                   }
                 />
+                <FormControlLabel 
+                  value="vnpay" 
+                  control={<Radio size="small" sx={{ color: '#ff5252', '&.Mui-checked': { color: '#ff5252' } }} />} 
+                  label={
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px]">🏦 VNPay (Thẻ ATM / Visa)</span>
+                      <span className="text-[10px] text-blue-600 bg-blue-50 px-1 rounded">Trực tuyến</span>
+                    </div>
+                  }
+                />
               </RadioGroup>
               
               {paymentMethod === 'sepay' && (
-                <div className="mt-2 p-2 bg-blue-50 rounded text-[11px] text-blue-700">
+                <div className="mt-2 p-2 bg-purple-50 rounded text-[11px] text-purple-700">
                   ⚠️ Bạn sẽ được chuyển đến cổng thanh toán SePay để hoàn tất
+                </div>
+              )}
+              {paymentMethod === 'vnpay' && (
+                <div className="mt-2 p-2 bg-blue-50 rounded text-[11px] text-blue-700">
+                  ⚠️ Bạn sẽ được chuyển đến cổng thanh toán VNPay để hoàn tất
                 </div>
               )}
             </div>
@@ -475,7 +502,7 @@ export const Checkout = () => {
               disabled={loading || context.cartItems.length === 0}
               className="w-full mt-5"
               sx={{
-                backgroundColor: paymentMethod === 'sepay' ? '#7c3aed' : '#ff5252',
+                backgroundColor: paymentMethod === 'vnpay' ? '#2563eb' : paymentMethod === 'sepay' ? '#7c3aed' : '#ff5252',
                 color: '#fff',
                 height: 48,
                 fontSize: 14,
@@ -498,7 +525,7 @@ export const Checkout = () => {
               ) : (
                 <>
                   <IoBagCheckOutline className="text-[18px]" />
-                  {paymentMethod === 'cod' ? 'Đặt hàng' : 'Thanh toán qua SePay'}
+                  {paymentMethod === 'cod' ? 'Đặt hàng' : paymentMethod === 'vnpay' ? 'Thanh toán qua VNPay' : 'Thanh toán qua SePay'}
                 </>
               )}
             </Button>
