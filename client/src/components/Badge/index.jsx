@@ -23,18 +23,18 @@ const Badge = (props) => {
   const getDisplayText = (status) => {
     switch (status?.toLowerCase()) {
       case 'paid':
-        return 'Paid';
+        return 'Đã thanh toán';
       case 'confirmed':
-        return 'Confirmed';
+        return 'Đã xác nhận';
       case 'shipped':
-        return 'Shipped';
+        return 'Đang giao';
       case 'delivered':
-        return 'Delivered';
+        return 'Đã giao';
       case 'cancelled':
-        return 'Cancelled';
+        return 'Đã hủy';
       case 'pending':
       default:
-        return 'Pending';
+        return 'Chờ xử lý';
     }
   };
 

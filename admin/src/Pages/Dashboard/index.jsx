@@ -87,9 +87,9 @@ const Dashboard = () => {
       {/* Header Section */}
       <div className="mb-6 bg-white rounded-xl shadow-sm p-4 md:p-6 border border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome, Admin 👋</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome, Admin </h1>
           <p className="text-gray-500 mt-1 text-sm md:text-base">
-            Here's what happening on your store today.
+            Tổng quan về hệ thống
           </p>
         </div>
 
@@ -99,7 +99,7 @@ const Dashboard = () => {
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium shadow-sm active:scale-95"
         >
           <FaPlus className="text-sm" />
-          <span>Add Product</span>
+          <span>Thêm sản phẩm</span>
         </button>
       </div>
 
@@ -144,7 +144,7 @@ const Dashboard = () => {
                 <div className="mt-6 flex items-center gap-2 border-t border-black/5 pt-3">
                   <FaChartBar className={`${stat.textColor} text-sm opacity-70`} />
                   <span className={`${stat.textColor} text-xs font-medium opacity-90`}>
-                    Click to view details
+                    Xem chi tiết
                   </span>
                 </div>
               </div>
