@@ -91,7 +91,7 @@ export const Navigation = () => {
                     <div className='col_1 w-auto md:w-[20%] flex-shrink-0'>
                         <Button className='!text-black gap-1 md:gap-2 !px-2 md:!px-4 !text-[12px] md:!text-[14px]' onClick={openCategoryPanel}>
                             <RiMenu2Line className='text-[16px] md:text-[18px]' />
-                            <span className='hidden sm:inline'>Shop By Categories</span>
+                            <span className='hidden sm:inline'>Mua sắm theo <br /> danh mục</span>
                             <span className='sm:hidden'>Menu</span>
                             <LiaAngleDownSolid className='text-[11px] md:text-[13px] ml-auto !font-bold' />
                         </Button>
@@ -118,7 +118,7 @@ export const Navigation = () => {
                     </div>
                     {/* Free delivery badge - hidden on mobile/tablet */}
                     <div className='col_3 hidden lg:block w-auto flex-shrink-0'>
-                        <p className='text-[13px] font-[500] flex items-center gap-2 whitespace-nowrap'><GoRocket className='text-[16px]' />Free International Delivery</p>
+                        <p className='text-[13px] font-[500] flex items-center gap-2 whitespace-nowrap'><GoRocket className='text-[16px]' />Free Ship trên toàn quốc</p>
                     </div>
                 </div>
             </nav>

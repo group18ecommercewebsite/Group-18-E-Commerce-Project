@@ -77,7 +77,7 @@ export const Search = () => {
       <form onSubmit={handleSearch} className="flex w-full items-center">
         <input 
           type="text" 
-          placeholder='Search for products...' 
+          placeholder='Tìm kiếm sản phẩm' 
           className='w-full h-10 focus:outline-none bg-inherit p-2 text-[15px]'
           value={query}
           onChange={(e) => setQuery(e.target.value)}

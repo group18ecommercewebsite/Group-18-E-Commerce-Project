@@ -35,6 +35,7 @@ import { duration } from '@mui/material';
 import { CategoryProvider } from './context/CategoryContext';
 import { CompareProvider } from './context/CompareContext';
 import { getCart } from './api/cartApi';
+import { getMyList } from './api/myListApi';
 import Compare from './pages/Compare';
 
 const MyContext = createContext();
@@ -71,6 +72,10 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(false);
 
+  // Global wishlist state
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+
   // Fetch cart function - có thể gọi từ bất kỳ component nào
   const fetchCart = useCallback(async () => {
     if (!isLogin) {
@@ -90,14 +95,35 @@ function App() {
     }
   }, [isLogin]);
 
-  // Fetch cart khi login state thay đổi
+  // Fetch wishlist function
+  const fetchWishlist = useCallback(async () => {
+    if (!isLogin) {
+      setWishlistItems([]);
+      return;
+    }
+    try {
+      setWishlistLoading(true);
+      const response = await getMyList();
+      if (response.success) {
+        setWishlistItems(response.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch wishlist:', error);
+    } finally {
+      setWishlistLoading(false);
+    }
+  }, [isLogin]);
+
+  // Fetch cart và wishlist khi login state thay đổi
   useEffect(() => {
     if (isLogin) {
       fetchCart();
+      fetchWishlist();
     } else {
       setCartItems([]);
+      setWishlistItems([]);
     }
-  }, [isLogin, fetchCart]);
+  }, [isLogin, fetchCart, fetchWishlist]);
 
   const handleCloseProductDetailsModal = () => {
     setOpenProductDetailsModal(false);
@@ -138,7 +164,12 @@ function App() {
     cartItems,
     setCartItems,
     cartLoading,
-    fetchCart
+    fetchCart,
+    // Global wishlist state
+    wishlistItems,
+    setWishlistItems,
+    wishlistLoading,
+    fetchWishlist
   };
 
   return (

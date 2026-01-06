@@ -63,15 +63,13 @@ export const Header = () => {
         <div className='container'>
           <div className='flex justify-between items-center'>
             <div className='col1 w-[50%]'>
-              <p className='text-[12px] font-[500] text-gray-600'>Giảm giá đến 50% cho bộ sưu tập mới</p>
+              <p className='text-[12px] font-[500] text-gray-600'>Giảm giá đến 20% cho bộ sưu tập mới</p>
             </div>
             <div className='col2 flex items-center justify-end'>
               <ul className='flex items-center gap-4'>
                 <li className='list-none'>
                   <Link to="help-center" className='link text-[13px] font-[500] text-gray-600 hover:text-gray-900 transition'>Trợ giúp</Link>
-                </li>
-                <li className='list-none'>
-                  <Link to="order-tracking" className='link text-[13px] font-[500] text-gray-600 hover:text-gray-900 transition'>Theo dõi đơn hàng</Link>
+                  <Link to="about-us" className='ml-4 link text-[13px] font-[500] text-gray-600 hover:text-gray-900 transition'>Thông tin về chúng tôi</Link>
                 </li>
               </ul>
             </div>
@@ -88,11 +86,11 @@ export const Header = () => {
             </Link>
           </div>
           {/* Search - flexible width */}
-          <div className='col2 flex-1 md:w-[35%] min-w-0'>
+          <div className='col2 flex-1 md:w-[45%] min-w-0'>
             <Search />
           </div>
           {/* Actions */}
-          <div className='col3 w-auto md:w-[45%] flex items-center justify-end flex-shrink-0'>
+          <div className='col3 w-auto md:w-[35%] flex items-center justify-end flex-shrink-0'>
             <ul className='flex items-center gap-1 md:gap-4'>
               <li className='list-none text-sm text-gray-700'>
                 {context.isLogin ? (
@@ -112,7 +110,6 @@ export const Header = () => {
                       </div>
                       <div className='hidden lg:block'>
                         <p className='text-[14px] font-[600] !m-0'>{user?.name}</p>
-                        <p className='text-[11px] text-gray-500 !m-0'>{user?.email}</p>
                       </div>
                     </div>
                     
@@ -170,7 +167,7 @@ export const Header = () => {
               <li>
                 <Tooltip title="Giỏ hàng">
                   <IconButton aria-label="cart" onClick={()=>context.setOpenCartPanel(true)} size="small">
-                    <StyledBadge badgeContent={4} color="secondary">
+                    <StyledBadge badgeContent={context.cartItems?.length || 0} color="secondary">
                       <BsCart3 />
                     </StyledBadge>
                   </IconButton>
@@ -179,7 +176,7 @@ export const Header = () => {
               <li className='hidden sm:block'>
                 <Tooltip title="Danh sách yêu thích">
                   <IconButton aria-label="wishlist" component={Link} to="/my-list" size="small">
-                    <StyledBadge badgeContent={4} color="secondary">
+                    <StyledBadge badgeContent={context.wishlistItems?.length || 0} color="secondary">
                       <FaRegHeart />
                     </StyledBadge>
                   </IconButton>

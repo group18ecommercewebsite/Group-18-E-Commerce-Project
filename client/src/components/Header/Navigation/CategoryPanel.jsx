@@ -11,7 +11,7 @@ export const CategoryPanel = ({ open, onClose }) => {
     const DrawerList = (
         <Box sx={{ width: 280 }} role="presentation">
             <h3 className="p-3 text-base font-[500] flex items-center justify-between border-b">
-                Shop By Categories
+                Mua sắm theo danh mục
                 <IoCloseSharp onClick={onClose} className="cursor-pointer text-xl hover:text-[#ff5252]" />
             </h3>
 

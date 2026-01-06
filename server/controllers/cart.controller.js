@@ -30,7 +30,7 @@ export const addToCartItemController = async (request, response) => {
 
             return response.status(200).json({
                 data: updatedCart,
-                message: "Cart updated successfully",
+                message: "Cập nhật giỏ hàng thành công",
                 error: false,
                 success: true
             })
@@ -56,7 +56,7 @@ export const addToCartItemController = async (request, response) => {
 
         return response.status(200).json({
             data: save,
-            message: "Item added to cart successfully",
+            message: "Thêm vào giỏ hàng thành công",
             error: false,
             success: true
         })
