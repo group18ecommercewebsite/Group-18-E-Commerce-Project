@@ -23,7 +23,7 @@ const Login = () => {
   const forgetPassword = async (e) => {
     e.preventDefault();
     if (formFields.email === '') {
-      context.openAlertBox("error", "Please enter your email to reset password");
+      context.openAlertBox("error", "Vui lòng nhập email để đặt lại mật khẩu");
       return;
     }
 
@@ -49,11 +49,11 @@ const Login = () => {
     e.preventDefault();
     
     if (formFields.email === '') {
-      context.openAlertBox("error", "Please enter your email");
+      context.openAlertBox("error", "Vui lòng nhập email");
       return;
     }
     if (formFields.password === '') {
-      context.openAlertBox("error", "Please enter your password");
+      context.openAlertBox("error", "Vui lòng nhập mật khẩu");
       return;
     }
 
@@ -72,13 +72,13 @@ const Login = () => {
         // Cập nhật global state
         context.setUser(response.data.user);
         context.setIsLogin(true);
-        context.openAlertBox("success", "Login successful!");
+        context.openAlertBox("success", "Đăng nhập thành công!");
         history("/");
       } else {
-        context.openAlertBox("error", response.message || "Login failed");
+        context.openAlertBox("error", response.message || "Đăng nhập thất bại");
       }
     } catch (error) {
-      context.openAlertBox("error", error.response?.data?.message || "Login failed");
+      context.openAlertBox("error", error.response?.data?.message || "Đăng nhập thất bại");
     } finally {
       setIsLoading(false);
     }
@@ -88,14 +88,14 @@ const Login = () => {
     <section className="section py-10">
       <div className="container">
         <div className="card shadow-md w-[400px] m-auto rounded-md bg-white p-5 px-10">
-          <h3 className="text-center text-[18px] text-black">Login to your account</h3>
+          <h3 className="text-center text-[18px] text-black">Đăng nhập tài khoản</h3>
 
           <form action="" className="w-full mt-5">
             <div className="form-group w-full mb-5">
               <TextField
                 type="email"
                 id="email"
-                label="Email Id *"
+                label="Email *"
                 variant="outlined"
                 className="w-full"
                 name='email'
@@ -108,7 +108,7 @@ const Login = () => {
               <TextField
                 type={isShowPassword === false ? 'password' : 'text'}
                 id="password"
-                label="Password *"
+                label="Mật khẩu *"
                 variant="outlined"
                 className="w-full"
                 name='password'
@@ -130,7 +130,7 @@ const Login = () => {
             </div>
 
             <a href="" className="link cursor-pointer text-[14px] font-[600]" onClick={forgetPassword}>
-              Forgot Password?
+              Quên mật khẩu?
             </a>
 
             <div className="flex items-center w-full mt-3 mb-3">
@@ -139,22 +139,22 @@ const Login = () => {
                 onClick={handleLogin}
                 disabled={isLoading}
               >
-                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Đăng nhập'}
               </Button>
             </div>
 
             <p className="text-center">
-              Not Registered?{' '}
+              Chưa có tài khoản?{' '}
               <Link className="link text-[14px] font-[600] mt-3 mb-3" to="/register">
-                Sign Up
+                Đăng ký
               </Link>
             </p>
 
-            <p className="text-center font-medium mt-3 mb-3">Or continue with social account</p>
+            <p className="text-center font-medium mt-3 mb-3">Hoặc tiếp tục với mạng xã hội</p>
 
             <Button className="flex gap-3 w-full !bg-[#f1f1f1] btn-lg !text-black">
               <FcGoogle className='text-[20px]' />
-              Login with Google
+              Đăng nhập với Google
             </Button>
           </form>
         </div>

@@ -201,7 +201,7 @@ const ProductDetails = () => {
               to="/"
               className="link transition !text-[14px]"
             >
-              Home
+              Trang chủ
             </Link>
             {product.catName && (
               <Link
@@ -219,48 +219,48 @@ const ProductDetails = () => {
       </div>
 
       <section className="bg-white py-5">
-        <div className="container flex gap-8 items-center">
-          <div className="productZoomContainer w-[40%]">
+        <div className="container flex flex-col lg:flex-row gap-6 lg:gap-8 items-start lg:items-center px-4 lg:px-0">
+          <div className="productZoomContainer w-full lg:w-[40%]">
             <ProductZoom images={product.images} />
           </div>
 
-          <div className="productContent w-[60%] pr-10 pl-10">
+          <div className="productContent w-full lg:w-[60%] lg:pr-10 lg:pl-10">
             <ProductDetailsComponent product={product} reviewStats={reviewStats} />
           </div>
         </div>
 
-        <div className="container pt-10">
-          <div className="flex items-center gap-8 mb-5">
+        <div className="container pt-10 px-4 lg:px-0">
+          <div className="flex flex-wrap items-center gap-4 lg:gap-8 mb-5">
             <span
-              className={`link text-[17px] cursor-pointer font-medium ${
+              className={`link text-[15px] lg:text-[17px] cursor-pointer font-medium ${
                 activeTab === 0 && 'text-[#ff5252]'
               }`}
               onClick={() => setActiveTab(0)}
             >
-              Description
+              Mô tả
             </span>
             <span
-              className={`link text-[17px] cursor-pointer font-medium ${
+              className={`link text-[15px] lg:text-[17px] cursor-pointer font-medium ${
                 activeTab === 1 && 'text-[#ff5252]'
               }`}
               onClick={() => setActiveTab(1)}
             >
-              Product Details
+              Chi tiết sản phẩm
             </span>
             <span
-              className={`link text-[17px] cursor-pointer font-medium ${
+              className={`link text-[15px] lg:text-[17px] cursor-pointer font-medium ${
                 activeTab === 2 && 'text-[#ff5252]'
               }`}
               onClick={() => setActiveTab(2)}
             >
-              Review ({reviewStats.totalReviews})
+              Đánh giá ({reviewStats.totalReviews})
             </span>
           </div>
 
           {activeTab === 0 && (
             <div className="shadow-md w-full py-5 p-8 rounded-md">
               <p>
-                {product.description || 'No description available.'}
+                {product.description || 'Chưa có mô tả.'}
               </p>
             </div>
           )}
@@ -272,14 +272,14 @@ const ProductDetails = () => {
                   <tbody>
                     <tr className="bg-white border-b border-gray-200">
                       <th scope="row" className="px-6 py-4 font-medium text-gray-900 w-1/3">
-                        Brand
+                        Thương hiệu
                       </th>
                       <td className="px-6 py-4">{product.brand || 'N/A'}</td>
                     </tr>
 
                     <tr className="bg-purple-50 border-b border-gray-200">
                       <th scope="row" className="px-6 py-4 font-medium text-gray-900">
-                        Category
+                        Danh mục
                       </th>
                       <td className="px-6 py-4">{product.catName || 'N/A'}</td>
                     </tr>
@@ -287,7 +287,7 @@ const ProductDetails = () => {
                     {product.subCat && (
                       <tr className="bg-white border-b border-gray-200">
                         <th scope="row" className="px-6 py-4 font-medium text-gray-900">
-                          Sub Category
+                          Danh mục con
                         </th>
                         <td className="px-6 py-4">{product.subCat}</td>
                       </tr>
@@ -296,7 +296,7 @@ const ProductDetails = () => {
                     {product.size && product.size.length > 0 && (
                       <tr className="bg-purple-50 border-b border-gray-200">
                         <th scope="row" className="px-6 py-4 font-medium text-gray-900">
-                          Available Sizes
+                          Kích thước có sẵn
                         </th>
                         <td className="px-6 py-4">{product.size.join(', ')}</td>
                       </tr>
@@ -305,7 +305,7 @@ const ProductDetails = () => {
                     {product.productRam && product.productRam.length > 0 && (
                       <tr className="bg-white border-b border-gray-200">
                         <th scope="row" className="px-6 py-4 font-medium text-gray-900">
-                          RAM Options
+                          Tùy chọn RAM
                         </th>
                         <td className="px-6 py-4">{product.productRam.join(', ')}</td>
                       </tr>
@@ -314,7 +314,7 @@ const ProductDetails = () => {
                     {product.productWeight && product.productWeight.length > 0 && (
                       <tr className="bg-purple-50 border-b border-gray-200">
                         <th scope="row" className="px-6 py-4 font-medium text-gray-900">
-                          Weight Options
+                          Tùy chọn trọng lượng
                         </th>
                         <td className="px-6 py-4">{product.productWeight.join(', ')}</td>
                       </tr>
@@ -322,12 +322,12 @@ const ProductDetails = () => {
 
                     <tr className="bg-white border-b border-gray-200">
                       <th scope="row" className="px-6 py-4 font-medium text-gray-900">
-                        Stock Status
+                        Tình trạng kho
                       </th>
                       <td className="px-6 py-4">
                         {product.countInStock > 0 
-                          ? <span className="text-green-600">{product.countInStock} items in stock</span>
-                          : <span className="text-red-600">Out of stock</span>
+                          ? <span className="text-green-600">Còn {product.countInStock} sản phẩm</span>
+                          : <span className="text-red-600">Hết hàng</span>
                         }
                       </td>
                     </tr>
@@ -338,15 +338,15 @@ const ProductDetails = () => {
           )}
 
           {activeTab === 2 && (
-            <div className="shadow-md w-[80%] py-5 p-8 rounded-md">
+            <div className="shadow-md w-full lg:w-[80%] py-5 p-4 lg:p-8 rounded-md">
               <div className="w-full productReviewsContainer">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-[18px]">Customer Reviews</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                  <h2 className="text-[18px]">Đánh giá từ khách hàng</h2>
                   {reviewStats.totalReviews > 0 && (
                     <div className="flex items-center gap-2">
                       <Rating value={reviewStats.avgRating} precision={0.1} readOnly size="small" />
-                      <span className="text-[14px] text-gray-600">
-                        {reviewStats.avgRating} out of 5 ({reviewStats.totalReviews} reviews)
+                      <span className="text-[12px] sm:text-[14px] text-gray-600">
+                        {reviewStats.avgRating} trên 5 ({reviewStats.totalReviews} đánh giá)
                       </span>
                     </div>
                   )}
@@ -364,8 +364,8 @@ const ProductDetails = () => {
                 ) : (
                   <div className="reviewScroll w-full max-h-[400px] overflow-y-auto mt-5 pr-2">
                     {reviews.map((review) => (
-                      <div key={review._id} className="review w-full pt-5 pb-5 border-b border-[rgba(0,0,0,0.1)] flex items-start justify-between">
-                        <div className="info w-[75%] flex items-start gap-4">
+                      <div key={review._id} className="review w-full pt-5 pb-5 border-b border-[rgba(0,0,0,0.1)] flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="info w-full sm:w-[75%] flex items-start gap-3 sm:gap-4">
                           <div className="img w-[60px] h-[60px] flex-shrink-0 overflow-hidden rounded-full bg-gray-200">
                             {review.userAvatar ? (
                               <img
@@ -411,7 +411,7 @@ const ProductDetails = () => {
                 <br />
 
                 <div className="reviewForm bg-[#fafafa] p-4 rounded-md">
-                  <h2 className="text-[18px]">Add a review</h2>
+                  <h2 className="text-[18px]">Viết đánh giá</h2>
                   {!context.isLogin ? (
                     <p className="text-gray-500 mt-3">
                       Vui lòng <Link to="/login" className="text-[#ff5252] font-medium">đăng nhập</Link> để viết đánh giá
@@ -419,7 +419,7 @@ const ProductDetails = () => {
                   ) : (
                     <form className="w-full mt-5" onSubmit={handleSubmitReview}>
                       <TextField
-                        label="Write a review...."
+                        label="Viết đánh giá...."
                         className="w-full mb-5"
                         multiline
                         rows={4}
@@ -429,7 +429,7 @@ const ProductDetails = () => {
                       />
 
                       <div className="flex items-center gap-2 mt-3 mb-4">
-                        <span className="text-[14px]">Your Rating:</span>
+                        <span className="text-[14px]">Đánh giá của bạn:</span>
                         <Rating 
                           value={reviewRating} 
                           onChange={(e, newValue) => setReviewRating(newValue || 5)}
@@ -499,7 +499,7 @@ const ProductDetails = () => {
                         {submitting ? (
                           <CircularProgress size={22} color="inherit" />
                         ) : (
-                          'Submit Review'
+                          'Gửi đánh giá'
                         )}
                       </Button>
                     </form>
@@ -512,7 +512,7 @@ const ProductDetails = () => {
 
         {relatedProducts.length > 0 && (
           <div className='container pt-8'>
-            <h2 className="text-[20px] font-[600] mb-1">Related Products</h2>
+            <h2 className="text-[20px] font-[600] mb-1">Sản phẩm liên quan</h2>
             <ProductsSlider items={5} products={relatedProducts} />
           </div>
         )}

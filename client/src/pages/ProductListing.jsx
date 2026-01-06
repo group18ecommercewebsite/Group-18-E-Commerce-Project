@@ -27,7 +27,7 @@ const ProductListing = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('Sales, highest to lowest');
+  const [sortBy, setSortBy] = useState('Bán chạy nhất');
   const productsPerPage = 12;
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -207,15 +207,15 @@ const ProductListing = () => {
   // Sort products (use filteredProducts)
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
-      case 'Price, low to high':
+      case 'Giá, thấp đến cao':
         return a.price - b.price;
-      case 'Price, high to low':
+      case 'Giá, cao đến thấp':
         return b.price - a.price;
-      case 'Name, A to Z':
+      case 'Tên, A đến Z':
         return a.name.localeCompare(b.name);
-      case 'Name, Z to A':
+      case 'Tên, Z đến A':
         return b.name.localeCompare(a.name);
-      case 'Rating':
+      case 'Đánh giá':
         return b.rating - a.rating;
       default:
         return 0;
@@ -237,7 +237,7 @@ const ProductListing = () => {
       <div className="container">
         <Breadcrumbs aria-label="breadcrumb">
           <Link underline="hover" color="inherit" href="/" className="link transition !text-[14px]">
-            Home
+            Trang chủ
           </Link>
           {categoryPath && categoryPath.map((cat, index) => (
             <Link 
@@ -252,7 +252,7 @@ const ProductListing = () => {
           ))}
           {!categoryId && !searchQuery && (
             <Link underline="hover" color="text.primary" href="/productListing" className="link transition !text-[14px]">
-              All Products
+              Tất cả sản phẩm
             </Link>
           )}
           {searchQuery && (
@@ -265,7 +265,8 @@ const ProductListing = () => {
 
       <div className="bg-white p-2 mt-4">
         <div className="container flex gap-3">
-          <div className="sidebarWrapper w-[20%] h-full bg-white">
+          {/* Sidebar - Hidden on mobile, shown on lg and above */}
+          <div className="sidebarWrapper hidden lg:block lg:w-[20%] h-full bg-white">
             <Sidebar 
               selectedCategoryIds={selectedCategoryIds}
               setSelectedCategoryIds={setSelectedCategoryIds}
@@ -276,7 +277,8 @@ const ProductListing = () => {
             />
           </div>
 
-          <div className="rightContent w-[80%] py-3">
+          {/* Products - Full width on mobile, 80% on lg */}
+          <div className="rightContent w-full lg:w-[80%] py-3">
             <div className="bg-[#f1f1f1] p-2 w-full mb-4 rounded-md flex items-center justify-between">
               <div className="col1 flex items-center itemViewActions">
                 <Button
@@ -297,13 +299,13 @@ const ProductListing = () => {
                 </Button>
 
                 <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]">
-                  There are {filteredProducts.length} products.
+                  Có {filteredProducts.length} sản phẩm.
                 </span>
               </div>
 
               <div className="col2 ml-auto flex items-center justify-end gap-3 pr-4">
                 <span className="text-[14px] font-medium pl-3 text-[rgba(0,0,0,0.7)]">
-                  Sort By:
+                  Sắp xếp:
                 </span>
 
                 <Button
@@ -329,40 +331,40 @@ const ProductListing = () => {
                   }}
                 >
                   <MenuItem
-                    onClick={() => handleSortChange('Sales, highest to lowest')}
+                    onClick={() => handleSortChange('Bán chạy nhất')}
                     className="!text-[13px] !text-[#000] !capitalize !font-medium"
                   >
-                    Sales, highest to lowest
+                    Bán chạy nhất
                   </MenuItem>
                   <MenuItem
-                    onClick={() => handleSortChange('Relevance')}
+                    onClick={() => handleSortChange('Liên quan nhất')}
                     className="!text-[13px] !text-[#000] !capitalize !font-medium"
                   >
-                    Relevance
+                    Liên quan nhất
                   </MenuItem>
                   <MenuItem
-                    onClick={() => handleSortChange('Name, A to Z')}
+                    onClick={() => handleSortChange('Tên, A đến Z')}
                     className="!text-[13px] !text-[#000] !capitalize !font-medium"
                   >
-                    Name, A to Z
+                    Tên, A đến Z
                   </MenuItem>
                   <MenuItem
-                    onClick={() => handleSortChange('Name, Z to A')}
+                    onClick={() => handleSortChange('Tên, Z đến A')}
                     className="!text-[13px] !text-[#000] !capitalize !font-medium"
                   >
-                    Name, Z to A
+                    Tên, Z đến A
                   </MenuItem>
                   <MenuItem
-                    onClick={() => handleSortChange('Price, low to high')}
+                    onClick={() => handleSortChange('Giá, thấp đến cao')}
                     className="!text-[13px] !text-[#000] !capitalize !font-medium"
                   >
-                    Price, low to high
+                    Giá, thấp đến cao
                   </MenuItem>
                   <MenuItem
-                    onClick={() => handleSortChange('Price, high to low')}
+                    onClick={() => handleSortChange('Giá, cao đến thấp')}
                     className="!text-[13px] !text-[#000] !capitalize !font-medium"
                   >
-                    Price, high to low
+                    Giá, cao đến thấp
                   </MenuItem>
                 </Menu>
               </div>
@@ -385,7 +387,7 @@ const ProductListing = () => {
             {/* No Products */}
             {!loading && !error && paginatedProducts.length === 0 && (
               <div className="flex items-center justify-center py-20">
-                <p className="text-gray-500 text-lg">No products found.</p>
+                <p className="text-gray-500 text-lg">Không tìm thấy sản phẩm.</p>
               </div>
             )}
 
@@ -393,7 +395,7 @@ const ProductListing = () => {
             {!loading && !error && paginatedProducts.length > 0 && (
               <div
                 className={`grid ${
-                  itemView === 'grid' ? 'grid-cols-4 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-1'
+                  itemView === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1'
                 } gap-4`}
               >
                 {itemView === 'grid' ? (

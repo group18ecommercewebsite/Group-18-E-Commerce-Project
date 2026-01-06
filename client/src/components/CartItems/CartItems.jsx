@@ -47,13 +47,13 @@ const CartItems = ({ cartItem, onUpdate }) => {
         setUpdating(true);
         const response = await updateCartQuantity(cartItemId, newQty);
         if (response.success) {
-          context.openAlertBox('success', 'Cart updated');
+          context.openAlertBox('success', 'Đã cập nhật giỏ hàng');
           onUpdate && onUpdate();
         } else {
-          context.openAlertBox('error', response.message || 'Failed to update');
+          context.openAlertBox('error', response.message || 'Cập nhật thất bại');
         }
       } catch (error) {
-        context.openAlertBox('error', error.response?.data?.message || 'Failed to update cart');
+        context.openAlertBox('error', error.response?.data?.message || 'Không thể cập nhật giỏ hàng');
       } finally {
         setUpdating(false);
       }
@@ -65,13 +65,13 @@ const CartItems = ({ cartItem, onUpdate }) => {
       setRemoving(true);
       const response = await removeFromCart(cartItemId, productId);
       if (response.success) {
-        context.openAlertBox('success', 'Item removed from cart');
+        context.openAlertBox('success', 'Đã xóa sản phẩm khỏi giỏ hàng');
         onUpdate && onUpdate();
       } else {
-        context.openAlertBox('error', response.message || 'Failed to remove');
+        context.openAlertBox('error', response.message || 'Xóa thất bại');
       }
     } catch (error) {
-      context.openAlertBox('error', error.response?.data?.message || 'Failed to remove item');
+      context.openAlertBox('error', error.response?.data?.message || 'Không thể xóa sản phẩm');
     } finally {
       setRemoving(false);
     }
@@ -120,7 +120,7 @@ const CartItems = ({ cartItem, onUpdate }) => {
               {updating ? (
                 <CircularProgress size={12} />
               ) : (
-                <>Qty: {quantity} <GoTriangleDown /></>
+                <>SL: {quantity} <GoTriangleDown /></>
               )}
             </span>
             <Menu

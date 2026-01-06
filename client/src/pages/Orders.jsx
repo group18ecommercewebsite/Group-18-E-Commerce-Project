@@ -193,19 +193,19 @@ export const Orders = () => {
   const menuItems = [
     {
       id: "profile",
-      label: "My Profile",
+      label: "Hồ sơ của tôi",
       icon: <FiUser className="text-[18px]" />,
       path: "/my-account"
     },
     {
       id: "mylist",
-      label: "My List",
+      label: "Danh sách yêu thích",
       icon: <GoHeart className="text-[18px]" />,
       path: "/my-list"
     },
     {
       id: "orders",
-      label: "My Orders",
+      label: "Đơn hàng của tôi",
       icon: <IoBagCheckOutline className="text-[18px]" />,
       path: "/my-orders"
     },
@@ -233,11 +233,11 @@ export const Orders = () => {
     );
   }
 
-  return (  
+  return (
     <section className="section py-10 pb-10">
-      <div className="container w-[90%] max-w-[90%] flex gap-5">
-        {/* Left Sidebar */}
-        <div className="w-[280px]">
+      <div className="container w-full lg:w-[90%] max-w-full lg:max-w-[90%] flex flex-col lg:flex-row gap-5 lg:px-4 lg:px-0">
+        {/* Left Sidebar - Hidden below lg (1024px) */}
+        <div className="hidden lg:block lg:w-[280px] flex-shrink-0">
           <div className="card bg-white shadow-md rounded-md p-5 sticky top-5">
             {/* User Avatar */}
             <div className="flex flex-col items-center mb-6">
@@ -279,7 +279,7 @@ export const Orders = () => {
                 className="flex items-center gap-3 w-full px-4 py-3 text-[14px] text-gray-700 hover:bg-gray-50 transition rounded-md mt-2"
               >
                 <IoLogOutOutline className="text-[18px]" />
-                Logout
+                Đăng xuất
               </button>
             </nav>
           </div>
@@ -289,9 +289,9 @@ export const Orders = () => {
         <div className="flex-1">
           <div className="shadow-md rounded-md bg-white">
             <div className="py-4 px-5 border-b border-[rgba(0,0,0,0.1)]">
-              <h2 className="text-[18px] font-semibold">My Orders</h2>
+              <h2 className="text-[18px] font-semibold">Đơn hàng của tôi</h2>
               <p className="mt-1 text-[14px] text-gray-500">
-                There are <span className="font-bold text-[#ff5252]">{orders.length}</span> orders
+                Có <span className="font-bold text-[#ff5252]">{orders.length}</span> đơn hàng
               </p>
             </div>
 
@@ -310,14 +310,14 @@ export const Orders = () => {
                   <thead>
                     <tr className="bg-[#3d464d] text-white">
                       <th className="py-3 px-3 text-left font-medium"></th>
-                      <th className="py-3 px-3 text-left font-medium uppercase">Order ID</th>
-                      <th className="py-3 px-3 text-left font-medium uppercase">Payment</th>
-                      <th className="py-3 px-3 text-left font-medium uppercase">Products</th>
-                      <th className="py-3 px-3 text-left font-medium uppercase">Total</th>
-                      <th className="py-3 px-3 text-left font-medium uppercase">Status</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Mã đơn</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Thanh toán</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Sản phẩm</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Tổng tiền</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Trạng thái</th>
                       <th className="py-3 px-3 text-left font-medium uppercase">Hoàn tiền</th>
-                      <th className="py-3 px-3 text-left font-medium uppercase">Date</th>
-                      <th className="py-3 px-3 text-left font-medium uppercase">Action</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Ngày</th>
+                      <th className="py-3 px-3 text-left font-medium uppercase">Thao tác</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -341,7 +341,7 @@ export const Orders = () => {
                           <td className="py-3 px-3">
                             <span className="text-[#ff5252]">{order.payment_status || 'COD'}</span>
                           </td>
-                          <td className="py-3 px-3">{order.products?.length || 0} items</td>
+                          <td className="py-3 px-3">{order.products?.length || 0} sản phẩm</td>
                           <td className="py-3 px-3 font-medium">{formatCurrency(order.totalAmt)}</td>
                           <td className="py-3 px-3">
                             <Badge status={order.order_status || 'pending'} />
@@ -380,11 +380,11 @@ export const Orders = () => {
                                 <table className="w-full text-[13px]">
                                   <thead>
                                     <tr className="bg-[#2d3748] text-white">
-                                      <th className="py-3 px-4 text-left font-medium uppercase">Image</th>
-                                      <th className="py-3 px-4 text-left font-medium uppercase">Product</th>
-                                      <th className="py-3 px-4 text-left font-medium uppercase">Quantity</th>
-                                      <th className="py-3 px-4 text-left font-medium uppercase">Price</th>
-                                      <th className="py-3 px-4 text-left font-medium uppercase">Sub Total</th>
+                                      <th className="py-3 px-4 text-left font-medium uppercase">Ảnh</th>
+                                      <th className="py-3 px-4 text-left font-medium uppercase">Sản phẩm</th>
+                                      <th className="py-3 px-4 text-left font-medium uppercase">Số lượng</th>
+                                      <th className="py-3 px-4 text-left font-medium uppercase">Giá</th>
+                                      <th className="py-3 px-4 text-left font-medium uppercase">Thành tiền</th>
                                     </tr>
                                   </thead>
                                   <tbody className="bg-white">

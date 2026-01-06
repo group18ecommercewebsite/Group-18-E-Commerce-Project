@@ -28,22 +28,22 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (formFields.newPassword === '') {
-      context.openAlertBox('error', 'Please enter new password');
+      context.openAlertBox('error', 'Vui lòng nhập mật khẩu mới');
       return;
     }
 
     if (formFields.newPassword.length < 6) {
-      context.openAlertBox('error', 'Password must be at least 6 characters');
+      context.openAlertBox('error', 'Mật khẩu phải có ít nhất 6 ký tự');
       return;
     }
 
     if (formFields.confirmPassword === '') {
-      context.openAlertBox('error', 'Please confirm your password');
+      context.openAlertBox('error', 'Vui lòng xác nhận mật khẩu');
       return;
     }
 
     if (formFields.newPassword !== formFields.confirmPassword) {
-      context.openAlertBox('error', 'Passwords do not match');
+      context.openAlertBox('error', 'Mật khẩu không khớp');
       return;
     }
 
@@ -61,7 +61,7 @@ const ResetPassword = () => {
       }
       
       if (!email) {
-        context.openAlertBox('error', 'Session expired. Please try again.');
+        context.openAlertBox('error', 'Phiên làm việc hết hạn. Vui lòng thử lại.');
         navigate('/login');
         return;
       }
@@ -73,7 +73,7 @@ const ResetPassword = () => {
       });
 
       if (response.success) {
-        context.openAlertBox('success', 'Password reset successfully!');
+        context.openAlertBox('success', 'Đặt lại mật khẩu thành công!');
         localStorage.removeItem('resetEmail');
         
         // Nếu đang đăng nhập thì quay về trang account, nếu không thì về login
@@ -83,10 +83,10 @@ const ResetPassword = () => {
           navigate('/login');
         }
       } else {
-        context.openAlertBox('error', response.message || 'Failed to reset password');
+        context.openAlertBox('error', response.message || 'Đặt lại mật khẩu thất bại');
       }
     } catch (error) {
-      context.openAlertBox('error', error.response?.data?.message || 'Failed to reset password');
+      context.openAlertBox('error', error.response?.data?.message || 'Đặt lại mật khẩu thất bại');
     } finally {
       setIsLoading(false);
     }
@@ -96,9 +96,9 @@ const ResetPassword = () => {
     <section className="section py-10">
       <div className="container">
         <div className="card shadow-md w-[400px] m-auto rounded-md bg-white p-5 px-10">
-          <h3 className="text-center text-[18px] text-black font-semibold">Reset Password</h3>
+          <h3 className="text-center text-[18px] text-black font-semibold">Đặt lại mật khẩu</h3>
           <p className="text-center text-[14px] text-gray-500 mt-2">
-            Enter your new password below
+            Nhập mật khẩu mới của bạn
           </p>
 
           <form onSubmit={handleSubmit} className="w-full mt-5">
@@ -106,7 +106,7 @@ const ResetPassword = () => {
               <TextField
                 type={isShowPassword ? 'text' : 'password'}
                 id="newPassword"
-                label="New Password *"
+                label="Mật khẩu mới *"
                 variant="outlined"
                 className="w-full"
                 name="newPassword"
@@ -129,7 +129,7 @@ const ResetPassword = () => {
               <TextField
                 type={isShowConfirmPassword ? 'text' : 'password'}
                 id="confirmPassword"
-                label="Confirm Password *"
+                label="Xác nhận mật khẩu *"
                 variant="outlined"
                 className="w-full"
                 name="confirmPassword"
@@ -164,7 +164,7 @@ const ResetPassword = () => {
                   },
                 }}
               >
-                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Reset Password'}
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Đặt lại mật khẩu'}
               </Button>
             </div>
 
@@ -173,7 +173,7 @@ const ResetPassword = () => {
                 onClick={() => navigate('/login')}
                 className="link text-[14px] font-[600] cursor-pointer"
               >
-                ← Back to Login
+                ← Quay lại đăng nhập
               </span>
             </p>
           </form>

@@ -73,29 +73,29 @@ const MyList = () => {
   const menuItems = [
     {
       id: "profile",
-      label: "My Profile",
+      label: "Hồ sơ của tôi",
       icon: <FiUser className="text-[18px]" />,
       path: "/my-account"
     },
     {
       id: "mylist",
-      label: "My List",
+      label: "Danh sách yêu thích",
       icon: <GoHeart className="text-[18px]" />,
       path: "/my-list"
     },
     {
       id: "orders",
-      label: "My Orders",
+      label: "Đơn hàng của tôi",
       icon: <IoBagCheckOutline className="text-[18px]" />,
       path: "/my-orders"
     },
   ];
 
-  return (  
+  return (
     <section className="section py-10 pb-10">
-      <div className="container w-[80%] max-w-[80%] flex gap-5">
-        {/* Left Sidebar */}
-        <div className="w-[280px]">
+      <div className="container w-full lg:w-[80%] max-w-full lg:max-w-[80%] flex flex-col lg:flex-row gap-5 px-4 lg:px-0">
+        {/* Left Sidebar - Hidden below lg (1024px) */}
+        <div className="hidden lg:block lg:w-[280px] flex-shrink-0">
           <div className="card bg-white shadow-md rounded-md p-5 sticky top-5">
             {/* User Avatar */}
             <div className="flex flex-col items-center mb-6">
@@ -133,20 +133,20 @@ const MyList = () => {
                 className="flex items-center gap-3 w-full px-4 py-3 text-[14px] text-gray-700 hover:bg-gray-50 transition rounded-md mt-2"
               >
                 <IoLogOutOutline className="text-[18px]" />
-                Logout
+                Đăng xuất
               </button>
             </nav>
           </div>
         </div>
         
         {/* Right Content */}
-        <div className="leftPart w-[70%]">
+        <div className="leftPart w-full lg:flex-1">
           <div className="shadow-md rounded-md bg-white">
             <div className="py-2 px-3 border-b border-[rgba(0,0,0,0.1)]">
-              <h2>My Wishlist</h2>
+              <h2>Danh sách yêu thích</h2>
               <p className="mt-0">
-                There are <span className="font-bold text-[#ff5252]">{myListItems.length}</span>{" "}
-                products in My List
+                Có <span className="font-bold text-[#ff5252]">{myListItems.length}</span>{" "}
+                sản phẩm trong danh sách
               </p>
             </div>
 

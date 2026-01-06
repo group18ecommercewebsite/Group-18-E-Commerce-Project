@@ -212,19 +212,19 @@ export const Checkout = () => {
 
   return (
     <section className="py-10 bg-[#f5f5f5]">
-      <div className="container flex gap-5">
+      <div className="container flex flex-col lg:flex-row gap-5 px-4 lg:px-0">
         {/* Left Column - Billing Details */}
-        <div className="leftCol w-[70%]">
-          <div className="card bg-white shadow-md p-8 rounded-md w-full">
-            <h1 className="text-[18px] font-semibold mb-6">Billing Details</h1>
+        <div className="leftCol w-full lg:w-[70%]">
+          <div className="card bg-white shadow-md p-4 sm:p-6 lg:p-8 rounded-md w-full">
+            <h1 className="text-[18px] font-semibold mb-6">Thông tin thanh toán</h1>
             
             <form className="w-full" onSubmit={handleSubmit}>
               {/* Full Name & Email */}
-              <div className="flex items-center gap-5 mb-5">
-                <div className="col w-[50%]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-5 mb-5">
+                <div className="col w-full sm:w-[50%]">
                   <TextField
                     className="w-full"
-                    label="Full Name *"
+                    label="Họ và tên *"
                     variant="outlined"
                     size="small"
                     name="fullName"
@@ -233,7 +233,7 @@ export const Checkout = () => {
                     required
                   />
                 </div>
-                <div className="col w-[50%]">
+                <div className="col w-full sm:w-[50%]">
                   <TextField
                     className="w-full"
                     label="Email *"
@@ -248,11 +248,11 @@ export const Checkout = () => {
               </div>
 
               {/* Street Address */}
-              <p className="text-[14px] font-medium mb-2">Street address *</p>
+              <p className="text-[14px] font-medium mb-2">Địa chỉ *</p>
               <div className="mb-4">
                 <TextField
                   className="w-full"
-                  placeholder="House No. and Street Name"
+                  placeholder="Số nhà và tên đường"
                   variant="outlined"
                   size="small"
                   name="streetAddress"
@@ -264,7 +264,7 @@ export const Checkout = () => {
               <div className="mb-5">
                 <TextField
                   className="w-full"
-                  placeholder="Apartment, suite, unit, etc. (optional)"
+                  placeholder="Căn hộ, tòa nhà, v.v. (tùy chọn)"
                   variant="outlined"
                   size="small"
                   name="apartment"
@@ -274,11 +274,11 @@ export const Checkout = () => {
               </div>
 
               {/* Town / City & State / County */}
-              <div className="flex items-center gap-5 mb-5">
-                <div className="col w-[50%]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-5 mb-5">
+                <div className="col w-full sm:w-[50%]">
                   <TextField
                     className="w-full"
-                    label="Town / City *"
+                    label="Thành phố / Tỉnh *"
                     variant="outlined"
                     size="small"
                     name="city"
@@ -287,10 +287,10 @@ export const Checkout = () => {
                     required
                   />
                 </div>
-                <div className="col w-[50%]">
+                <div className="col w-full sm:w-[50%]">
                   <TextField
                     className="w-full"
-                    label="State / County"
+                    label="Quận / Huyện"
                     variant="outlined"
                     size="small"
                     name="state"
@@ -301,11 +301,11 @@ export const Checkout = () => {
               </div>
 
               {/* ZIP Code & Phone */}
-              <div className="flex items-center gap-5">
-                <div className="col w-[50%]">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-5">
+                <div className="col w-full sm:w-[50%]">
                   <TextField
                     className="w-full"
-                    label="Postcode / ZIP"
+                    label="Mã bưu điện"
                     variant="outlined"
                     size="small"
                     name="zipCode"
@@ -313,10 +313,10 @@ export const Checkout = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="col w-[50%]">
+                <div className="col w-full sm:w-[50%]">
                   <TextField
                     className="w-full"
-                    label="Phone Number *"
+                    label="Số điện thoại *"
                     variant="outlined"
                     size="small"
                     name="phone"
@@ -331,14 +331,14 @@ export const Checkout = () => {
         </div>
 
         {/* Right Column - Order Summary */}
-        <div className="rightCol w-[30%]">
-          <div className="card bg-white shadow-md p-5 rounded-md w-full sticky top-5">
-            <h2 className="text-[18px] font-semibold mb-4">Your Order</h2>
+        <div className="rightCol w-full lg:w-[30%]">
+          <div className="card bg-white shadow-md p-4 sm:p-5 rounded-md w-full lg:sticky lg:top-5">
+            <h2 className="text-[18px] font-semibold mb-4">Đơn hàng của bạn</h2>
 
             {/* Header */}
             <div className="flex justify-between border-b border-gray-200 pb-3 mb-3">
-              <span className="font-medium text-[14px]">Product</span>
-              <span className="font-medium text-[14px]">Subtotal</span>
+              <span className="font-medium text-[14px]">Sản phẩm</span>
+              <span className="font-medium text-[14px]">Thành tiền</span>
             </div>
 
             {/* Cart Items with scroll */}
@@ -435,7 +435,7 @@ export const Checkout = () => {
 
             {/* Payment Method Selection */}
             <div className="mt-4 p-3 bg-gray-50 rounded-md">
-              <p className="text-[14px] font-semibold mb-3">Payment Method</p>
+              <p className="text-[14px] font-semibold mb-3">Phương thức thanh toán</p>
               <RadioGroup
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
@@ -445,7 +445,7 @@ export const Checkout = () => {
                   control={<Radio size="small" sx={{ color: '#ff5252', '&.Mui-checked': { color: '#ff5252' } }} />} 
                   label={
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px]">💵 Cash On Delivery (COD)</span>
+                      <span className="text-[13px]">💵 Thanh toán khi nhận hàng (COD)</span>
                     </div>
                   }
                 />
@@ -454,8 +454,8 @@ export const Checkout = () => {
                   control={<Radio size="small" sx={{ color: '#ff5252', '&.Mui-checked': { color: '#ff5252' } }} />} 
                   label={
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px]">💳 SePay (VietQR / Card)</span>
-                      <span className="text-[10px] text-purple-600 bg-purple-50 px-1 rounded">Online</span>
+                      <span className="text-[13px]">💳 SePay (VietQR / Thẻ)</span>
+                      <span className="text-[10px] text-purple-600 bg-purple-50 px-1 rounded">Trực tuyến</span>
                     </div>
                   }
                 />
@@ -498,7 +498,7 @@ export const Checkout = () => {
               ) : (
                 <>
                   <IoBagCheckOutline className="text-[18px]" />
-                  {paymentMethod === 'cod' ? 'Place Order' : 'Pay with SePay'}
+                  {paymentMethod === 'cod' ? 'Đặt hàng' : 'Thanh toán qua SePay'}
                 </>
               )}
             </Button>

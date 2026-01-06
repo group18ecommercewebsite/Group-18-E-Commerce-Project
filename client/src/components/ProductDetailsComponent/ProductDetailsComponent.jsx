@@ -44,7 +44,7 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
   const handleAddToCart = async () => {
     // Kiểm tra đăng nhập
     if (!context.isLogin) {
-      context.openAlertBox('error', 'Please login to add items to cart');
+      context.openAlertBox('error', 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
       navigate('/login');
       return;
     }
@@ -53,16 +53,16 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
       setAddingToCart(true);
       const response = await addToCart(_id, quantity);
       if (response.success) {
-        context.openAlertBox('success', response.message || 'Product added to cart!');
+        context.openAlertBox('success', response.message || 'Đã thêm sản phẩm vào giỏ hàng!');
         // Cập nhật global cart state để CartPanel hiển thị ngay
         context.fetchCart();
         // Reset quantity về 1 sau khi thêm thành công
         setQuantity(1);
       } else {
-        context.openAlertBox('error', response.message || 'Failed to add to cart');
+        context.openAlertBox('error', response.message || 'Không thể thêm vào giỏ hàng');
       }
     } catch (error) {
-      context.openAlertBox('error', error.response?.data?.message || 'Failed to add to cart');
+      context.openAlertBox('error', error.response?.data?.message || 'Không thể thêm vào giỏ hàng');
     } finally {
       setAddingToCart(false);
     }
@@ -71,7 +71,7 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
   const handleAddToWishlist = async () => {
     // Kiểm tra đăng nhập
     if (!context.isLogin) {
-      context.openAlertBox('error', 'Please login to add items to wishlist');
+      context.openAlertBox('error', 'Vui lòng đăng nhập để thêm vào danh sách yêu thích');
       navigate('/login');
       return;
     }
@@ -90,15 +90,15 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
       };
       const response = await addToMyList(productData);
       if (response.success) {
-        context.openAlertBox('success', response.message || 'Added to wishlist!');
+        context.openAlertBox('success', response.message || 'Đã thêm vào danh sách yêu thích!');
       } else {
-        context.openAlertBox('error', response.message || 'Failed to add to wishlist');
+        context.openAlertBox('error', response.message || 'Không thể thêm vào danh sách yêu thích');
       }
     } catch (error) {
       if (error.response?.status === 400) {
-        context.openAlertBox('error', 'This item is already in your wishlist');
+        context.openAlertBox('error', 'Sản phẩm này đã có trong danh sách yêu thích');
       } else {
-        context.openAlertBox('error', error.response?.data?.message || 'Failed to add to wishlist');
+        context.openAlertBox('error', error.response?.data?.message || 'Không thể thêm vào danh sách yêu thích');
       }
     } finally {
       setAddingToWishlist(false);
@@ -110,12 +110,12 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
       <h1 className="text-[24px] font-[600] mb-2">{name}</h1>
       <div className="flex items-center gap-3">
         <span className="text-gray-400 text-[13px]">
-          Brands : <span className="font-medium text-black opacity-75">{brand}</span>
+          Thương hiệu: <span className="font-medium text-black opacity-75">{brand}</span>
         </span>
 
         <Rating name="size-small" value={reviewStats?.avgRating || rating} precision={0.1} size="small" readOnly />
 
-        <span className="text-[13px] cursor-pointer">Review ({reviewStats?.totalReviews || 0})</span>
+        <span className="text-[13px] cursor-pointer">Đánh giá ({reviewStats?.totalReviews || 0})</span>
       </div>
 
       <div className="flex items-center gap-4 mt-4">
@@ -132,9 +132,9 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
 
         <span className="text-[14px]">
           {countInStock > 0 ? (
-            <>Available In Stock: <span className="text-green-600 text-[14px] font-bold">{countInStock} Items</span></>
+            <><>Còn hàng: <span className="text-green-600 text-[14px] font-bold">{countInStock} sản phẩm</span></></>
           ) : (
-            <span className="text-red-600 font-bold">Out of Stock</span>
+            <span className="text-red-600 font-bold">Hết hàng</span>
           )}
         </span>
       </div>
@@ -148,7 +148,7 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
       {/* Size Options */}
       {size && size.length > 0 && (
         <div className="flex items-center gap-3 mb-3">
-          <span className="text-[16px]">Size:</span>
+          <span className="text-[16px]">Kích thước:</span>
           <div className="flex items-center gap-1 actions">
             {size.map((s, index) => (
               <Button
@@ -184,7 +184,7 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
       {/* Weight Options */}
       {productWeight && productWeight.length > 0 && (
         <div className="flex items-center gap-3 mb-3">
-          <span className="text-[16px]">Weight:</span>
+          <span className="text-[16px]">Trọng lượng:</span>
           <div className="flex items-center gap-1 actions">
             {productWeight.map((weight, index) => (
               <Button
@@ -200,7 +200,7 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
       )}
 
       <p className="text-[14px] mt-5 mb-2 text-[#000]">
-        Free Shipping (Est. Delivery Time 2-3 Days)
+        Miễn phí vận chuyển (Dự kiến giao hàng 2-3 ngày)
       </p>
 
       <div className="flex items-center gap-4 py-4">
@@ -241,7 +241,7 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
             <CircularProgress size={22} color="inherit" />
           ) : (
             <>
-              <MdOutlineShoppingCart className="text-[22px]" /> Add to Cart
+              <MdOutlineShoppingCart className="text-[22px]" /> Thêm vào giỏ hàng
             </>
           )}
         </Button>
@@ -257,11 +257,11 @@ const ProductDetailsComponent = ({ product, reviewStats }) => {
           ) : (
             <FaRegHeart className="text-[18px]" />
           )}
-          Add to Wishlist
+          Thêm vào yêu thích
         </span>
         <span className="flex items-center gap-2 text-[15px] link cursor-pointer font-medium">
           <IoIosGitCompare className="text-[18px]" />
-          Add to Compare
+          Thêm vào so sánh
         </span>
       </div>
     </>

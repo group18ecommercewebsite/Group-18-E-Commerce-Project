@@ -83,17 +83,17 @@ export const Home = () => {
 
       <HomeCatSlider categories={categories} />
 
-      <section className="bg-white py-8">
+      <section className="bg-white py-4 md:py-8">
         <div className="container">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-4">
             <div className="leftSec">
-              <h2 className="text-[20px] font-[600]">Popular Products</h2>
-              <p className="text-[14px] font-[400]">
-                Do not miss the current offers until the end of March.
+              <h2 className="text-[18px] md:text-[20px] font-[600]">Sản phẩm phổ biến</h2>
+              <p className="text-[13px] md:text-[14px] font-[400] !m-0">
+                Đừng bỏ lỡ các ưu đãi hiện tại!
               </p>
             </div>
 
-            <div className="rightSec w-full md:w-[60%]">
+            <div className="rightSec w-full md:w-auto md:max-w-[60%]">
               <Tabs
                 value={tabValue}
                 onChange={handleTabChange}
@@ -101,7 +101,7 @@ export const Home = () => {
                 scrollButtons="auto"
                 aria-label="product category tabs"
               >
-                <Tab label="All" />
+                <Tab label="Tất cả" />
                 {categories.slice(0, 7).map((cat) => (
                   <Tab key={cat._id} label={cat.name} />
                 ))}
@@ -121,28 +121,29 @@ export const Home = () => {
 
       <section className="py-4 pt-2 bg-white">
         <div className="container">
-          <div className="freeShipping w-[80%] m-auto py-4 p-4 border-2 border-[#ff5252] flex items-center justify-between rounded-md mb-7">
-            <div className="col1 flex items-center gap-4">
-              <LiaShippingFastSolid className="text-[50px]" />
-              <span className="text-[20px] font-[600] uppercase">Free Shipping </span>
+          {/* Free shipping banner - responsive */}
+          <div className="freeShipping w-full md:w-[90%] lg:w-[80%] m-auto py-3 md:py-4 px-3 md:px-4 border-2 border-[#ff5252] flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 md:gap-4 rounded-md mb-5 md:mb-7 text-center md:text-left">
+            <div className="col1 flex items-center gap-2 md:gap-4">
+              <LiaShippingFastSolid className="text-[36px] md:text-[50px]" />
+              <span className="text-[16px] md:text-[20px] font-[600] uppercase">Miễn phí vận chuyển</span>
             </div>
 
-            <div className="col2">
-              <p className="mb-0 font-medium">
-                Free Delivery Now On Your First Order and over $200
+            <div className="col2 hidden md:block">
+              <p className="mb-0 font-medium text-[13px] md:text-[14px]">
+                Miễn phí giao hàng cho đơn hàng đầu tiên và đơn trên 500.000đ
               </p>
             </div>
 
-            <p className="font-bold text-2xl">- Only $200*</p>
+            <p className="font-bold text-lg md:text-2xl !m-0">- Chỉ từ 500.000đ*</p>
           </div>
 
           <AdsBannerSlider items={4} banners={banners} />
         </div>
       </section>
 
-      <section className="py-5 pt-0 bg-white">
+      <section className="py-4 md:py-5 pt-0 bg-white">
         <div className="container">
-          <h2 className="text-[20px] font-[600]">Latest Products</h2>
+          <h2 className="text-[18px] md:text-[20px] font-[600]">Sản phẩm mới nhất</h2>
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -155,9 +156,9 @@ export const Home = () => {
         </div>
       </section>
 
-      <section className="py-5 pt-0 bg-white">
+      <section className="py-4 md:py-5 pt-0 bg-white">
         <div className="container">
-          <h2 className="text-[20px] font-[600]">Featured Products</h2>
+          <h2 className="text-[18px] md:text-[20px] font-[600]">Sản phẩm nổi bật</h2>
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

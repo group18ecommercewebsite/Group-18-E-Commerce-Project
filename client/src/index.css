@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /* * {
     margin: 0px;
@@ -6,11 +6,13 @@
     box-sizing: border-box;
 } */
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-optical-sizing: auto;
   background: #f5f0f0;
   color: rgba(36, 36, 36, 1);
   overflow-x: hidden;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
 }
 
 p {
@@ -20,7 +22,12 @@ p {
   margin-top: 10px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
 }
 
@@ -47,8 +54,21 @@ h1, h2, h3, h4, h5, h6 {
   color: #ff5252;
 }
 
+/* Hide scrollbar for horizontal scroll areas */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
 .sliderHome {
-  overflow: inherit !important;
+  overflow: hidden !important;
+}
+
+.homeSlider {
+  overflow: hidden;
 }
 
 .swiper-button-prev,
@@ -94,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .homeCatSlider {
-  overflow: inherit !important;
+  overflow: hidden !important;
 }
 
 .homeCatSlider .item {
@@ -147,9 +167,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .productsSlider .swiper-wrapper {
-  padding: 15px;
-  margin-left: -15px;
-  margin-right: -15px;
+  padding: 15px 0;
 }
 
 .btn-org {
@@ -306,18 +324,37 @@ h1, h2, h3, h4, h5, h6 {
 
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    -appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -appearance: none;
 }
 
-.reviewScroll::-webkit-scrollbar{width: 5px !important;}
-.reviewScroll::-webkit-scrollbar-thumb{background: #ccc !important;}
+.reviewScroll::-webkit-scrollbar {
+  width: 5px !important;
+}
+.reviewScroll::-webkit-scrollbar-thumb {
+  background: #ccc !important;
+}
 
-.productDetailsModal .MuiDialogContent-root{padding: 0px !important;}
+.productDetailsModal .MuiDialogContent-root {
+  padding: 0px !important;
+}
 
-.productsSlider .swiper,.blogSection .swiper{overflow: inherit !important;}
+.productsSlider .swiper,
+.blogSection .swiper {
+  overflow: hidden !important;
+}
 
-.cartPanel .MuiPaper-root{width: 400px !important; overflow: hidden !important;}
+.productsSlider {
+  overflow: hidden;
+}
 
-#size-menu .MuiButtonBase-root{font-size: 12px !important;}
+.cartPanel .MuiPaper-root {
+  width: 100% !important;
+  max-width: 400px !important;
+  overflow: hidden !important;
+}
+
+#size-menu .MuiButtonBase-root {
+  font-size: 12px !important;
+}

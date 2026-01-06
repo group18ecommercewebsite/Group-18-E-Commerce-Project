@@ -45,7 +45,7 @@ const Sidebar = ({
     <aside className="sidebar py-5">
       <div className="box">
         <h3 className="w-full mb-3 text-[16px] font-[600] flex items-center pr-5">
-          Shop by Category
+          Danh mục sản phẩm
           <Button
             className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[#000]"
             onClick={() => setIsOpenCategoryFilter(!isOpenCategoryFilter)}
@@ -78,7 +78,7 @@ const Sidebar = ({
 
       <div className="box">
         <h3 className="w-full mb-3 text-[16px] font-[600] flex items-center pr-5">
-          Availability
+          Tình trạng
           <Button
             className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[#000]"
             onClick={() => setIsOpenAvailFilter(!isOpenAvailFilter)}
@@ -92,19 +92,19 @@ const Sidebar = ({
           <div className="scroll px-4 relative -left-[13px]">
             <FormControlLabel
               control={<Checkbox size="small" />}
-              label="Availabe (17)"
+              label="Còn hàng (17)"
               className="w-full"
             />
 
             <FormControlLabel
               control={<Checkbox size="small" />}
-              label="In stock (10)"
+              label="Có sẵn (10)"
               className="w-full"
             />
 
             <FormControlLabel
               control={<Checkbox size="small" />}
-              label="Not availabe (17)"
+              label="Hết hàng (17)"
               className="w-full"
             />
             
@@ -114,7 +114,7 @@ const Sidebar = ({
 
       <div className="box mt-3">
         <h3 className="w-full mb-3 text-[16px] font-[600] flex items-center pr-5">
-          Size
+          Kích thước
           <Button
             className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[#000]"
             onClick={() => setIsOpenSizeFilter(!isOpenSizeFilter)}
@@ -128,19 +128,19 @@ const Sidebar = ({
           <div className="scroll px-4 relative -left-[13px]">
             <FormControlLabel
               control={<Checkbox size="small" />}
-              label="Small (17)"
+              label="Nhỏ (17)"
               className="w-full"
             />
 
             <FormControlLabel
               control={<Checkbox size="small" />}
-              label="Medium (10)"
+              label="Trung bình (10)"
               className="w-full"
             />
 
             <FormControlLabel
               control={<Checkbox size="small" />}
-              label="Large (17)"
+              label="Lớn (17)"
               className="w-full"
             />
 
@@ -162,7 +162,7 @@ const Sidebar = ({
 
       <div className="box mt-4">
         <h3 className="w-full mb-3 text-[16px] font-[600] flex items-center pr-5">
-          Filter By Price
+          Lọc theo giá
           <Button
             className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[#000]"
             onClick={() => setIsOpenPriceFilter(!isOpenPriceFilter)}
@@ -194,7 +194,7 @@ const Sidebar = ({
 
       <div className="box mt-4">
         <h3 className="w-full mb-3 text-[16px] font-[600] flex items-center pr-5">
-          Filter By Rating
+          Lọc theo đánh giá
           <Button
             className="!w-[30px] !h-[30px] !min-w-[30px] !rounded-full !ml-auto !text-[#000]"
             onClick={() => setIsOpenRatingFilter(!isOpenRatingFilter)}
@@ -212,7 +212,7 @@ const Sidebar = ({
                 onClick={() => setSelectedRating && setSelectedRating(selectedRating === rating ? null : rating)}
               >
                 <Rating name={`rating-${rating}`} value={rating} size="small" readOnly />
-                <span className='text-[12px] text-gray-600'>& Up</span>
+                <span className='text-[12px] text-gray-600'>trở lên</span>
                 {selectedRating === rating && (
                   <span className='ml-auto text-[10px] text-red-500 font-medium'>✓</span>
                 )}

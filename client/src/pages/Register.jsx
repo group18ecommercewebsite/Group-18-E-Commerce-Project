@@ -30,19 +30,19 @@ const Register = () => {
     e.preventDefault();
 
     if (formFields.name === '') {
-      context.openAlertBox("error", "Please enter your name");
+      context.openAlertBox("error", "Vui lòng nhập họ tên");
       return;
     }
     if (formFields.email === '') {
-      context.openAlertBox("error", "Please enter your email");
+      context.openAlertBox("error", "Vui lòng nhập email");
       return;
     }
     if (formFields.password === '') {
-      context.openAlertBox("error", "Please enter your password");
+      context.openAlertBox("error", "Vui lòng nhập mật khẩu");
       return;
     }
     if (formFields.password.length < 6) {
-      context.openAlertBox("error", "Password must be at least 6 characters");
+      context.openAlertBox("error", "Mật khẩu phải có ít nhất 6 ký tự");
       return;
     }
 
@@ -55,15 +55,15 @@ const Register = () => {
       });
 
       if (response.success) {
-        context.openAlertBox("success", response.message || "Registration successful! Please verify your email.");
+        context.openAlertBox("success", response.message || "Đăng ký thành công! Vui lòng xác minh email.");
         // Lưu email để sử dụng ở trang verify
         localStorage.setItem('verifyEmail', formFields.email);
         navigate("/verify?type=register");
       } else {
-        context.openAlertBox("error", response.message || "Registration failed");
+        context.openAlertBox("error", response.message || "Đăng ký thất bại");
       }
     } catch (error) {
-      context.openAlertBox("error", error.response?.data?.message || "Registration failed");
+      context.openAlertBox("error", error.response?.data?.message || "Đăng ký thất bại");
     } finally {
       setIsLoading(false);
     }
@@ -73,14 +73,14 @@ const Register = () => {
     <section className="section py-10">
       <div className="container">
         <div className="card shadow-md w-[400px] m-auto rounded-md bg-white p-5 px-10">
-          <h3 className="text-center text-[18px] text-black">Register to a new account</h3>
+          <h3 className="text-center text-[18px] text-black">Đăng ký tài khoản mới</h3>
 
           <form action="" className="w-full mt-5">
             <div className="form-group w-full mb-5">
               <TextField
                 type="text"
                 id="name"
-                label="Full Name"
+                label="Họ và tên"
                 variant="outlined"
                 className="w-full"
                 name="name"
@@ -93,7 +93,7 @@ const Register = () => {
               <TextField
                 type="email"
                 id="email"
-                label="Email Id *"
+                label="Email *"
                 variant="outlined"
                 className="w-full"
                 name="email"
@@ -106,7 +106,7 @@ const Register = () => {
               <TextField
                 type={isShowPassword === false ? 'password' : 'text'}
                 id="password"
-                label="Password *"
+                label="Mật khẩu *"
                 variant="outlined"
                 className="w-full"
                 name="password"
@@ -133,22 +133,22 @@ const Register = () => {
                 onClick={handleRegister}
                 disabled={isLoading}
               >
-                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Register'}
+                {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Đăng ký'}
               </Button>
             </div>
 
             <p className="text-center">
-              Already have an account?{' '}
+              Đã có tài khoản?{' '}
               <Link className="link text-[14px] font-[600] mt-3 mb-3" to="/login">
-                Login
+                Đăng nhập
               </Link>
             </p>
 
-            <p className="text-center font-medium mt-3 mb-3">Or continue with social account</p>
+            <p className="text-center font-medium mt-3 mb-3">Hoặc tiếp tục với mạng xã hội</p>
 
             <Button className="flex gap-3 w-full !bg-[#f1f1f1] btn-lg !text-black">
               <FcGoogle className='text-[20px]' />
-              Login with Google
+              Đăng ký với Google
             </Button>
           </form>
         </div>

@@ -39,12 +39,12 @@ const CartPage = () => {
     return (
       <section className="section py-10 pb-10">
         <div className="container w-[80%] max-w-[80%] flex flex-col items-center justify-center min-h-[300px]">
-          <h2 className="text-xl mb-4">Please login to view your cart</h2>
+          <h2 className="text-xl mb-4">Vui lòng đăng nhập để xem giỏ hàng</h2>
           <Button 
             className="btn-org"
             onClick={() => navigate('/login')}
           >
-            Login
+            Đăng nhập
           </Button>
         </div>
       </section>
@@ -63,21 +63,21 @@ const CartPage = () => {
 
   return (
     <section className="section py-10 pb-10">
-      <div className="container w-[80%] max-w-[80%] flex gap-5">
-        <div className="leftPart w-[70%]">
+      <div className="container w-full lg:w-[80%] max-w-full lg:max-w-[80%] flex flex-col lg:flex-row gap-5 px-4 lg:px-0">
+        <div className="leftPart w-full lg:w-[70%]">
           <div className="shadow-md rounded-md bg-white">
             <div className="py-2 px-3 border-b border-[rgba(0,0,0,0.1)]">
-              <h2>Your Cart</h2>
+              <h2>Giỏ hàng của bạn</h2>
               <p className="mt-0">
-                There are <span className="font-bold text-[#ff5252]">{cartItems.length}</span> products in your cart
+                Có <span className="font-bold text-[#ff5252]">{cartItems.length}</span> sản phẩm trong giỏ hàng
               </p>
             </div>
 
             {cartItems.length === 0 ? (
               <div className="p-8 text-center">
-                <p className="text-gray-500 mb-4">Your cart is empty</p>
+                <p className="text-gray-500 mb-4">Giỏ hàng trống</p>
                 <Link to="/productListing">
-                  <Button className="btn-org">Continue Shopping</Button>
+                  <Button className="btn-org">Tiếp tục mua sắm</Button>
                 </Link>
               </div>
             ) : (
@@ -93,23 +93,23 @@ const CartPage = () => {
           </div>
         </div>
 
-        <div className="rightPart w-[30%]">
+        <div className="rightPart w-full lg:w-[30%]">
           <div className="shadow-md rounded-md bg-white p-5">
-            <h3 className="pb-3">Cart Totals</h3>
+            <h3 className="pb-3">Tổng giỏ hàng</h3>
             <hr />
 
             <p className="flex items-center justify-between py-2">
-              <span className="text-[14px] font-medium">Subtotal</span>
+              <span className="text-[14px] font-medium">Tạm tính</span>
               <span className="text-[#ff5252] font-bold">{formatCurrency(subtotal)}</span>
             </p>
 
             <p className="flex items-center justify-between py-2">
-              <span className="text-[14px] font-medium">Shipping</span>
+              <span className="text-[14px] font-medium">Vận chuyển</span>
               <span className="font-bold">{shipping === 0 ? 'Miễn phí' : formatCurrency(shipping)}</span>
             </p>
 
             <p className="flex items-center justify-between py-2">
-              <span className="text-[14px] font-medium">Total</span>
+              <span className="text-[14px] font-medium">Tổng cộng</span>
               <span className="text-[#ff5252] font-bold text-lg">{formatCurrency(total)}</span>
             </p>
 
@@ -127,7 +127,7 @@ const CartPage = () => {
                 disabled={cartItems.length === 0}
               >
                 <BsFillBagCheckFill className="text-[20px]" />
-                Checkout
+                Thanh toán
               </Button>
             </Link>
           </div>

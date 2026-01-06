@@ -189,9 +189,9 @@ export const Account = () => {
   };
 
   const menuItems = [
-    { id: 'profile', label: 'My Profile', icon: <FiUser className="text-[18px]" />, path: '/my-account' },
-    { id: 'mylist', label: 'My List', icon: <GoHeart className="text-[18px]" />, path: '/my-list' },
-    { id: 'orders', label: 'My Orders', icon: <IoBagCheckOutline className="text-[18px]" />, path: '/my-orders' },
+    { id: 'profile', label: 'Hồ sơ của tôi', icon: <FiUser className="text-[18px]" />, path: '/my-account' },
+    { id: 'mylist', label: 'Danh sách yêu thích', icon: <GoHeart className="text-[18px]" />, path: '/my-list' },
+    { id: 'orders', label: 'Đơn hàng của tôi', icon: <IoBagCheckOutline className="text-[18px]" />, path: '/my-orders' },
   ];
 
   if (loading) {
@@ -207,9 +207,9 @@ export const Account = () => {
   return (
     <section className="py-10 bg-[#f5f5f5]">
       <div className="container">
-        <div className="flex gap-5">
-          {/* Left Sidebar */}
-          <div className="w-[280px]">
+        <div className="flex flex-col md:flex-row gap-5">
+          {/* Left Sidebar - Hidden on mobile */}
+          <div className="hidden md:block md:w-[280px]">
             <div className="card bg-white shadow-md rounded-md p-5">
               {/* User Avatar with Menu */}
               <div className="flex flex-col items-center mb-6">
@@ -295,7 +295,7 @@ export const Account = () => {
                   className="flex items-center gap-3 w-full px-4 py-3 text-[14px] text-gray-700 hover:bg-gray-50 transition rounded-md mt-2"
                 >
                   <IoLogOutOutline className="text-[18px]" />
-                  Logout
+                  Đăng xuất
                 </button>
               </nav>
             </div>
@@ -305,17 +305,17 @@ export const Account = () => {
           <div className="flex-1">
             <div className="card bg-white shadow-md rounded-md p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-[18px] font-semibold">My Profile</h2>
+                <h2 className="text-[18px] font-semibold">Hồ sơ của tôi</h2>
                 <Link to="/reset-password" className="text-[#ff5252] text-[14px] font-medium hover:underline">
-                  CHANGE PASSWORD
+                  ĐỔI MẬT KHẨU
                 </Link>
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div className="flex gap-5 mb-5">
-                  <div className="w-[50%]">
+                <div className="flex flex-col sm:flex-row gap-5 mb-5">
+                  <div className="w-full sm:w-[50%]">
                     <TextField
-                      label="Full Name"
+                      label="Họ và tên"
                       variant="outlined"
                       size="small"
                       className="w-full"
@@ -324,7 +324,7 @@ export const Account = () => {
                       onChange={handleChange}
                     />
                   </div>
-                  <div className="w-[50%]">
+                  <div className="w-full sm:w-[50%]">
                     <TextField
                       label="Email"
                       variant="outlined"
@@ -341,7 +341,7 @@ export const Account = () => {
 
                 <div className="mb-5">
                   <TextField
-                    label="Phone Number"
+                    label="Số điện thoại"
                     variant="outlined"
                     size="small"
                     className="w-full max-w-[300px]"
@@ -375,7 +375,7 @@ export const Account = () => {
                   {saving ? (
                     <CircularProgress size={20} color="inherit" />
                   ) : (
-                    'Update Profile'
+                    'Cập nhật hồ sơ'
                   )}
                 </Button>
               </form>

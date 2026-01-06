@@ -52,25 +52,26 @@ export const Header = () => {
     localStorage.removeItem('user');
     
     context.setIsLogin(false);
-    context.openAlertBox('success', 'Logged out successfully');
+    context.openAlertBox('success', 'Đăng xuất thành công');
     navigate('/login');
   };
 
   return (
     <header className='bg-white shadow-sm'>
-      <div className='top-strip bg-gradient-to-r from-white to-gray-50 border-b border-gray-100 py-2'>
+      {/* Top strip - hidden on mobile */}
+      <div className='top-strip bg-gradient-to-r from-white to-gray-50 border-b border-gray-100 py-2 hidden md:block'>
         <div className='container'>
           <div className='flex justify-between items-center'>
             <div className='col1 w-[50%]'>
-              <p className='text-[12px] font-[500] text-gray-600'>Get up to 50% off new season styles — limited time only</p>
+              <p className='text-[12px] font-[500] text-gray-600'>Giảm giá đến 50% cho bộ sưu tập mới</p>
             </div>
             <div className='col2 flex items-center justify-end'>
               <ul className='flex items-center gap-4'>
                 <li className='list-none'>
-                  <Link to="help-center" className='link text-[13px] font-[500] text-gray-600 hover:text-gray-900 transition'>Help center</Link>
+                  <Link to="help-center" className='link text-[13px] font-[500] text-gray-600 hover:text-gray-900 transition'>Trợ giúp</Link>
                 </li>
                 <li className='list-none'>
-                  <Link to="order-tracking" className='link text-[13px] font-[500] text-gray-600 hover:text-gray-900 transition'>Order Tracking</Link>
+                  <Link to="order-tracking" className='link text-[13px] font-[500] text-gray-600 hover:text-gray-900 transition'>Theo dõi đơn hàng</Link>
                 </li>
               </ul>
             </div>
@@ -78,25 +79,27 @@ export const Header = () => {
         </div>
       </div>
 
-      <div className='header py-3'>
-        <div className='container flex items-center justify-between'>
-          <div className='col1 w-[25%] flex items-center'>
+      <div className='header py-2 md:py-3'>
+        <div className='container flex items-center justify-between gap-2 md:gap-4'>
+          {/* Logo */}
+          <div className='col1 w-auto md:w-[15%] flex items-center flex-shrink-0'>
             <Link to='/' className='flex items-center'>
-              <img src="/logo.webp" alt="logo image" className='h-16 object-contain' />
-
+              <img src="/logo.webp" alt="logo image" className='h-10 md:h-16 object-contain' />
             </Link>
           </div>
-          <div className='col2 w-[45%]'>
+          {/* Search - flexible width */}
+          <div className='col2 flex-1 md:w-[35%] min-w-0'>
             <Search />
           </div>
-          <div className='col3 w-[30%] flex items-center justify-end'>
-            <ul className='flex items-center gap-4'>
+          {/* Actions */}
+          <div className='col3 w-auto md:w-[45%] flex items-center justify-end flex-shrink-0'>
+            <ul className='flex items-center gap-1 md:gap-4'>
               <li className='list-none text-sm text-gray-700'>
                 {context.isLogin ? (
                   <div className='relative group'>
                     <div className='flex items-center gap-2 cursor-pointer'>
                       {/* Avatar - hiển thị ảnh nếu có, otherwise icon hoặc chữ cái */}
-                      <div className='w-10 h-10 rounded-full bg-[#ff5252] flex items-center justify-center text-white overflow-hidden'>
+                      <div className='w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#ff5252] flex items-center justify-center text-white overflow-hidden'>
                         {user?.avatar ? (
                           <img 
                             src={user.avatar} 
@@ -104,33 +107,33 @@ export const Header = () => {
                             className='w-full h-full object-cover'
                           />
                         ) : (
-                          <span className='text-lg font-semibold'>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                          <span className='text-sm md:text-lg font-semibold'>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
                         )}
                       </div>
-                      <div className='hidden sm:block'>
+                      <div className='hidden lg:block'>
                         <p className='text-[14px] font-[600] !m-0'>{user?.name}</p>
                         <p className='text-[11px] text-gray-500 !m-0'>{user?.email}</p>
                       </div>
                     </div>
                     
                     {/* Dropdown Menu */}
-                    <div className='absolute right-0 top-full pt-2 w-[80%] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50'>
+                    <div className='absolute right-0 top-full pt-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50'>
                       <div className='bg-white rounded-md shadow-lg border border-gray-100 py-2 font-semibold'>
                         <Link to='/my-account' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
                           <FiUser className='text-[20px]' />
-                          My Account
+                          Tài khoản của tôi
                         </Link>
                         <Link to='/address' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
                           <CiLocationOn className='text-[20px]' />
-                          Address
+                          Địa chỉ
                         </Link>
                         <Link to='/my-orders' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
                           <IoBagCheckOutline className='text-[20px]' />
-                          Orders
+                          Đơn hàng
                         </Link>
                         <Link to='/my-list' className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition'>
                           <GoHeart className='text-[20px] ' />
-                          My List
+                          Danh sách yêu thích
                         </Link>
                         <div className='border-t border-gray-100 mt-1 pt-1'>
                           <button 
@@ -138,7 +141,7 @@ export const Header = () => {
                             className='flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:bg-gray-50 transition w-full'
                           >
                             <IoLogOutOutline className='text-[20px]' />
-                            Logout
+                            Đăng xuất
                           </button>
                         </div>
                       </div>
@@ -147,17 +150,17 @@ export const Header = () => {
                 ) : (
                   <div className='flex items-center gap-2'>
                     <FaUserCircle className='text-xl text-gray-600' />
-                    <div className='hidden sm:flex gap-2'>
-                      <Link to='/login' className='link transition text-[15px] font-[500] hover:text-[#ff5252]'>Login</Link>
+                    <div className='hidden md:flex gap-2'>
+                      <Link to='/login' className='link transition text-[14px] font-[500] hover:text-[#ff5252]'>Đăng nhập</Link>
                       <span className='text-gray-400'>|</span>
-                      <Link to='/register' className='link transition text-[15px] font-[500] hover:text-[#ff5252]'>Register</Link>
+                      <Link to='/register' className='link transition text-[14px] font-[500] hover:text-[#ff5252]'>Đăng ký</Link>
                     </div>
                   </div>
                 )}
               </li>
-              <li>
+              <li className='hidden sm:block'>
                 <Tooltip title="So sánh">
-                  <IconButton aria-label="compare" component={Link} to="/compare">
+                  <IconButton aria-label="compare" component={Link} to="/compare" size="small">
                     <StyledBadge badgeContent={compareCount} color="secondary">
                       <IoIosGitCompare />
                     </StyledBadge>
@@ -165,26 +168,26 @@ export const Header = () => {
                 </Tooltip>
               </li>
               <li>
-                <Tooltip title="Cart">
-                  <IconButton aria-label="cart" onClick={()=>context.setOpenCartPanel(true)}>
+                <Tooltip title="Giỏ hàng">
+                  <IconButton aria-label="cart" onClick={()=>context.setOpenCartPanel(true)} size="small">
                     <StyledBadge badgeContent={4} color="secondary">
                       <BsCart3 />
                     </StyledBadge>
                   </IconButton>
                 </Tooltip>
               </li>
-              <li>
-                <Tooltip title="Wishlist">
-                  <IconButton aria-label="wishlist" component={Link} to="/my-list">
+              <li className='hidden sm:block'>
+                <Tooltip title="Danh sách yêu thích">
+                  <IconButton aria-label="wishlist" component={Link} to="/my-list" size="small">
                     <StyledBadge badgeContent={4} color="secondary">
                       <FaRegHeart />
                     </StyledBadge>
                   </IconButton>
                 </Tooltip>
               </li>
-              <li>
+              <li className='hidden md:block'>
                 <Tooltip title="Mã giảm giá">
-                  <IconButton aria-label="coupons" component={Link} to="/coupons">
+                  <IconButton aria-label="coupons" component={Link} to="/coupons" size="small">
                     <MdLocalOffer className="text-[20px] text-[#ff5252]" />
                   </IconButton>
                 </Tooltip>
