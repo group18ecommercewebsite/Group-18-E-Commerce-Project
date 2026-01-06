@@ -36,15 +36,17 @@ function sortObject(obj) {
     return sorted;
 }
 
-// Format date theo yêu cầu VNPay: yyyyMMddHHmmss
+// Format date theo yêu cầu VNPay: yyyyMMddHHmmss (Vietnam timezone UTC+7)
 function formatVNPayDate(date) {
+    // Chuyển sang Vietnam timezone (UTC+7)
+    const vnDate = new Date(date.getTime() + (7 * 60 * 60 * 1000)); // Add 7 hours
     const pad = (n) => n < 10 ? '0' + n : n;
-    return date.getFullYear().toString() +
-        pad(date.getMonth() + 1) +
-        pad(date.getDate()) +
-        pad(date.getHours()) +
-        pad(date.getMinutes()) +
-        pad(date.getSeconds());
+    return vnDate.getUTCFullYear().toString() +
+        pad(vnDate.getUTCMonth() + 1) +
+        pad(vnDate.getUTCDate()) +
+        pad(vnDate.getUTCHours()) +
+        pad(vnDate.getUTCMinutes()) +
+        pad(vnDate.getUTCSeconds());
 }
 
 /**
