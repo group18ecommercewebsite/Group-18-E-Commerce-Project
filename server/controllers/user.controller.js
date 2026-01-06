@@ -57,13 +57,13 @@ export async function registerUserController(request, response) {
 
         await user.save();
 
-        // Send verification email
-        await sendEmailFun({
+        // Send verification email (non-blocking để tránh timeout trên production)
+        sendEmailFun({
             sendTo: email,
             subject: "Verify email from Ecommerce App",
             text: "Verify email from Ecommerce App",
             html: VerificationEmail(name, verifyCode)
-        })
+        }).catch(err => console.error('Error sending email:', err));
 
         // Create a JWT token for vertification purposes
         const token = jwt.sign(
@@ -398,13 +398,13 @@ export async function updateUserDetails(request, response) {
         );
 
         if (email !== userExist.email) {
-            // Send vertification email
-            await sendEmailFun({
+            // Send vertification email (non-blocking)
+            sendEmailFun({
                 sendTo: email,
                 subject: "Verify email from Ecommerce",
                 text: "",
                 html: VerificationEmail(name, verifyCode)
-            })
+            }).catch(err => console.error('Error sending email:', err));
         }
 
         return response.json({
@@ -447,12 +447,13 @@ export async function forgotPasswordController(request, response) {
 
             await user.save(0);
 
-            await sendEmailFun({
+            // Send email (non-blocking)
+            sendEmailFun({
                 sendTo: email,
                 subject: "Verify email from Ecommerce",
                 text: "",
                 html: VerificationEmail(user.name, verifyCode)
-            })
+            }).catch(err => console.error('Error sending email:', err));
 
             return response.json({
                 message: "Check your email",
